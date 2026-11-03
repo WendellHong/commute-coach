@@ -1,0 +1,575 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<base target="_top">
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Commute Coach</title>
+<style>
+:root{--bg:#f4f6f8;--card:#fff;--ink:#17202a;--mut:#5a6672;--acc:#0b5fff;--ok:#12805c;--warn:#a15c00;--rec:#c4281c;--line:#dce1e6}
+@media (prefers-color-scheme:dark){:root{--bg:#0e1217;--card:#171d25;--ink:#eef1f4;--mut:#98a4b0;--acc:#6ea0ff;--ok:#4cc79a;--warn:#e0a24a;--rec:#ff7a6e;--line:#29313c}}
+*{box-sizing:border-box}
+body{margin:0;background:var(--bg);color:var(--ink);font:16px/1.5 system-ui,-apple-system,sans-serif}
+main{max-width:660px;margin:0 auto;padding:12px 16px 40px}
+header{display:flex;justify-content:space-between;align-items:baseline;margin:4px 0 10px}
+header b{font-size:20px}header span{font-size:12px;color:var(--mut)}
+nav{display:flex;gap:6px;margin-bottom:12px}
+nav button{flex:1;padding:10px 4px;border:1px solid var(--line);background:var(--card);color:var(--ink);border-radius:10px;font-size:14px}
+nav button.on{border-color:var(--acc);color:var(--acc);font-weight:600}
+.card{background:var(--card);border:1px solid var(--line);border-radius:14px;padding:16px;margin-bottom:12px}
+h1{font-size:20px;margin:0 0 4px}h2{font-size:17px;margin:0 0 8px}h3{font-size:15px;margin:14px 0 4px}
+.mut{color:var(--mut);font-size:14px}
+button.big{width:100%;padding:18px;font-size:19px;font-weight:600;border:0;border-radius:14px;background:var(--acc);color:#fff;margin-top:10px}
+button.big:disabled{opacity:.5}
+button.alt{padding:11px 14px;border:1px solid var(--line);background:var(--card);color:var(--ink);border-radius:10px;font-size:15px;margin:6px 6px 0 0}
+input[type=text],input[type=password]{width:100%;padding:10px;border:1px solid var(--line);border-radius:10px;background:var(--bg);color:var(--ink);font-size:15px;margin:4px 0 8px}
+.sess{display:flex;justify-content:space-between;align-items:center;gap:8px;padding:12px;border:1px solid var(--line);border-radius:10px;margin-top:8px}
+.sess.sel{border-color:var(--acc)}
+.state{font-size:26px;font-weight:700;margin:4px 0}.state.rec{color:var(--rec)}.state.say{color:var(--acc)}
+.bar{height:8px;background:var(--line);border-radius:6px;overflow:hidden;margin:8px 0}
+.bar i{display:block;height:100%;background:var(--acc);width:0}
+.meter{height:10px;background:var(--line);border-radius:6px;overflow:hidden}
+.meter i{display:block;height:100%;width:0;background:var(--rec)}
+.cap{min-height:190px;margin-top:12px}
+.cap .p,.cap .n{color:var(--mut);font-size:15px;margin:6px 0}
+.cap .c{font-size:21px;line-height:1.4;font-weight:600;margin:8px 0}
+.cap .who{font-size:12px;text-transform:uppercase;letter-spacing:.06em;color:var(--acc)}
+textarea{width:100%;min-height:110px;border:1px solid var(--line);border-radius:10px;background:var(--bg);color:var(--ink);padding:10px;font:14px/1.4 ui-monospace,monospace}
+.h{border-top:1px solid var(--line);padding-top:10px;margin-top:10px}
+.lab{font-size:12px;text-transform:uppercase;letter-spacing:.05em;color:var(--mut)}
+.fb{background:var(--bg);border-left:3px solid var(--ok);padding:8px 10px;border-radius:6px;margin-top:6px}
+.hide{display:none!important}
+.chk{display:flex;gap:10px;align-items:flex-start;padding:7px 0;border-top:1px solid var(--line);font-size:14px}
+.chk:first-of-type{border-top:0}
+.dot{width:12px;height:12px;border-radius:50%;margin-top:6px;flex:none;background:var(--line)}
+.dot.ok{background:var(--ok)}.dot.bad{background:var(--rec)}.dot.warn{background:var(--warn)}
+.flow{display:grid;gap:6px;margin:8px 0}
+.step{display:grid;grid-template-columns:30px 1fr;gap:10px;padding:10px;border:1px solid var(--line);border-radius:10px;font-size:14px}
+.step b.n{display:flex;align-items:center;justify-content:center;width:26px;height:26px;border-radius:50%;background:var(--acc);color:#fff;font-size:13px}
+.step .who{font-size:11px;text-transform:uppercase;letter-spacing:.05em;color:var(--mut)}
+.ver{padding:8px 0;border-top:1px solid var(--line);font-size:14px}.ver ul{margin:4px 0 0 18px;padding:0}
+label.row{display:flex;gap:8px;align-items:center;font-size:14px;margin:6px 0}
+</style>
+</head>
+<body>
+<main>
+<header><b>Commute Coach</b><span id="vtag">v1.2.0</span></header>
+<nav>
+  <button id="t-home" class="on">Today</button>
+  <button id="t-review">Review</button>
+  <button id="t-sync">Sync</button>
+  <button id="t-guide">Guide</button>
+</nav>
+
+<section id="v-home">
+  <div class="card">
+    <h1>Today's session</h1>
+    <div class="mut">Start it while parked and mount the phone. After one tap it plays, listens for your answers and moves on by itself.</div>
+    <div id="list"></div>
+    <div class="mut" id="prep" style="margin-top:8px"></div>
+    <button class="big" id="start" disabled>Loading...</button>
+    <div class="mut" id="micnote" style="margin-top:8px"></div>
+  </div>
+</section>
+
+<section id="v-play" class="hide">
+  <div class="card">
+    <div class="mut" id="p-block"></div>
+    <div class="state" id="p-state">Ready</div>
+    <div class="bar"><i id="p-bar"></i></div>
+    <div class="mut" id="p-time"></div>
+    <div class="meter"><i id="p-meter"></i></div>
+    <div class="cap" id="cap"></div>
+    <button class="alt" id="b-pause">Pause</button>
+    <button class="alt" id="b-skip">Skip</button>
+    <button class="alt" id="b-stop">Stop</button>
+  </div>
+</section>
+
+<section id="v-done" class="hide">
+  <div class="card">
+    <h2>Session finished</h2>
+    <div id="d-sum" class="mut"></div>
+    <div class="h"><div class="lab">Confidence now (1 to 10)</div>
+      <input id="conf" type="range" min="1" max="10" value="6" style="width:100%">
+      <div id="conf-v" class="state">6</div></div>
+    <button class="big" id="save-done">Save and finish</button>
+  </div>
+</section>
+
+<section id="v-review" class="hide"><div class="card"><h2>What I said and what Claude replied</h2><div id="hist" class="mut">Loading...</div></div></section>
+
+<section id="v-sync" class="hide">
+  <div class="card">
+    <h2>1. Copy my answers for Claude</h2>
+    <div class="mut">Paste the result into the Claude chat. Claude replies with feedback and tomorrow's session.</div>
+    <button class="alt" id="exp">Build text for this session</button>
+    <textarea id="exp-t" readonly></textarea>
+    <button class="alt" id="copy">Copy</button>
+  </div>
+  <div class="card">
+    <h2>2. Import what Claude sent back</h2>
+    <textarea id="imp-t" placeholder='{"content":[...],"audio":[...],"feedback":[...]}'></textarea>
+    <button class="alt" id="imp">Import</button>
+    <div id="imp-m" class="mut"></div>
+  </div>
+  <div class="card">
+    <h2>Optional: automatic feedback</h2>
+    <div class="mut">Needs your own API key in the Apps Script properties; it costs API usage.</div>
+    <button class="alt" id="auto">Get feedback now</button>
+    <div id="auto-m" class="mut"></div>
+  </div>
+</section>
+
+<section id="v-guide" class="hide">
+  <div class="card">
+    <h2>Connection</h2>
+    <div id="cfg-url-wrap"><div class="lab">Apps Script web app URL (ends in /exec)</div><input id="cfg-url" type="text" placeholder="https://script.google.com/macros/s/.../exec"></div>
+    <div class="lab">API token (from the Apps Script log)</div><input id="cfg-tok" type="password" placeholder="token">
+    <label class="row"><input id="cfg-stt" type="checkbox" checked> Transcribe my answers with the browser (needs Chrome, Edge or Safari)</label>
+    <button class="alt" id="cfg-save">Save and check</button>
+  </div>
+  <div class="card"><h2>Checks</h2><div id="checks" class="mut">Press "Save and check".</div>
+    <button class="alt" id="mic-test">Test microphone</button>
+    <div class="meter" style="margin-top:8px"><i id="mic-meter"></i></div></div>
+  <div class="card">
+    <h2>How the app works</h2>
+    <div class="flow">
+      <div class="step"><b class="n">1</b><div><div class="who">Claude, in your project chat</div>Writes the session: spoken script, answer windows, and the MP3 audio with caption timings.</div></div>
+      <div class="step"><b class="n">2</b><div><div class="who">You, once per session, 2 minutes</div>Paste Claude's JSON into Sync, Import. Upload the MP3 files to the Drive folder "Commute Coach audio" and run registerAudio in Apps Script.</div></div>
+      <div class="step"><b class="n">3</b><div><div class="who">This page</div>Downloads the audio once and keeps it on your device, so later plays start fast.</div></div>
+      <div class="step"><b class="n">4</b><div><div class="who">Your commute</div>Tap Start while parked. The coach and interviewer speak; captions follow. At each chime the microphone opens; stop talking for a few seconds and it moves on.</div></div>
+      <div class="step"><b class="n">5</b><div><div class="who">Saved automatically</div>Each answer goes to the Google Sheet (transcript, length) and your recording to Drive.</div></div>
+      <div class="step"><b class="n">6</b><div><div class="who">Evening, Sync tab</div>Build the text of your answers, copy it, paste it into the Claude chat.</div></div>
+      <div class="step"><b class="n">7</b><div><div class="who">Claude</div>Replies with feedback and the next session. Import it, and the cycle repeats. Feedback shows in the Review tab.</div></div>
+    </div>
+    <h3>Where things live</h3>
+    <div class="mut">Google Sheet "Commute Coach data": Content, Responses, Feedback, Log, Audio, Versions. Drive folder "Commute Coach audio": lesson MP3s and your answer recordings. This page: only your settings and a cached copy of the audio.</div>
+    <h3>If the microphone does not ask for permission</h3>
+    <div class="mut">The page must be opened from its own https address (GitHub Pages or similar), not inside Google's Apps Script page or another app's embedded view. On iPhone use Safari, tap the aA icon, Website Settings, Microphone, Allow. On a PC click the lock icon next to the address, allow Microphone, and reload.</div>
+  </div>
+  <div class="card"><h2>Versions</h2>
+    <div class="mut" id="vinfo"></div><div id="vlist"></div></div>
+</section>
+</main>
+
+<script>
+var APP_VERSION = '1.2.0';
+var LOCAL_CHANGES = [
+  { v: '1.2.0', date: '2026-11-01', notes: ['Hosted page so the microphone prompt works', 'Captions follow the audio', 'Faster audio with on-device cache', 'Guide tab and version history'] },
+  { v: '1.1.0', date: '2026-11-01', notes: ['Studio-quality MP3 playback with answer windows'] },
+  { v: '1.0.0', date: '2026-11-01', notes: ['First version'] }
+];
+var FAST = !!window.__FAST;
+var IS_AS = !!(window.google && google.script && google.script.run);
+var $ = function (id) { return document.getElementById(id); };
+function sleep(ms) { return new Promise(function (r) { setTimeout(r, FAST ? Math.min(ms, 30) : ms); }); }
+function esc(s) { return String(s == null ? '' : s).replace(/[&<>]/g, function (c) { return { '&': '&amp;', '<': '&lt;', '>': '&gt;' }[c]; }); }
+function pretty(t) { return String(t).replace(/\b[A-Z](?: [A-Z](?![a-z]))+\b/g, function (m) { return m.replace(/ /g, ''); }); }
+
+/* ---- settings ---- */
+var cfg = { url: '', token: '', stt: true };
+try { var saved = JSON.parse(localStorage.getItem('cc.cfg') || '{}'); for (var k in saved) cfg[k] = saved[k]; } catch (e) {}
+function saveCfg() { try { localStorage.setItem('cc.cfg', JSON.stringify(cfg)); } catch (e) {} }
+var backendVersion = '';
+
+/* ---- API (hosted page uses fetch; Apps Script fallback uses google.script.run) ---- */
+async function call(action, p) {
+  p = p || {};
+  if (IS_AS) {
+    var r = await new Promise(function (ok, bad) { google.script.run.withSuccessHandler(ok).withFailureHandler(function (e) { bad(new Error(e && e.message || e)); }).api(action, p, cfg.token); });
+    return unwrap(r);
+  }
+  if (!cfg.url) throw new Error('no_url');
+  var big = { audio: 1, response: 1, log: 1, 'import': 1 }[action];
+  var res = big
+    ? await fetch(cfg.url, { method: 'POST', headers: { 'Content-Type': 'text/plain;charset=utf-8' }, body: JSON.stringify({ action: action, p: p, token: cfg.token }) })
+    : await fetch(cfg.url + '?action=' + action + '&token=' + encodeURIComponent(cfg.token) + '&p=' + encodeURIComponent(JSON.stringify(p)));
+  return unwrap(await res.json());
+}
+function unwrap(j) { if (!j || !j.ok) throw new Error(j && j.error || 'bad_response'); backendVersion = j.version || backendVersion; return j.data; }
+
+/* ---- tabs ---- */
+var views = ['home', 'play', 'done', 'review', 'sync', 'guide'];
+function show(v) {
+  views.forEach(function (x) { $('v-' + x).classList.toggle('hide', x !== v); });
+  ['home', 'review', 'sync', 'guide'].forEach(function (x) { $('t-' + x).classList.toggle('on', x === v); });
+}
+var running = false;
+$('t-home').onclick = function () { if (!running) show('home'); };
+$('t-review').onclick = function () { if (!running) { show('review'); loadHist(); } };
+$('t-sync').onclick = function () { if (!running) show('sync'); };
+$('t-guide').onclick = function () { if (!running) { show('guide'); loadGuide(); } };
+$('vtag').textContent = 'v' + APP_VERSION;
+
+/* ---- session list + audio prefetch ---- */
+var sessions = [], chosen = null, items = [], audioMeta = {}, blobUrls = {}, loading = {};
+function renderList() {
+  var h = '';
+  sessions.forEach(function (s) {
+    h += '<div class="sess ' + (chosen === s.session ? 'sel' : '') + '" data-s="' + s.session + '"><div><b>Session ' + s.session +
+         '</b><div class="mut">' + esc(s.title) + '</div></div><div class="mut">' + (s.done ? 'done' : 'new') + '</div></div>';
+  });
+  $('list').innerHTML = h || '<div class="mut">No sessions yet. Open the Guide tab to connect.</div>';
+  Array.prototype.forEach.call(document.querySelectorAll('.sess'), function (el) {
+    el.onclick = function () { chosen = Number(el.dataset.s); renderList(); setStart(); prefetch(); };
+  });
+}
+function setStart() { $('start').disabled = !chosen; $('start').textContent = chosen ? 'Start session ' + chosen : 'Pick a session'; }
+async function loadSessions() {
+  if (!cfg.token || (!IS_AS && !cfg.url)) { $('list').innerHTML = '<div class="mut">Not connected yet. Open the Guide tab, enter the URL and token.</div>'; $('start').textContent = 'Not connected'; return; }
+  try {
+    sessions = await call('sessions');
+    var next = sessions.filter(function (s) { return !s.done; })[0] || sessions[sessions.length - 1];
+    chosen = next ? next.session : null; renderList(); setStart(); prefetch();
+  } catch (e) { $('list').innerHTML = '<div class="mut">Could not reach your sheet: ' + esc(e.message) + '. Check the Guide tab.</div>'; $('start').textContent = 'Not connected'; }
+}
+
+/* IndexedDB cache for audio */
+function idb() {
+  return new Promise(function (ok, bad) {
+    try { var r = indexedDB.open('cc', 1); r.onupgradeneeded = function () { r.result.createObjectStore('audio'); }; r.onsuccess = function () { ok(r.result); }; r.onerror = function () { bad(r.error); }; }
+    catch (e) { bad(e); }
+  });
+}
+async function idbGet(key) { try { var d = await idb(); return await new Promise(function (ok) { var q = d.transaction('audio').objectStore('audio').get(key); q.onsuccess = function () { ok(q.result || null); }; q.onerror = function () { ok(null); }; }); } catch (e) { return null; } }
+async function idbPut(key, val) { try { var d = await idb(); d.transaction('audio', 'readwrite').objectStore('audio').put(val, key); } catch (e) {} }
+function b64bytes(s) { var bin = atob(s), u = new Uint8Array(bin.length); for (var i = 0; i < bin.length; i++) u[i] = bin.charCodeAt(i); return u; }
+async function fetchAudio(meta, onProg) {
+  var key = meta.fileId + '|' + (meta.file || '');
+  var cached = await idbGet(key);
+  if (cached) return URL.createObjectURL(cached);
+  var first = await call('audioChunk', { fileId: meta.fileId, i: 0 });
+  var parts = [b64bytes(first.b64)], done = 1;
+  if (onProg) onProg(done, first.n);
+  var rest = [];
+  for (var i = 1; i < first.n; i++) rest.push((function (i) { return call('audioChunk', { fileId: meta.fileId, i: i }).then(function (c) { parts[i] = b64bytes(c.b64); done++; if (onProg) onProg(done, first.n); }); })(i));
+  await Promise.all(rest);
+  var blob = new Blob(parts, { type: first.mime || 'audio/mpeg' });
+  idbPut(key, blob);
+  return URL.createObjectURL(blob);
+}
+function blockUrl(blk) {
+  if (blobUrls[blk]) return Promise.resolve(blobUrls[blk]);
+  if (!loading[blk]) loading[blk] = fetchAudio(audioMeta[blk], function (d, n) { $('prep').textContent = 'Preparing audio... ' + blk + ' ' + d + '/' + n; })
+    .then(function (u) { blobUrls[blk] = u; return u; });
+  return loading[blk];
+}
+async function prefetch() {
+  blobUrls = {}; loading = {}; audioMeta = {}; $('prep').textContent = '';
+  if (!chosen) return;
+  try {
+    audioMeta = await call('audioMeta', { n: chosen });
+    var blks = Object.keys(audioMeta);
+    if (!blks.length) { $('prep').textContent = 'No studio audio registered for this session: the phone voice will be used.'; return; }
+    $('prep').textContent = 'Preparing audio...';
+    for (var i = 0; i < blks.length; i++) await blockUrl(blks[i]);
+    $('prep').textContent = 'Audio ready on this device (' + blks.length + ' parts).';
+  } catch (e) { $('prep').textContent = 'Audio not ready: ' + e.message; }
+}
+
+/* ---- speech (phone voice fallback) ---- */
+var voices = [];
+function loadVoices() { voices = (window.speechSynthesis && speechSynthesis.getVoices()) || []; }
+if (window.speechSynthesis) { loadVoices(); speechSynthesis.onvoiceschanged = loadVoices; }
+function pick(role) {
+  var en = voices.filter(function (v) { return /^en[-_]US/i.test(v.lang); });
+  if (!en.length) en = voices.filter(function (v) { return /^en/i.test(v.lang); });
+  var re = role === 'interviewer' ? /(daniel|alex|guy|david|male|aaron|fred)/i : /(samantha|aria|jenny|zira|female|google us english|karen)/i;
+  return en.filter(function (v) { return re.test(v.name); })[0] || en[role === 'interviewer' ? en.length - 1 : 0] || null;
+}
+var paused = false, skipFlag = false, stopFlag = false;
+function speakOne(text, role) {
+  return new Promise(function (res) {
+    if (!window.speechSynthesis || FAST) return res();
+    var u = new SpeechSynthesisUtterance(text), v = pick(role); if (v) u.voice = v;
+    u.lang = 'en-US'; u.rate = 0.95; u.pitch = role === 'interviewer' ? 0.85 : 1; u.onend = res; u.onerror = res;
+    speechSynthesis.speak(u);
+  });
+}
+async function say(text, role) {
+  var parts = text.split(/(?<=[.?!])\s+/);
+  for (var i = 0; i < parts.length; i++) {
+    if (skipFlag || stopFlag) break;
+    while (paused && !stopFlag) await sleep(200);
+    showCap(null, pretty(parts[i]), null, role); await speakOne(parts[i], role); await sleep(250);
+  }
+  if (window.speechSynthesis) speechSynthesis.cancel();
+}
+var actx = null;
+function beep(f) {
+  try { actx = actx || new (window.AudioContext || window.webkitAudioContext)();
+    var o = actx.createOscillator(), g = actx.createGain(); o.frequency.value = f || 700; g.gain.value = 0.15;
+    o.connect(g); g.connect(actx.destination); o.start(); o.stop(actx.currentTime + 0.18); } catch (e) {}
+}
+function showCap(prev, cur, next, role) {
+  $('cap').innerHTML = (prev ? '<div class="p">' + esc(prev) + '</div>' : '') +
+    '<div class="who">' + (role === 'interviewer' ? 'Interviewer' : role === 'you' ? 'Your turn' : 'Coach') + '</div>' +
+    '<div class="c">' + esc(cur) + '</div>' + (next ? '<div class="n">' + esc(next) + '</div>' : '');
+}
+
+/* ---- microphone + recording ---- */
+var stream = null, micError = '', SR = window.SpeechRecognition || window.webkitSpeechRecognition, pending = [];
+async function openMic() {
+  micError = '';
+  if (!navigator.mediaDevices || !navigator.mediaDevices.getUserMedia) { micError = 'unsupported'; return false; }
+  try { stream = await navigator.mediaDevices.getUserMedia({ audio: { echoCancellation: true, noiseSuppression: true } }); return true; }
+  catch (e) { stream = null; micError = (e && e.name) || 'error'; return false; }
+}
+function micAdvice() {
+  var sandbox = IS_AS || window.top !== window.self;
+  if (sandbox) return 'This page is running inside a frame (Google Apps Script or an app viewer), which blocks the microphone. Open the hosted https page directly in Safari or Chrome.';
+  if (micError === 'NotAllowedError' || micError === 'PermissionDeniedError') return 'Microphone is blocked for this site. iPhone: aA menu, Website Settings, Microphone, Allow. PC: lock icon next to the address, allow Microphone, reload.';
+  if (micError === 'NotFoundError') return 'No microphone was found.';
+  if (micError === 'unsupported') return 'This browser or address cannot use the microphone (it needs https).';
+  return 'Microphone error: ' + micError;
+}
+function b64(blob) { return new Promise(function (r) { var f = new FileReader(); f.onload = function () { r(String(f.result).split(',')[1]); }; f.readAsDataURL(blob); }); }
+function beginRec() {
+  var R = { chunks: [], mime: '', transcript: '', rec: null, an: null, buf: null, t0: Date.now(), mr: null };
+  try {
+    R.mime = MediaRecorder.isTypeSupported('audio/webm') ? 'audio/webm' : (MediaRecorder.isTypeSupported('audio/mp4') ? 'audio/mp4' : '');
+    R.mr = new MediaRecorder(stream, R.mime ? { mimeType: R.mime } : undefined);
+  } catch (e) { return null; }
+  R.mr.ondataavailable = function (e) { if (e.data && e.data.size) R.chunks.push(e.data); };
+  if (SR && cfg.stt && !FAST) {
+    try { R.rec = new SR(); R.rec.lang = 'en-US'; R.rec.continuous = true; R.rec.interimResults = false;
+      R.rec.onresult = function (e) { for (var i = e.resultIndex; i < e.results.length; i++) if (e.results[i].isFinal) R.transcript += e.results[i][0].transcript + ' '; };
+      R.rec.onerror = function () {}; R.rec.start(); } catch (e) { R.rec = null; }
+  }
+  try { actx = actx || new (window.AudioContext || window.webkitAudioContext)();
+    var src = actx.createMediaStreamSource(stream); R.an = actx.createAnalyser(); R.an.fftSize = 512; src.connect(R.an); R.buf = new Uint8Array(R.an.fftSize); } catch (e) {}
+  R.mr.start();
+  return R;
+}
+function level(R, meterId) {
+  if (!R || !R.an) return 0;
+  R.an.getByteTimeDomainData(R.buf);
+  var s = 0; for (var i = 0; i < R.buf.length; i++) { var d = (R.buf[i] - 128) / 128; s += d * d; }
+  var lv = Math.sqrt(s / R.buf.length);
+  $(meterId || 'p-meter').style.width = Math.min(100, lv * 400) + '%';
+  return lv;
+}
+async function finishRec(R, item, prompt) {
+  $('p-meter').style.width = '0';
+  await new Promise(function (r) { R.mr.onstop = r; try { R.mr.stop(); } catch (e) { r(); } });
+  if (R.rec) { try { R.rec.stop(); } catch (e) {} }
+  var dur = Math.round((Date.now() - R.t0) / 1000), blob = new Blob(R.chunks, { type: R.mime || 'audio/webm' });
+  pending.push((async function () {
+    var a = { id: '', url: '' };
+    try { if (blob.size > 0 && blob.size < 6000000) a = await call('audio', { session: item.session, block: item.block, seq: item.seq, b64: await b64(blob), mime: R.mime || 'audio/webm' }); } catch (e) {}
+    await call('response', { session: item.session, block: item.block, seq: item.seq, prompt: prompt.slice(0, 500), transcript: R.transcript.trim(), durationSec: dur, audioFileId: a.id, audioUrl: a.url });
+  })().catch(function () {}));
+}
+async function recordTts(item, prompt) {
+  var maxMs = item.sec * 1000;
+  showCap(null, pretty(prompt), null, 'you');
+  if (!stream) { beep(700); $('p-state').textContent = 'Your turn (no mic)'; $('p-state').className = 'state rec';
+    var t = Date.now(); while (!stopFlag && !skipFlag && Date.now() - t < (FAST ? 100 : maxMs)) await sleep(200); beep(520); return; }
+  beep(700);
+  var R = beginRec(); if (!R) return;
+  $('p-state').textContent = 'Your turn'; $('p-state').className = 'state rec';
+  var spoke = false, lastVoice = Date.now();
+  while (!stopFlag && !skipFlag && (Date.now() - R.t0) < (FAST ? 300 : maxMs)) {
+    await sleep(120);
+    var lv = level(R); if (lv > 0.03) { spoke = true; lastVoice = Date.now(); }
+    if (spoke && Date.now() - lastVoice > 3500 && (Date.now() - R.t0) > 6000) break;
+  }
+  beep(520); await finishRec(R, item, prompt);
+}
+
+/* ---- studio audio: captions + answer windows driven by the audio clock ---- */
+var player = null, SILENT = 'data:audio/wav;base64,UklGRiQAAABXQVZFZm10IBAAAAABAAEAQB8AAEAfAAABAAgAZGF0YQAAAAA=';
+function promptFor(bItems, seq) {
+  var last = '';
+  for (var i = 0; i < bItems.length; i++) { if (bItems[i].seq === seq) return last; if (bItems[i].type === 'say') last = bItems[i].text; }
+  return last;
+}
+function fmt(s) { s = Math.max(0, Math.floor(s)); return Math.floor(s / 60) + ':' + ('0' + (s % 60)).slice(-2); }
+async function playBlockAudio(blk, bItems) {
+  var meta = audioMeta[blk];
+  $('p-state').textContent = 'Loading audio...'; $('p-state').className = 'state';
+  player.src = await blockUrl(blk);
+  if (FAST) player.playbackRate = 16;
+  var caps = meta.captions || [], cues = meta.cues || [];
+  await new Promise(function (resolve) {
+    var ci = 0, ki = 0, active = null, busy = false, finished = false;
+    player.onended = function () { finished = true; };
+    player.onerror = function () { finished = true; };
+    player.play().catch(function () { finished = true; });
+    var timer = setInterval(async function () {
+      if (busy) return; busy = true;
+      try {
+        var t = player.currentTime, dur = player.duration || meta.durationSec || 1;
+        $('p-bar').style.width = Math.min(100, 100 * t / dur) + '%';
+        $('p-time').textContent = fmt(t) + ' / ' + fmt(dur);
+        if (stopFlag || finished) {
+          clearInterval(timer);
+          if (active) { if (active.R) await finishRec(active.R, active.item, active.prompt); active = null; }
+          player.pause(); resolve(); return;
+        }
+        if (skipFlag) {
+          skipFlag = false;
+          if (active) active.force = true;
+          else if (ci < cues.length) player.currentTime = Math.max(0, cues[ci].start - 0.3);
+        }
+        if (!active && ci < cues.length) {
+          var c = cues[ci];
+          if (t >= c.start && t < c.end - 0.8) {
+            var item = bItems.filter(function (x) { return x.seq === c.seq; })[0] || { session: chosen, block: blk, seq: c.seq };
+            var prompt = promptFor(bItems, c.seq);
+            active = { c: c, item: item, prompt: prompt, R: stream ? beginRec() : null, spoke: false, lastVoice: t, force: false };
+            $('p-state').textContent = active.R ? 'Your turn' : 'Your turn (no mic)'; $('p-state').className = 'state rec';
+            showCap(null, pretty(prompt), null, 'you');
+          } else if (t >= c.end - 0.8) ci++;
+        }
+        if (active) {
+          var lv = active.R ? level(active.R) : 0;
+          if (lv > 0.03) { active.spoke = true; active.lastVoice = t; }
+          var left = Math.max(0, Math.round(active.c.end - 0.6 - t));
+          $('p-time').textContent = 'Answer time left about ' + left + ' s. Stop talking for 3 s to continue.';
+          if (active.force || t >= active.c.end - 0.6 || (active.spoke && t - active.lastVoice > 3.5 && t - active.c.start > 6)) {
+            if (t < active.c.end - 1) player.currentTime = active.c.end - 0.6;
+            var a = active; active = null; ci++;
+            if (a.R) await finishRec(a.R, a.item, a.prompt);
+            $('p-state').textContent = 'Coach'; $('p-state').className = 'state say';
+          }
+        } else {
+          while (ki < caps.length - 1 && t >= caps[ki].t1 + 0.05) ki++;
+          while (ki > 0 && t < caps[ki].t0 - 0.2) ki--;
+          if (caps.length && t >= caps[ki].t0 - 0.2) {
+            var cp = caps[ki];
+            $('p-state').textContent = cp.voice === 'interviewer' ? 'Interviewer' : 'Coach'; $('p-state').className = 'state say';
+            showCap(ki > 0 ? pretty(caps[ki - 1].text) : '', pretty(cp.text), ki + 1 < caps.length ? pretty(caps[ki + 1].text) : '', cp.voice);
+          }
+        }
+      } finally { busy = false; }
+    }, FAST ? 40 : 100);
+  });
+}
+
+/* ---- run a session ---- */
+async function wakeLock() { try { if (navigator.wakeLock) await navigator.wakeLock.request('screen'); } catch (e) {} }
+$('start').onclick = async function () {
+  if (!chosen || running) return;
+  running = true; stopFlag = false; paused = false; pending = [];
+  player = new Audio(); player.src = SILENT; player.play().catch(function () {}); // unlock audio inside the tap
+  var ok = await openMic();
+  $('micnote').textContent = ok ? '' : micAdvice() + ' Playing in listen-only mode.';
+  try { items = await call('session', { n: chosen }); } catch (e) { $('micnote').textContent = 'Could not load the session: ' + e.message; running = false; return; }
+  wakeLock(); show('play');
+  var blocks = [], seen = {};
+  items.forEach(function (it) { if (!seen[it.block]) { seen[it.block] = 1; blocks.push(it.block); } });
+  var names = { mindset: 'Mindset', interview: 'Interview', market: 'Market' }, answered = 0;
+  for (var bi = 0; bi < blocks.length && !stopFlag; bi++) {
+    var blk = blocks[bi], bItems = items.filter(function (x) { return x.block === blk; });
+    $('p-block').textContent = 'Session ' + chosen + ' - ' + (names[blk] || blk) + ' (' + (bi + 1) + ' of ' + blocks.length + ')';
+    if (audioMeta[blk]) {
+      try { await playBlockAudio(blk, bItems); answered += (audioMeta[blk].cues || []).length; continue; }
+      catch (e) { $('micnote').textContent = 'Audio failed to load, using the phone voice for this part.'; }
+    }
+    var lastSay = '';
+    for (var j = 0; j < bItems.length && !stopFlag; j++) {
+      var it = bItems[j]; skipFlag = false;
+      $('p-bar').style.width = Math.round(100 * (bi + j / bItems.length) / blocks.length) + '%';
+      while (paused && !stopFlag) await sleep(200);
+      if (it.type === 'say') { $('p-state').textContent = it.voice === 'interviewer' ? 'Interviewer' : 'Coach'; $('p-state').className = 'state say'; lastSay = it.text; await say(it.text, it.voice); }
+      else if (it.type === 'record') { await recordTts(it, lastSay); answered++; }
+      else { $('p-state').textContent = 'Pause'; $('p-state').className = 'state'; await sleep(it.sec * 1000); }
+    }
+  }
+  if (window.speechSynthesis) speechSynthesis.cancel();
+  if (player) player.pause();
+  if (stream) { stream.getTracks().forEach(function (t) { t.stop(); }); stream = null; }
+  $('p-state').textContent = 'Saving...';
+  await Promise.all(pending);
+  running = false;
+  $('d-sum').textContent = answered + ' answer windows finished. Your answers are saved to the sheet.';
+  show('done');
+};
+$('b-pause').onclick = function () {
+  paused = !paused; $('b-pause').textContent = paused ? 'Resume' : 'Pause';
+  if (player && player.src && player.src.indexOf('data:') !== 0 && !player.ended) { paused ? player.pause() : player.play(); }
+  if (window.speechSynthesis) paused ? speechSynthesis.pause() : speechSynthesis.resume();
+};
+$('b-skip').onclick = function () { skipFlag = true; if (window.speechSynthesis) speechSynthesis.cancel(); };
+$('b-stop').onclick = function () { stopFlag = true; skipFlag = true; paused = false; if (player) player.pause(); if (window.speechSynthesis) speechSynthesis.cancel(); };
+$('conf').oninput = function () { $('conf-v').textContent = $('conf').value; };
+$('save-done').onclick = async function () {
+  $('save-done').disabled = true;
+  try { await call('log', { session: chosen, confidence: Number($('conf').value), note: '' }); sessions = await call('sessions'); renderList(); setStart(); } catch (e) {}
+  $('save-done').disabled = false; show('home');
+};
+
+/* ---- review ---- */
+async function loadHist() {
+  try {
+    var h = await call('history', { limit: 40 }), out = '';
+    if (!h.length) { $('hist').textContent = 'Nothing recorded yet.'; return; }
+    h.forEach(function (r) {
+      out += '<div class="h"><div class="lab">Session ' + esc(r.session) + ' - ' + esc(r.block) + ' - ' + esc(r.durationSec) + 's</div>' +
+        '<div class="mut">Claude asked: ' + esc(String(r.prompt).slice(0, 220)) + '</div>' +
+        '<div><b>I said:</b> ' + (esc(r.transcript) || '<span class="mut">(no transcript)</span>') + '</div>' +
+        (r.feedback ? '<div class="fb"><b>Claude:</b> ' + esc(r.feedback) + (r.suggestion ? '<br><b>Try:</b> ' + esc(r.suggestion) : '') + '</div>' : '<div class="mut">No feedback yet.</div>') + '</div>';
+    });
+    $('hist').innerHTML = out;
+  } catch (e) { $('hist').textContent = 'Could not load: ' + e.message; }
+}
+
+/* ---- sync ---- */
+$('exp').onclick = async function () { try { $('exp-t').value = await call('export', { n: chosen || 1 }); } catch (e) { $('exp-t').value = 'Error: ' + e.message; } };
+$('copy').onclick = function () { var t = $('exp-t'); t.select(); try { navigator.clipboard.writeText(t.value); } catch (e) { document.execCommand('copy'); } };
+$('imp').onclick = async function () {
+  try { $('imp-m').textContent = await call('import', { json: $('imp-t').value }); sessions = await call('sessions'); renderList(); setStart(); }
+  catch (e) { $('imp-m').textContent = 'Error: ' + e.message; }
+};
+$('auto').onclick = async function () { $('auto-m').textContent = 'Working...'; try { $('auto-m').textContent = await call('feedback', { n: chosen || 1 }); } catch (e) { $('auto-m').textContent = e.message; } };
+
+/* ---- guide: settings, checks, versions ---- */
+function chk(state, text) { return '<div class="chk"><span class="dot ' + state + '"></span><div>' + text + '</div></div>'; }
+async function loadGuide() {
+  $('cfg-url').value = cfg.url || ''; $('cfg-tok').value = cfg.token || ''; $('cfg-stt').checked = cfg.stt !== false;
+  $('cfg-url-wrap').classList.toggle('hide', IS_AS);
+  var h = '', vs = LOCAL_CHANGES;
+  h += chk(window.isSecureContext ? 'ok' : 'bad', window.isSecureContext ? 'Secure (https) page' : 'Not a secure page: the microphone will not work');
+  var framed = IS_AS || window.top !== window.self;
+  h += chk(framed ? 'bad' : 'ok', framed ? 'Page is inside a frame: the microphone is blocked here. Use the hosted https address.' : 'Page is opened directly (microphone can prompt)');
+  h += chk(SR ? 'ok' : 'warn', SR ? 'Browser speech-to-text available' : 'No browser speech-to-text: answers will be recorded without a transcript');
+  if (!cfg.token || (!IS_AS && !cfg.url)) h += chk('warn', 'Not connected: enter the URL and token above.');
+  else {
+    try {
+      var ping = await call('ping');
+      h += chk('ok', 'Sheet reachable. Tabs: ' + esc(ping.tabs.join(', ')));
+      var s = await call('sessions'); h += chk(s.length ? 'ok' : 'warn', s.length + ' session(s) in the sheet');
+      if (chosen) { var m = await call('audioMeta', { n: chosen }); var n = Object.keys(m).length;
+        h += chk(n ? 'ok' : 'warn', n ? 'Studio audio registered for ' + n + ' part(s) of session ' + chosen : 'No studio audio registered for session ' + chosen + ' (phone voice will be used)'); }
+      var about = await call('about'); vs = about.changelog;
+      var same = String(about.version).split('.').slice(0, 2).join('.') === APP_VERSION.split('.').slice(0, 2).join('.');
+      h += chk(same ? 'ok' : 'warn', same ? 'Page v' + APP_VERSION + ' matches backend v' + esc(about.version) : 'Version mismatch: page v' + APP_VERSION + ', backend v' + esc(about.version) + '. Redeploy the Apps Script (New version) or refresh this page.');
+    } catch (e) { h += chk('bad', e.message === 'bad_token' ? 'Token rejected: copy it again from the Apps Script log (run showToken).' : 'Cannot reach the sheet: ' + esc(e.message)); }
+  }
+  $('checks').innerHTML = h;
+  $('vinfo').textContent = 'Page v' + APP_VERSION + (backendVersion ? ' - backend v' + backendVersion : '');
+  $('vlist').innerHTML = vs.map(function (c) { return '<div class="ver"><b>v' + esc(c.v) + '</b> <span class="mut">' + esc(c.date) + '</span><ul>' + c.notes.map(function (x) { return '<li>' + esc(x) + '</li>'; }).join('') + '</ul></div>'; }).join('');
+}
+$('cfg-save').onclick = async function () {
+  cfg.url = $('cfg-url').value.trim(); cfg.token = $('cfg-tok').value.trim(); cfg.stt = $('cfg-stt').checked; saveCfg();
+  await loadGuide(); loadSessions();
+};
+$('mic-test').onclick = async function () {
+  $('mic-test').textContent = 'Listening...';
+  var ok = await openMic(), R = null;
+  if (ok) {
+    R = beginRec();
+    for (var i = 0; i < 30; i++) { await sleep(100); level(R, 'mic-meter'); }
+    if (R) { try { R.mr.stop(); if (R.rec) R.rec.stop(); } catch (e) {} }
+    stream.getTracks().forEach(function (t) { t.stop(); }); stream = null; $('mic-meter').style.width = '0';
+    $('checks').insertAdjacentHTML('afterbegin', chk('ok', 'Microphone works. Say something while testing to see the bar move.'));
+  } else $('checks').insertAdjacentHTML('afterbegin', chk('bad', esc(micAdvice())));
+  $('mic-test').textContent = 'Test microphone';
+};
+
+loadSessions();
+</script>
+</body>
+</html>
