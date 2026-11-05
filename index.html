@@ -49,11 +49,43 @@ textarea{width:100%;min-height:110px;border:1px solid var(--line);border-radius:
 .step .who{font-size:11px;text-transform:uppercase;letter-spacing:.05em;color:var(--mut)}
 .ver{padding:8px 0;border-top:1px solid var(--line);font-size:14px}.ver ul{margin:4px 0 0 18px;padding:0}
 label.row{display:flex;gap:8px;align-items:center;font-size:14px;margin:6px 0}
+.sess{display:block;padding:0;cursor:pointer}
+.sess-h{display:flex;justify-content:space-between;align-items:center;gap:8px;padding:12px}
+.part{display:flex;justify-content:space-between;align-items:center;gap:8px;padding:10px 12px;border-top:1px solid var(--line);cursor:default}
+.part-b{display:flex;gap:6px;flex-wrap:nowrap;justify-content:flex-end}
+.part-t span{white-space:nowrap}
+.part .st{font-size:13px}
+.sess .big{width:calc(100% - 24px);margin:4px 12px 12px}
+button.sm{padding:8px 12px;font-size:14px;margin:0}
+button.pri{border-color:var(--acc);color:var(--acc);font-weight:600}
+.ctl{display:flex;flex-wrap:wrap;gap:0}
+.subnav{display:flex;gap:6px;margin-bottom:12px}
+.subnav button{flex:1;padding:8px;border:1px solid var(--line);background:var(--card);color:var(--ink);border-radius:999px;font-size:14px}
+.subnav button.on{background:var(--acc);border-color:var(--acc);color:#fff}
+.tiles{display:grid;grid-template-columns:repeat(2,1fr);gap:8px;margin-bottom:12px}
+@media (min-width:560px){.tiles{grid-template-columns:repeat(4,1fr)}}
+.tile{background:var(--card);border:1px solid var(--line);border-radius:12px;padding:10px 12px}
+.tile .tv{font-size:20px;font-weight:700;margin-top:2px}
+.viz-root{--s1:#2a78d6;--s2:#eb6834;--s3:#1baf7a}
+@media (prefers-color-scheme:dark){.viz-root,.tblwrap,.tip{--s1:#3987e5;--s2:#d95926;--s3:#199e70}}
+.tblwrap,.tip{--s1:#2a78d6;--s2:#eb6834;--s3:#1baf7a}
+.chartwrap svg{width:100%;height:auto;display:block}
+.chartwrap .grid{stroke:var(--line);stroke-width:1}
+.chartwrap .ax{fill:var(--mut);font-size:11px}
+.chartwrap .ring{stroke:var(--card);stroke-width:2}
+.legend{display:flex;gap:14px;font-size:13px;color:var(--mut);margin:2px 0 8px}
+.legend i,.sw{display:inline-block;width:10px;height:10px;border-radius:3px;margin-right:5px;vertical-align:-1px}
+.tip{position:fixed;z-index:9;background:var(--card);color:var(--ink);border:1px solid var(--line);border-radius:8px;padding:6px 9px;font-size:13px;box-shadow:0 4px 14px rgba(0,0,0,.15);pointer-events:none;max-width:240px}
+.tblwrap{overflow-x:auto}
+table{border-collapse:collapse;width:100%;font-size:13px;white-space:nowrap}
+th,td{text-align:left;padding:6px 8px;border-top:1px solid var(--line)}
+th{color:var(--mut);font-weight:600;font-size:12px}
+td.n,th.n{text-align:right;font-variant-numeric:tabular-nums}
 </style>
 </head>
 <body>
 <main>
-<header><b>Commute Coach</b><span id="vtag">v1.2.0</span></header>
+<header><b>Commute Coach</b><span id="vtag"></span></header>
 <nav>
   <button id="t-home" class="on">Today</button>
   <button id="t-review">Review</button>
@@ -62,12 +94,17 @@ label.row{display:flex;gap:8px;align-items:center;font-size:14px;margin:6px 0}
 </nav>
 
 <section id="v-home">
+  <div class="card hide" id="resume-card">
+    <div class="lab">Paused</div>
+    <div id="resume-txt" style="font-weight:600;margin:2px 0 4px"></div>
+    <button class="alt" id="resume-go">Resume</button>
+    <button class="alt" id="resume-end">End and save</button>
+  </div>
   <div class="card">
-    <h1>Today's session</h1>
-    <div class="mut">Start it while parked and mount the phone. After one tap it plays, listens for your answers and moves on by itself.</div>
+    <h1>Sessions</h1>
+    <div class="mut">Pick a session, then play all three parts or any single part. Your place in each part is saved, so you can pause, switch, and come back.</div>
     <div id="list"></div>
     <div class="mut" id="prep" style="margin-top:8px"></div>
-    <button class="big" id="start" disabled>Loading...</button>
     <div class="mut" id="micnote" style="margin-top:8px"></div>
   </div>
 </section>
@@ -80,24 +117,55 @@ label.row{display:flex;gap:8px;align-items:center;font-size:14px;margin:6px 0}
     <div class="mut" id="p-time"></div>
     <div class="meter"><i id="p-meter"></i></div>
     <div class="cap" id="cap"></div>
-    <button class="alt" id="b-pause">Pause</button>
-    <button class="alt" id="b-skip">Skip</button>
-    <button class="alt" id="b-stop">Stop</button>
+    <div class="ctl">
+      <button class="alt" id="b-back">Back 15 s</button>
+      <button class="alt" id="b-pause">Pause</button>
+      <button class="alt" id="b-skip">Skip</button>
+      <button class="alt" id="b-stop">Stop</button>
+    </div>
+    <div class="mut" id="p-hint" style="margin-top:8px"></div>
   </div>
 </section>
 
 <section id="v-done" class="hide">
   <div class="card">
-    <h2>Session finished</h2>
+    <h2 id="d-title">Part finished</h2>
     <div id="d-sum" class="mut"></div>
-    <div class="h"><div class="lab">Confidence now (1 to 10)</div>
-      <input id="conf" type="range" min="1" max="10" value="6" style="width:100%">
-      <div id="conf-v" class="state">6</div></div>
-    <button class="big" id="save-done">Save and finish</button>
+    <div id="d-parts"></div>
+    <button class="big" id="d-next">Next part</button>
+    <div id="d-conf" class="hide">
+      <div class="h"><div class="lab">All three parts done. Confidence now (1 to 10)</div>
+        <input id="conf" type="range" min="1" max="10" value="6" style="width:100%">
+        <div id="conf-v" class="state">6</div></div>
+      <button class="alt" id="save-done">Save score</button> <span id="conf-m" class="mut"></span>
+    </div>
+    <button class="alt" id="d-home">Back to sessions</button>
   </div>
 </section>
 
-<section id="v-review" class="hide"><div class="card"><h2>What I said and what Claude replied</h2><div id="hist" class="mut">Loading...</div></div></section>
+<section id="v-review" class="hide">
+  <div class="subnav"><button id="r-use" class="on">Practice</button><button id="r-ans">Answers and feedback</button></div>
+  <div id="rv-use">
+    <div class="tiles" id="tiles"></div>
+    <div class="card viz-root">
+      <h2>Minutes practiced per day</h2>
+      <div class="legend" id="leg1"></div>
+      <div class="chartwrap" id="ch-min"></div>
+    </div>
+    <div class="card viz-root">
+      <h2>When each part was finished</h2>
+      <div class="mut">One dot per part finished on that day. Tap a dot for details.</div>
+      <div class="legend" id="leg2"></div>
+      <div class="chartwrap" id="ch-done"></div>
+    </div>
+    <div class="card">
+      <h2>Practice log</h2>
+      <div class="tblwrap mut" id="runs">Loading...</div>
+    </div>
+  </div>
+  <div id="rv-ans" class="hide"><div class="card"><h2>What I said and what Claude replied</h2><div id="hist" class="mut">Loading...</div></div></div>
+  <div id="tip" class="tip hide"></div>
+</section>
 
 <section id="v-sync" class="hide">
   <div class="card">
@@ -144,13 +212,13 @@ label.row{display:flex;gap:8px;align-items:center;font-size:14px;margin:6px 0}
       <div class="step"><b class="n">1</b><div><div class="who">Claude, in your project chat</div>Writes the session: spoken script, answer windows, and the MP3 audio with caption timings.</div></div>
       <div class="step"><b class="n">2</b><div><div class="who">You, once per batch, 2 minutes</div>Upload Claude's files (DayNN.json plus its three MP3s) to the Drive folder "Commute Coach audio". Then tap "Load new sessions from Drive" above.</div></div>
       <div class="step"><b class="n">3</b><div><div class="who">This page</div>Downloads the audio once and keeps it on your device, so later plays start fast.</div></div>
-      <div class="step"><b class="n">4</b><div><div class="who">Your commute</div>Tap Start while parked. The coach and interviewer speak; captions follow. At each chime the microphone opens; stop talking for a few seconds and it moves on.</div></div>
-      <div class="step"><b class="n">5</b><div><div class="who">Saved automatically</div>Each answer goes to the Google Sheet (transcript, length) and your recording to Drive.</div></div>
+      <div class="step"><b class="n">4</b><div><div class="who">Your commute</div>Pick a session, then Play all 3 parts or one part, while parked. Captions follow the audio. At each chime the microphone opens; stop talking for a few seconds and it moves on. Pause keeps your place: you can switch to another part and come back.</div></div>
+      <div class="step"><b class="n">5</b><div><div class="who">Saved automatically</div>Each answer goes to the Google Sheet (transcript, length) and your recording to Drive. Every part you play is logged in the Usage tab: when, how long, from where to where. Review, Practice shows it as charts.</div></div>
       <div class="step"><b class="n">6</b><div><div class="who">Evening, Sync tab</div>Build the text of your answers, copy it, paste it into the Claude chat.</div></div>
       <div class="step"><b class="n">7</b><div><div class="who">Claude</div>Replies with feedback and the next session. Import it, and the cycle repeats. Feedback shows in the Review tab.</div></div>
     </div>
     <h3>Where things live</h3>
-    <div class="mut">Google Sheet "Commute Coach data": Content, Responses, Feedback, Log, Audio, Versions. Drive folder "Commute Coach audio": lesson MP3s and your answer recordings. This page: only your settings and a cached copy of the audio.</div>
+    <div class="mut">Google Sheet "Commute Coach data": Content, Responses, Feedback, Log, Usage, Audio, Versions. Drive folder "Commute Coach audio": lesson MP3s and your answer recordings. This page: only your settings and a cached copy of the audio.</div>
     <h3>If the microphone does not ask for permission</h3>
     <div class="mut">The page must be opened from its own https address (GitHub Pages or similar), not inside Google's Apps Script page or another app's embedded view. On iPhone use Safari, tap the aA icon, Website Settings, Microphone, Allow. On a PC click the lock icon next to the address, allow Microphone, and reload.</div>
   </div>
@@ -160,8 +228,9 @@ label.row{display:flex;gap:8px;align-items:center;font-size:14px;margin:6px 0}
 </main>
 
 <script>
-var APP_VERSION = '1.3.0';
+var APP_VERSION = '1.4.0';
 var LOCAL_CHANGES = [
+  { v: '1.4.0', date: '2026-11-06', notes: ['Pick any part of any session; each part keeps its own status and place', 'Pause, switch to another part or tab, and resume where you left off', 'Review, Practice: when, how long and which part, with two charts', 'More natural voices'] },
   { v: '1.3.0', date: '2026-11-05', notes: ['Load new sessions from Drive with one tap (Guide tab)', 'Links to your Sheet and audio folder in Checks', 'Works with the single-file backend'] },
   { v: '1.2.0', date: '2026-11-01', notes: ['Hosted page so the microphone prompt works', 'Captions follow the audio', 'Faster audio with on-device cache', 'Guide tab and version history'] },
   { v: '1.1.0', date: '2026-11-01', notes: ['Studio-quality MP3 playback with answer windows'] },
@@ -188,7 +257,7 @@ async function call(action, p) {
     return unwrap(r);
   }
   if (!cfg.url) throw new Error('no_url');
-  var big = { audio: 1, response: 1, log: 1, 'import': 1 }[action];
+  var big = { audio: 1, response: 1, log: 1, usage: 1, 'import': 1 }[action];
   var res = big
     ? await fetch(cfg.url, { method: 'POST', headers: { 'Content-Type': 'text/plain;charset=utf-8' }, body: JSON.stringify({ action: action, p: p, token: cfg.token }) })
     : await fetch(cfg.url + '?action=' + action + '&token=' + encodeURIComponent(cfg.token) + '&p=' + encodeURIComponent(JSON.stringify(p)));
@@ -202,37 +271,108 @@ function show(v) {
   views.forEach(function (x) { $('v-' + x).classList.toggle('hide', x !== v); });
   ['home', 'review', 'sync', 'guide'].forEach(function (x) { $('t-' + x).classList.toggle('on', x === v); });
 }
-var running = false;
-$('t-home').onclick = function () { if (!running) show('home'); };
-$('t-review').onclick = function () { if (!running) { show('review'); loadHist(); } };
-$('t-sync').onclick = function () { if (!running) show('sync'); };
-$('t-guide').onclick = function () { if (!running) { show('guide'); loadGuide(); } };
+/* ---- tabs (locked only while a part is actively playing) ---- */
+var running = false, paused = false;
+function locked() { return running && !paused; }
+$('t-home').onclick = function () { if (!locked()) { show('home'); renderList(); } };
+$('t-review').onclick = function () { if (!locked()) { show('review'); loadReview(); } };
+$('t-sync').onclick = function () { if (!locked()) show('sync'); };
+$('t-guide').onclick = function () { if (!locked()) { show('guide'); loadGuide(); } };
 $('vtag').textContent = 'v' + APP_VERSION;
 
-/* ---- session list + audio prefetch ---- */
-var sessions = [], chosen = null, items = [], audioMeta = {}, blobUrls = {}, loading = {};
+/* ---- names, device, local state ---- */
+var ORDER = ['mindset', 'interview', 'market'], NAMES = { mindset: 'Mindset', interview: 'Interview', market: 'Market' };
+var UA = navigator.userAgent;
+var DEVICE = /iPhone|iPad/.test(UA) ? 'iPhone' : /Android/.test(UA) ? 'Android' : /Windows/.test(UA) ? 'PC' : /Mac/.test(UA) ? 'Mac' : 'Other';
+function lsGet(k, d) { try { var v = JSON.parse(localStorage.getItem(k)); return v == null ? d : v; } catch (e) { return d; } }
+function lsSet(k, v) { try { localStorage.setItem(k, JSON.stringify(v)); } catch (e) {} }
+var localProg = lsGet('cc.prog', {});          // "s|block" -> {pos, idx, at}
+function nowIso() { return new Date().toISOString(); }
+function pkey(s, b) { return s + '|' + b; }
+
+/* ---- sessions, progress, audio cache ---- */
+var sessions = [], chosen = null, usage = [], itemsBy = {}, metaBy = {}, blobUrls = {}, loading = {};
+function progress(s, b) {
+  var done = 0, lastDone = '', last = null, listened = 0;
+  usage.forEach(function (r) {
+    if (Number(r.session) !== Number(s) || r.block !== b) return;
+    listened += Number(r.listenedSec) || 0;
+    if (r.outcome === 'completed') { done++; if (String(r.end) > lastDone) lastDone = String(r.end); }
+    if (!last || String(r.end) > String(last.end)) last = r;
+  });
+  var sv = last ? { pos: last.outcome === 'completed' ? 0 : Number(last.toSec) || 0, idx: last.outcome === 'completed' ? 0 : Number(last.idx) || 0, at: String(last.end) } : null;
+  var lp = localProg[pkey(s, b)];
+  var cur = [lp, sv].filter(Boolean).sort(function (x, y) { return String(y.at).localeCompare(String(x.at)); })[0] || { pos: 0, idx: 0 };
+  return { done: done, lastDone: lastDone, pos: cur.pos > 5 ? cur.pos : 0, idx: cur.idx || 0, listened: listened };
+}
+function shortDate(iso) { if (!iso) return ''; var d = new Date(iso); return d.toLocaleDateString('en-US', { month: 'short', day: 'numeric' }); }
+function partStatus(s, b) {
+  var p = progress(s, b), bits = [];
+  if (run && run.s === s && run.b === b && paused) bits.push('Paused at ' + fmt(run.pos));
+  else if (p.pos || p.idx) bits.push('Stopped at ' + (p.pos ? fmt(p.pos) : 'step ' + p.idx));
+  if (p.done) bits.push('Done ' + (p.done > 1 ? p.done + ' times' : 'once') + ', last ' + shortDate(p.lastDone));
+  return { p: p, text: bits.join(' - ') || 'Not started' };
+}
+function sessionStatus(s) {
+  var n = ORDER.filter(function (b) { return progress(s, b).done > 0; }).length;
+  var started = ORDER.some(function (b) { var p = progress(s, b); return p.pos || p.idx; });
+  return n === 3 ? 'All 3 done' : n ? n + ' of 3 done' : started ? 'Started' : 'New';
+}
 function renderList() {
   var h = '';
   sessions.forEach(function (s) {
-    h += '<div class="sess ' + (chosen === s.session ? 'sel' : '') + '" data-s="' + s.session + '"><div><b>Session ' + s.session +
-         '</b><div class="mut">' + esc(s.title) + '</div></div><div class="mut">' + (s.done ? 'done' : 'new') + '</div></div>';
+    var sel = chosen === s.session;
+    h += '<div class="sess ' + (sel ? 'sel' : '') + '" data-s="' + s.session + '"><div class="sess-h"><div><b>Session ' + s.session +
+         '</b><div class="mut">' + esc(s.title) + '</div></div><div class="mut">' + sessionStatus(s.session) + '</div></div>';
+    if (sel) {
+      ORDER.forEach(function (b) {
+        var st = partStatus(s.session, b), m = metaBy[s.session] && metaBy[s.session][b];
+        var len = m && m.durationSec ? Math.round(m.durationSec / 60) + ' min' : '';
+        var resume = st.p.pos || st.p.idx || (run && run.s === s.session && run.b === b && paused);
+        h += '<div class="part"><div class="part-t"><b>' + NAMES[b] + '</b> <span class="mut">' + len + '</span><div class="mut st">' + esc(st.text) + '</div></div>' +
+             '<div class="part-b"><button class="alt sm pri" data-play="' + b + '">' + (resume ? 'Resume' : st.p.done ? 'Play again' : 'Play') + '</button>' +
+             (resume ? '<button class="alt sm" data-restart="' + b + '">Restart</button>' : '') + '</div></div>';
+      });
+      var first = ORDER.filter(function (b) { return !progress(s.session, b).done; })[0] || 'mindset';
+      h += '<button class="big" data-all="' + first + '">Play ' + (first === 'mindset' ? 'all 3 parts' : 'from ' + NAMES[first]) + '</button>';
+    }
+    h += '</div>';
   });
   $('list').innerHTML = h || '<div class="mut">No sessions yet. Open the Guide tab to connect.</div>';
-  Array.prototype.forEach.call(document.querySelectorAll('.sess'), function (el) {
-    el.onclick = function () { chosen = Number(el.dataset.s); renderList(); setStart(); prefetch(); };
+  Array.prototype.forEach.call(document.querySelectorAll('.sess-h'), function (el) {
+    el.onclick = function () { var s = Number(el.parentNode.dataset.s); chosen = chosen === s ? null : s; renderList(); if (chosen) prefetch(chosen); };
   });
+  Array.prototype.forEach.call(document.querySelectorAll('[data-play]'), function (el) {
+    el.onclick = function () { startParts(chosen, [el.dataset.play], false); };
+  });
+  Array.prototype.forEach.call(document.querySelectorAll('[data-restart]'), function (el) {
+    el.onclick = function () { startParts(chosen, [el.dataset.restart], true); };
+  });
+  Array.prototype.forEach.call(document.querySelectorAll('[data-all]'), function (el) {
+    el.onclick = function () { var b = el.dataset.all; startParts(chosen, ORDER.slice(ORDER.indexOf(b)), false); };
+  });
+  renderResume();
 }
-function setStart() { $('start').disabled = !chosen; $('start').textContent = chosen ? 'Start session ' + chosen : 'Pick a session'; }
+function renderResume() {
+  var on = !!(run && paused);
+  $('resume-card').classList.toggle('hide', !on);
+  if (on) $('resume-txt').textContent = 'Session ' + run.s + ' - ' + NAMES[run.b] + ' at ' + fmt(run.pos);
+}
 async function loadSessions() {
-  if (!cfg.token || (!IS_AS && !cfg.url)) { $('list').innerHTML = '<div class="mut">Not connected yet. Open the Guide tab, enter the URL and token.</div>'; $('start').textContent = 'Not connected'; return; }
+  if (!cfg.token || (!IS_AS && !cfg.url)) { $('list').innerHTML = '<div class="mut">Not connected yet. Open the Guide tab, enter the URL and token.</div>'; return; }
   try {
-    sessions = await call('sessions');
-    var next = sessions.filter(function (s) { return !s.done; })[0] || sessions[sessions.length - 1];
-    chosen = next ? next.session : null; renderList(); setStart(); prefetch();
-  } catch (e) { $('list').innerHTML = '<div class="mut">Could not reach your sheet: ' + esc(e.message) + '. Check the Guide tab.</div>'; $('start').textContent = 'Not connected'; }
+    await flushOpen();
+    var r = await Promise.all([call('sessions'), call('usageList').catch(function () { return []; })]);
+    sessions = r[0]; usage = r[1] || [];
+    if (chosen == null) {
+      var next = sessions.filter(function (s) { return ORDER.some(function (b) { return !progress(s.session, b).done; }); })[0] || sessions[sessions.length - 1];
+      chosen = next ? next.session : null;
+    }
+    renderList(); if (chosen) prefetch(chosen);
+  } catch (e) { $('list').innerHTML = '<div class="mut">Could not reach your sheet: ' + esc(e.message) + '. Check the Guide tab.</div>'; }
 }
 
-/* IndexedDB cache for audio */
+/* IndexedDB cache for audio: key = file id + file revision, so a replaced MP3 is downloaded again */
 function idb() {
   return new Promise(function (ok, bad) {
     try { var r = indexedDB.open('cc', 1); r.onupgradeneeded = function () { r.result.createObjectStore('audio'); }; r.onsuccess = function () { ok(r.result); }; r.onerror = function () { bad(r.error); }; }
@@ -240,10 +380,15 @@ function idb() {
   });
 }
 async function idbGet(key) { try { var d = await idb(); return await new Promise(function (ok) { var q = d.transaction('audio').objectStore('audio').get(key); q.onsuccess = function () { ok(q.result || null); }; q.onerror = function () { ok(null); }; }); } catch (e) { return null; } }
-async function idbPut(key, val) { try { var d = await idb(); d.transaction('audio', 'readwrite').objectStore('audio').put(val, key); } catch (e) {} }
+async function idbPut(key, val, fileId) {
+  try {
+    var d = await idb(), st = d.transaction('audio', 'readwrite').objectStore('audio');
+    var q = st.getAllKeys(); q.onsuccess = function () { (q.result || []).forEach(function (k) { if (String(k).indexOf(fileId + '|') === 0 && k !== key) st.delete(k); }); st.put(val, key); };
+  } catch (e) {}
+}
 function b64bytes(s) { var bin = atob(s), u = new Uint8Array(bin.length); for (var i = 0; i < bin.length; i++) u[i] = bin.charCodeAt(i); return u; }
 async function fetchAudio(meta, onProg) {
-  var key = meta.fileId + '|' + (meta.file || '');
+  var key = meta.fileId + '|' + (meta.rev || meta.file || '');
   var cached = await idbGet(key);
   if (cached) return URL.createObjectURL(cached);
   var first = await call('audioChunk', { fileId: meta.fileId, i: 0 });
@@ -253,26 +398,32 @@ async function fetchAudio(meta, onProg) {
   for (var i = 1; i < first.n; i++) rest.push((function (i) { return call('audioChunk', { fileId: meta.fileId, i: i }).then(function (c) { parts[i] = b64bytes(c.b64); done++; if (onProg) onProg(done, first.n); }); })(i));
   await Promise.all(rest);
   var blob = new Blob(parts, { type: first.mime || 'audio/mpeg' });
-  idbPut(key, blob);
+  idbPut(key, blob, meta.fileId);
   return URL.createObjectURL(blob);
 }
-function blockUrl(blk) {
-  if (blobUrls[blk]) return Promise.resolve(blobUrls[blk]);
-  if (!loading[blk]) loading[blk] = fetchAudio(audioMeta[blk], function (d, n) { $('prep').textContent = 'Preparing audio... ' + blk + ' ' + d + '/' + n; })
-    .then(function (u) { blobUrls[blk] = u; return u; });
-  return loading[blk];
+function blockUrl(s, b) {
+  var k = pkey(s, b);
+  if (blobUrls[k]) return Promise.resolve(blobUrls[k]);
+  if (!loading[k]) loading[k] = fetchAudio(metaBy[s][b], function (d, n) { $('prep').textContent = 'Preparing audio... ' + NAMES[b] + ' ' + d + '/' + n; })
+    .then(function (u) { blobUrls[k] = u; return u; }, function (e) { delete loading[k]; throw e; });
+  return loading[k];
 }
-async function prefetch() {
-  blobUrls = {}; loading = {}; audioMeta = {}; $('prep').textContent = '';
-  if (!chosen) return;
+async function ensureSession(s) {
+  if (!itemsBy[s]) itemsBy[s] = await call('session', { n: s });
+  if (!metaBy[s]) metaBy[s] = await call('audioMeta', { n: s });
+}
+var prefetching = null;
+async function prefetch(s) {
+  $('prep').textContent = '';
   try {
-    audioMeta = await call('audioMeta', { n: chosen });
-    var blks = Object.keys(audioMeta);
+    if (!metaBy[s]) { metaBy[s] = await call('audioMeta', { n: s }); if (chosen === s && !running) renderList(); }
+    var blks = ORDER.filter(function (b) { return metaBy[s][b]; });
     if (!blks.length) { $('prep').textContent = 'No studio audio registered for this session: the phone voice will be used.'; return; }
-    $('prep').textContent = 'Preparing audio...';
-    for (var i = 0; i < blks.length; i++) await blockUrl(blks[i]);
-    $('prep').textContent = 'Audio ready on this device (' + blks.length + ' parts).';
+    if (prefetching === s) return; prefetching = s;
+    for (var i = 0; i < blks.length; i++) await blockUrl(s, blks[i]);
+    if (chosen === s) $('prep').textContent = 'Audio for session ' + s + ' is ready on this device.';
   } catch (e) { $('prep').textContent = 'Audio not ready: ' + e.message; }
+  finally { if (prefetching === s) prefetching = null; }
 }
 
 /* ---- speech (phone voice fallback) ---- */
@@ -285,7 +436,6 @@ function pick(role) {
   var re = role === 'interviewer' ? /(daniel|alex|guy|david|male|aaron|fred)/i : /(samantha|aria|jenny|zira|female|google us english|karen)/i;
   return en.filter(function (v) { return re.test(v.name); })[0] || en[role === 'interviewer' ? en.length - 1 : 0] || null;
 }
-var paused = false, skipFlag = false, stopFlag = false;
 function speakOne(text, role) {
   return new Promise(function (res) {
     if (!window.speechSynthesis || FAST) return res();
@@ -297,8 +447,8 @@ function speakOne(text, role) {
 async function say(text, role) {
   var parts = text.split(/(?<=[.?!])\s+/);
   for (var i = 0; i < parts.length; i++) {
-    if (skipFlag || stopFlag) break;
-    while (paused && !stopFlag) await sleep(200);
+    if (skipFlag || stopFlag || leaveFlag) break;
+    while (paused && !stopFlag && !leaveFlag) await sleep(200);
     showCap(null, pretty(parts[i]), null, role); await speakOne(parts[i], role); await sleep(250);
   }
   if (window.speechSynthesis) speechSynthesis.cancel();
@@ -372,12 +522,12 @@ async function recordTts(item, prompt) {
   var maxMs = item.sec * 1000;
   showCap(null, pretty(prompt), null, 'you');
   if (!stream) { beep(700); $('p-state').textContent = 'Your turn (no mic)'; $('p-state').className = 'state rec';
-    var t = Date.now(); while (!stopFlag && !skipFlag && Date.now() - t < (FAST ? 100 : maxMs)) await sleep(200); beep(520); return; }
+    var t = Date.now(); while (!stopFlag && !leaveFlag && !skipFlag && Date.now() - t < (FAST ? 100 : maxMs)) await sleep(200); beep(520); return; }
   beep(700);
   var R = beginRec(); if (!R) return;
   $('p-state').textContent = 'Your turn'; $('p-state').className = 'state rec';
   var spoke = false, lastVoice = Date.now();
-  while (!stopFlag && !skipFlag && (Date.now() - R.t0) < (FAST ? 300 : maxMs)) {
+  while (!stopFlag && !leaveFlag && !skipFlag && !paused && (Date.now() - R.t0) < (FAST ? 300 : maxMs)) {
     await sleep(120);
     var lv = level(R); if (lv > 0.03) { spoke = true; lastVoice = Date.now(); }
     if (spoke && Date.now() - lastVoice > 3500 && (Date.now() - R.t0) > 6000) break;
@@ -385,36 +535,163 @@ async function recordTts(item, prompt) {
   beep(520); await finishRec(R, item, prompt);
 }
 
-/* ---- studio audio: captions + answer windows driven by the audio clock ---- */
+/* ---- playing parts: one run = a chain of parts; each part's time is logged as a usage segment ---- */
 var player = null, SILENT = 'data:audio/wav;base64,UklGRiQAAABXQVZFZm10IBAAAAABAAEAQB8AAEAfAAABAAgAZGF0YQAAAAA=';
+var run = null, chain = null, stopFlag = false, leaveFlag = false, skipFlag = false, backFlag = false;
 function promptFor(bItems, seq) {
   var last = '';
   for (var i = 0; i < bItems.length; i++) { if (bItems[i].seq === seq) return last; if (bItems[i].type === 'say') last = bItems[i].text; }
   return last;
 }
-function fmt(s) { s = Math.max(0, Math.floor(s)); return Math.floor(s / 60) + ':' + ('0' + (s % 60)).slice(-2); }
-async function playBlockAudio(blk, bItems) {
-  var meta = audioMeta[blk];
+function fmt(s) { s = Math.max(0, Math.floor(s || 0)); return Math.floor(s / 60) + ':' + ('0' + (s % 60)).slice(-2); }
+function tick() { // count listening time and keep a snapshot so an interrupted part is still logged
+  var n = Date.now();
+  if (run) { if (!paused) run.listened += (n - run.lastTick) / 1000; run.lastTick = n;
+    if (n - run.lastSave > 5000) { run.lastSave = n; snapshot(); } }
+}
+function snapshot() {
+  if (!run) return;
+  localProg[pkey(run.s, run.b)] = { pos: run.pos, idx: run.idx, at: nowIso() }; lsSet('cc.prog', localProg);
+  lsSet('cc.open', segment('interrupted'));
+}
+function segment(outcome) {
+  return { start: run.start, end: nowIso(), session: run.s, block: run.b, fromSec: Math.round(run.from), toSec: Math.round(run.pos), idx: run.idx,
+           durSec: run.dur ? Math.round(run.dur) : '', listenedSec: Math.round(run.listened), answers: run.answers, outcome: outcome, device: DEVICE, runId: run.id };
+}
+async function closeSegment(outcome) {
+  tick();
+  var seg = segment(outcome);
+  localProg[pkey(run.s, run.b)] = outcome === 'completed' ? { pos: 0, idx: 0, at: seg.end } : { pos: run.pos, idx: run.idx, at: seg.end };
+  lsSet('cc.prog', localProg); lsSet('cc.open', null);
+  usage.push(seg);
+  pending.push(call('usage', seg).catch(function () { var q = lsGet('cc.queue', []); q.push(seg); lsSet('cc.queue', q); }));
+}
+async function flushOpen() { // segments left behind by a closed tab or a lost connection
+  var open = lsGet('cc.open', null), q = lsGet('cc.queue', []);
+  if (open) { open.outcome = 'interrupted'; q.push(open); lsSet('cc.open', null); }
+  if (!q.length) return;
+  var left = [];
+  for (var i = 0; i < q.length; i++) { try { await call('usage', q[i]); } catch (e) { left.push(q[i]); } }
+  lsSet('cc.queue', left);
+}
+window.addEventListener('pagehide', function () { if (run) snapshot(); });
+document.addEventListener('visibilitychange', function () { if (document.hidden && run) snapshot(); });
+
+async function wakeLock() { try { if (navigator.wakeLock) await navigator.wakeLock.request('screen'); } catch (e) {} }
+function quietUnpause() { paused = false; $('b-pause').textContent = 'Pause'; $('p-hint').textContent = ''; if (window.speechSynthesis) speechSynthesis.cancel(); renderResume(); }
+function setPaused(v) {
+  paused = v; $('b-pause').textContent = paused ? 'Resume' : 'Pause';
+  $('p-hint').textContent = paused ? 'Paused. You can switch tabs or pick another part; this place is kept.' : '';
+  if (player && player.src && player.src.indexOf('data:') !== 0 && !player.ended && run && run.mode === 'audio') { paused ? player.pause() : player.play().catch(function () {}); }
+  if (window.speechSynthesis) paused ? speechSynthesis.pause() : speechSynthesis.resume();
+  renderResume();
+}
+
+/* Entry point from every Play / Resume / From start button. */
+async function startParts(s, blocks, fromStart) {
+  if (!player) player = new Audio();
+  if (!player.src || player.src.indexOf('data:') === 0) { player.src = SILENT; player.play().catch(function () {}); } // unlock audio inside the tap
+  if (chain) { leaveFlag = true; quietUnpause(); await chain; }
+  chain = runChain(s, blocks, fromStart);
+  await chain; chain = null;
+}
+async function runChain(s, blocks, fromStart) {
+  stopFlag = false; leaveFlag = false; skipFlag = false; pending = pending || [];
+  $('micnote').textContent = 'Loading session ' + s + '...';
+  try { await ensureSession(s); } catch (e) { $('micnote').textContent = 'Could not load the session: ' + e.message; return; }
+  var ok = stream ? true : await openMic();
+  $('micnote').textContent = ok ? '' : micAdvice() + ' Playing in listen-only mode.';
+  running = true; setPaused(false); wakeLock(); show('play');
+  var finished = [], outcome = 'completed';
+  for (var i = 0; i < blocks.length; i++) {
+    var b = blocks[i], items = itemsBy[s].filter(function (x) { return x.block === b; });
+    if (!items.length) continue;
+    var pr = progress(s, b), meta = metaBy[s][b];
+    run = { s: s, b: b, id: Date.now().toString(36), start: nowIso(), listened: 0, lastTick: Date.now(), lastSave: Date.now(), answers: 0,
+            pos: 0, idx: 0, from: 0, dur: meta ? meta.durationSec : 0, mode: meta ? 'audio' : 'voice' };
+    var startPos = (fromStart || i > 0) ? 0 : pr.pos, startIdx = (fromStart || i > 0) ? 0 : pr.idx;
+    $('p-block').textContent = 'Session ' + s + ' - ' + NAMES[b] + (blocks.length > 1 ? ' (' + (i + 1) + ' of ' + blocks.length + ')' : '');
+    var res = 'completed';
+    if (meta) {
+      try { res = await playAudioPart(s, b, items, meta, startPos); }
+      catch (e) { $('micnote').textContent = 'Audio failed to load, using the phone voice for this part.'; run.mode = 'voice'; res = await playVoicePart(s, b, items, startIdx); }
+    } else res = await playVoicePart(s, b, items, startIdx);
+    await closeSegment(res);
+    if (res !== 'completed') { outcome = res; break; }
+    finished.push(b);
+  }
+  if (window.speechSynthesis) speechSynthesis.cancel();
+  if (player) player.pause();
+  var last = run; run = null; running = false; setPaused(false);
+  if (stream) { stream.getTracks().forEach(function (t) { t.stop(); }); stream = null; }
+  $('p-state').textContent = 'Saving...';
+  await Promise.all(pending); pending = [];
+  if (outcome === 'completed' && last) showDone(s, finished);
+  else if (!leaveFlag) { show('home'); renderList(); }
+}
+
+function showDone(s, finished) {
+  var left = ORDER.filter(function (b) { return !progress(s, b).done; });
+  $('d-title').textContent = finished.length > 1 ? 'Session ' + s + ': ' + finished.length + ' parts finished' : 'Session ' + s + ': ' + NAMES[finished[0]] + ' finished';
+  $('d-sum').textContent = 'Saved to your sheet. Your answers are in Review.';
+  $('d-parts').innerHTML = ORDER.map(function (b) { return '<div class="chk"><span class="dot ' + (progress(s, b).done ? 'ok' : '') + '"></span><div>' + NAMES[b] + ' - ' + esc(partStatus(s, b).text) + '</div></div>'; }).join('');
+  var nb = left[0] || null;
+  $('d-next').classList.toggle('hide', !nb);
+  $('d-next').textContent = nb ? 'Next: ' + NAMES[nb] : '';
+  $('d-next').onclick = function () { startParts(s, [nb], false); };
+  $('d-conf').classList.toggle('hide', !!left.length);
+  $('conf-m').textContent = '';
+  show('done');
+}
+$('d-home').onclick = function () { show('home'); renderList(); };
+$('conf').oninput = function () { $('conf-v').textContent = $('conf').value; };
+$('save-done').onclick = async function () {
+  $('save-done').disabled = true;
+  try { await call('log', { session: chosen, confidence: Number($('conf').value), note: '' }); $('conf-m').textContent = 'Saved.'; } catch (e) { $('conf-m').textContent = 'Could not save: ' + e.message; }
+  $('save-done').disabled = false;
+};
+
+/* Studio audio: captions and answer windows follow the audio clock. Returns 'completed' | 'stopped' | 'paused'. */
+async function playAudioPart(s, b, bItems, meta, startPos) {
   $('p-state').textContent = 'Loading audio...'; $('p-state').className = 'state';
-  player.src = await blockUrl(blk);
-  if (FAST) player.playbackRate = 16;
+  var url = await blockUrl(s, b);
+  player.src = url;
+  await new Promise(function (r) { player.onloadedmetadata = r; player.onerror = r; setTimeout(r, 4000); });
   var caps = meta.captions || [], cues = meta.cues || [];
-  await new Promise(function (resolve) {
+  // never resume inside an answer window: go back to its chime
+  cues.forEach(function (c) { if (startPos > c.start - 0.3 && startPos < c.end) startPos = Math.max(0, c.start - 0.3); });
+  if (startPos > 0) { try { player.currentTime = startPos; } catch (e) {} }
+  run.from = startPos; run.pos = startPos;
+  if (FAST) player.playbackRate = 16;
+  return await new Promise(function (resolve) {
     var ci = 0, ki = 0, active = null, busy = false, finished = false;
+    while (ci < cues.length && cues[ci].end - 0.8 <= startPos) ci++;
     player.onended = function () { finished = true; };
     player.onerror = function () { finished = true; };
-    player.play().catch(function () { finished = true; });
+    player.play().catch(function () { if (!paused) finished = true; });
     var timer = setInterval(async function () {
       if (busy) return; busy = true;
       try {
+        tick();
         var t = player.currentTime, dur = player.duration || meta.durationSec || 1;
+        run.pos = t; run.dur = dur;
         $('p-bar').style.width = Math.min(100, 100 * t / dur) + '%';
-        $('p-time').textContent = fmt(t) + ' / ' + fmt(dur);
-        if (stopFlag || finished) {
+        if (!active) $('p-time').textContent = fmt(t) + ' / ' + fmt(dur);
+        if (stopFlag || leaveFlag || finished) {
           clearInterval(timer);
-          if (active) { if (active.R) await finishRec(active.R, active.item, active.prompt); active = null; }
-          player.pause(); resolve(); return;
+          if (active) { if (active.R) { await finishRec(active.R, active.item, active.prompt); run.answers++; } run.pos = Math.max(0, active.c.start - 0.3); active = null; }
+          player.pause(); resolve(finished && !stopFlag && !leaveFlag ? 'completed' : stopFlag ? 'stopped' : 'paused'); return;
         }
+        if (paused) {
+          if (active) { // stop the answer window; on resume it starts again at the chime
+            var a0 = active; active = null;
+            if (a0.R) { await finishRec(a0.R, a0.item, a0.prompt); run.answers++; }
+            player.currentTime = Math.max(0, a0.c.start - 0.3); run.pos = player.currentTime;
+            $('p-state').textContent = 'Paused'; $('p-state').className = 'state';
+          }
+          return;
+        }
+        if (backFlag) { backFlag = false; if (!active) { player.currentTime = Math.max(0, t - 15); while (ci > 0 && cues[ci - 1].end > player.currentTime) ci--; } }
         if (skipFlag) {
           skipFlag = false;
           if (active) active.force = true;
@@ -423,7 +700,7 @@ async function playBlockAudio(blk, bItems) {
         if (!active && ci < cues.length) {
           var c = cues[ci];
           if (t >= c.start && t < c.end - 0.8) {
-            var item = bItems.filter(function (x) { return x.seq === c.seq; })[0] || { session: chosen, block: blk, seq: c.seq };
+            var item = bItems.filter(function (x) { return x.seq === c.seq; })[0] || { session: s, block: b, seq: c.seq };
             var prompt = promptFor(bItems, c.seq);
             active = { c: c, item: item, prompt: prompt, R: stream ? beginRec() : null, spoke: false, lastVoice: t, force: false };
             $('p-state').textContent = active.R ? 'Your turn' : 'Your turn (no mic)'; $('p-state').className = 'state rec';
@@ -438,7 +715,7 @@ async function playBlockAudio(blk, bItems) {
           if (active.force || t >= active.c.end - 0.6 || (active.spoke && t - active.lastVoice > 3.5 && t - active.c.start > 6)) {
             if (t < active.c.end - 1) player.currentTime = active.c.end - 0.6;
             var a = active; active = null; ci++;
-            if (a.R) await finishRec(a.R, a.item, a.prompt);
+            if (a.R) { await finishRec(a.R, a.item, a.prompt); run.answers++; }
             $('p-state').textContent = 'Coach'; $('p-state').className = 'state say';
           }
         } else {
@@ -455,66 +732,158 @@ async function playBlockAudio(blk, bItems) {
   });
 }
 
-/* ---- run a session ---- */
-async function wakeLock() { try { if (navigator.wakeLock) await navigator.wakeLock.request('screen'); } catch (e) {} }
-$('start').onclick = async function () {
-  if (!chosen || running) return;
-  running = true; stopFlag = false; paused = false; pending = [];
-  player = new Audio(); player.src = SILENT; player.play().catch(function () {}); // unlock audio inside the tap
-  var ok = await openMic();
-  $('micnote').textContent = ok ? '' : micAdvice() + ' Playing in listen-only mode.';
-  try { items = await call('session', { n: chosen }); } catch (e) { $('micnote').textContent = 'Could not load the session: ' + e.message; running = false; return; }
-  wakeLock(); show('play');
-  var blocks = [], seen = {};
-  items.forEach(function (it) { if (!seen[it.block]) { seen[it.block] = 1; blocks.push(it.block); } });
-  var names = { mindset: 'Mindset', interview: 'Interview', market: 'Market' }, answered = 0;
-  for (var bi = 0; bi < blocks.length && !stopFlag; bi++) {
-    var blk = blocks[bi], bItems = items.filter(function (x) { return x.block === blk; });
-    $('p-block').textContent = 'Session ' + chosen + ' - ' + (names[blk] || blk) + ' (' + (bi + 1) + ' of ' + blocks.length + ')';
-    if (audioMeta[blk]) {
-      try { await playBlockAudio(blk, bItems); answered += (audioMeta[blk].cues || []).length; continue; }
-      catch (e) { $('micnote').textContent = 'Audio failed to load, using the phone voice for this part.'; }
-    }
-    var lastSay = '';
-    for (var j = 0; j < bItems.length && !stopFlag; j++) {
-      var it = bItems[j]; skipFlag = false;
-      $('p-bar').style.width = Math.round(100 * (bi + j / bItems.length) / blocks.length) + '%';
-      while (paused && !stopFlag) await sleep(200);
-      if (it.type === 'say') { $('p-state').textContent = it.voice === 'interviewer' ? 'Interviewer' : 'Coach'; $('p-state').className = 'state say'; lastSay = it.text; await say(it.text, it.voice); }
-      else if (it.type === 'record') { await recordTts(it, lastSay); answered++; }
-      else { $('p-state').textContent = 'Pause'; $('p-state').className = 'state'; await sleep(it.sec * 1000); }
-    }
+/* Phone-voice fallback (no MP3 registered). Position is the step number. */
+async function playVoicePart(s, b, bItems, startIdx) {
+  run.from = 0; run.idx = startIdx;
+  var lastSay = '';
+  for (var k = 0; k < startIdx && k < bItems.length; k++) if (bItems[k].type === 'say') lastSay = bItems[k].text;
+  for (var j = startIdx; j < bItems.length; j++) {
+    var it = bItems[j]; skipFlag = false; run.idx = j;
+    $('p-bar').style.width = Math.round(100 * j / bItems.length) + '%';
+    $('p-time').textContent = 'Step ' + (j + 1) + ' of ' + bItems.length;
+    while (paused && !stopFlag && !leaveFlag) { tick(); await sleep(200); }
+    if (stopFlag) return 'stopped';
+    if (leaveFlag) return 'paused';
+    tick();
+    if (it.type === 'say') { $('p-state').textContent = it.voice === 'interviewer' ? 'Interviewer' : 'Coach'; $('p-state').className = 'state say'; lastSay = it.text; await say(it.text, it.voice); }
+    else if (it.type === 'record') { await recordTts(it, lastSay); run.answers++; }
+    else { $('p-state').textContent = 'Pause'; $('p-state').className = 'state'; await sleep(it.sec * 1000); }
+    if (stopFlag) return 'stopped';
+    if (leaveFlag || paused) { if (paused) { while (paused && !stopFlag && !leaveFlag) { tick(); await sleep(200); } if (stopFlag) return 'stopped'; if (leaveFlag) return 'paused'; } }
   }
-  if (window.speechSynthesis) speechSynthesis.cancel();
-  if (player) player.pause();
-  if (stream) { stream.getTracks().forEach(function (t) { t.stop(); }); stream = null; }
-  $('p-state').textContent = 'Saving...';
-  await Promise.all(pending);
-  running = false;
-  $('d-sum').textContent = answered + ' answer windows finished. Your answers are saved to the sheet.';
-  show('done');
-};
-$('b-pause').onclick = function () {
-  paused = !paused; $('b-pause').textContent = paused ? 'Resume' : 'Pause';
-  if (player && player.src && player.src.indexOf('data:') !== 0 && !player.ended) { paused ? player.pause() : player.play(); }
-  if (window.speechSynthesis) paused ? speechSynthesis.pause() : speechSynthesis.resume();
-};
-$('b-skip').onclick = function () { skipFlag = true; if (window.speechSynthesis) speechSynthesis.cancel(); };
-$('b-stop').onclick = function () { stopFlag = true; skipFlag = true; paused = false; if (player) player.pause(); if (window.speechSynthesis) speechSynthesis.cancel(); };
-$('conf').oninput = function () { $('conf-v').textContent = $('conf').value; };
-$('save-done').onclick = async function () {
-  $('save-done').disabled = true;
-  try { await call('log', { session: chosen, confidence: Number($('conf').value), note: '' }); sessions = await call('sessions'); renderList(); setStart(); } catch (e) {}
-  $('save-done').disabled = false; show('home');
-};
+  run.idx = 0;
+  return 'completed';
+}
 
-/* ---- review ---- */
+$('b-pause').onclick = function () { setPaused(!paused); };
+$('b-skip').onclick = function () { skipFlag = true; if (window.speechSynthesis) speechSynthesis.cancel(); };
+$('b-back').onclick = function () { backFlag = true; };
+$('b-stop').onclick = function () { stopFlag = true; skipFlag = true; quietUnpause(); if (player) player.pause(); };
+$('resume-go').onclick = function () { if (!run) return; show('play'); setPaused(false); };
+$('resume-end').onclick = function () { if (!run) return; stopFlag = true; quietUnpause(); };
+
+/* ---- review: practice log, tiles, two charts; answers ---- */
+var COLORS = { mindset: 'var(--s1)', interview: 'var(--s2)', market: 'var(--s3)' };
+$('r-use').onclick = function () { $('r-use').classList.add('on'); $('r-ans').classList.remove('on'); $('rv-use').classList.remove('hide'); $('rv-ans').classList.add('hide'); };
+$('r-ans').onclick = function () { $('r-ans').classList.add('on'); $('r-use').classList.remove('on'); $('rv-ans').classList.remove('hide'); $('rv-use').classList.add('hide'); loadHist(); };
+function dayKey(iso) { var d = new Date(iso); return d.getFullYear() + '-' + ('0' + (d.getMonth() + 1)).slice(-2) + '-' + ('0' + d.getDate()).slice(-2); }
+function dayLabel(k) { var p = k.split('-'); return Number(p[1]) + '/' + Number(p[2]); }
+function dayRange(rows) {
+  var today = new Date(); today.setHours(12, 0, 0, 0);
+  var first = rows.length ? new Date(rows.reduce(function (m, r) { return String(r.end) < m ? String(r.end) : m; }, String(rows[0].end))) : today;
+  first.setHours(12, 0, 0, 0);
+  var span = Math.round((today - first) / 864e5) + 1, n = Math.min(28, Math.max(7, span)), out = [];
+  for (var i = n - 1; i >= 0; i--) { var d = new Date(today); d.setDate(d.getDate() - i); out.push(dayKey(d.toISOString())); }
+  return out;
+}
+function legend(id) {
+  $(id).innerHTML = ORDER.map(function (b) { return '<span><i style="background:' + COLORS[b] + '"></i>' + NAMES[b] + '</span>'; }).join('');
+}
+function tipAt(ev, html) {
+  var t = $('tip'); t.innerHTML = html; t.classList.remove('hide');
+  var x = (ev.touches ? ev.touches[0].clientX : ev.clientX), y = (ev.touches ? ev.touches[0].clientY : ev.clientY);
+  t.style.left = Math.max(8, Math.min(window.innerWidth - t.offsetWidth - 8, x - t.offsetWidth / 2)) + 'px';
+  t.style.top = Math.max(8, y - t.offsetHeight - 14) + 'px';
+}
+document.addEventListener('click', function (e) { if (!e.target.closest || !e.target.closest('[data-tip]')) $('tip').classList.add('hide'); });
+function bindTips(root) {
+  Array.prototype.forEach.call(root.querySelectorAll('[data-tip]'), function (el) {
+    var h = function (e) { tipAt(e, el.getAttribute('data-tip')); };
+    el.addEventListener('mousemove', h); el.addEventListener('click', h);
+    el.addEventListener('mouseleave', function () { $('tip').classList.add('hide'); });
+  });
+}
+function niceMax(v) { var steps = [10, 15, 20, 30, 45, 60, 90, 120, 180]; for (var i = 0; i < steps.length; i++) if (v <= steps[i]) return steps[i]; return Math.ceil(v / 60) * 60; }
+
+function chartMinutes(rows, days) {
+  var W = Math.max(300, Math.min(640, $('ch-min').clientWidth || 340)), H = 200, L = 28, R = 4, T = 8, B = 24, pw = W - L - R, ph = H - T - B;
+  var per = {}; days.forEach(function (d) { per[d] = { mindset: 0, interview: 0, market: 0 }; });
+  rows.forEach(function (r) { var k = dayKey(r.end); if (per[k] && per[k][r.block] !== undefined) per[k][r.block] += (Number(r.listenedSec) || 0) / 60; });
+  var max = niceMax(Math.max(10, Math.max.apply(null, days.map(function (d) { return ORDER.reduce(function (s, b) { return s + per[d][b]; }, 0); }))));
+  var bw = pw / days.length, barW = Math.max(6, Math.min(26, bw * 0.62)), y = function (v) { return T + ph - ph * v / max; };
+  var s = '<svg viewBox="0 0 ' + W + ' ' + H + '" role="img" aria-label="Minutes practiced per day, by part">';
+  [0, max / 2, max].forEach(function (g) { s += '<line x1="' + L + '" x2="' + (W - R) + '" y1="' + y(g) + '" y2="' + y(g) + '" class="grid"/><text x="' + (L - 6) + '" y="' + (y(g) + 4) + '" class="ax" text-anchor="end">' + Math.round(g) + '</text>'; });
+  days.forEach(function (d, i) {
+    var x = L + i * bw + (bw - barW) / 2, acc = 0, segs = '', tipRows = [], tot = 0;
+    ORDER.forEach(function (b) { tot += per[d][b]; });
+    var order = ORDER.filter(function (b) { return per[d][b] > 0.05; });
+    order.forEach(function (b, j) {
+      var v = per[d][b], y0 = y(acc), y1 = y(acc + v), top = j === order.length - 1;
+      var hgt = Math.max(1, y0 - y1 - (j ? 2 : 0));
+      segs += top ? '<path d="' + roundTop(x, y1, barW, hgt) + '" fill="' + COLORS[b] + '"/>' : '<rect x="' + x + '" y="' + y1 + '" width="' + barW + '" height="' + hgt + '" fill="' + COLORS[b] + '"/>';
+      acc += v; tipRows.push(NAMES[b] + ': ' + Math.round(v) + ' min');
+    });
+    s += segs;
+    var tip = '<b>' + dayLabel(d) + '</b><br>' + (tot ? tipRows.join('<br>') + '<br>Total: ' + Math.round(tot) + ' min' : 'No practice');
+    s += '<rect x="' + (L + i * bw) + '" y="' + T + '" width="' + bw + '" height="' + ph + '" fill="transparent" data-tip="' + esc(tip).replace(/"/g, '&quot;') + '"/>';
+    if ((days.length - 1 - i) % Math.ceil(days.length / 7) === 0) s += '<text x="' + (L + i * bw + bw / 2) + '" y="' + (H - 8) + '" class="ax" text-anchor="middle">' + dayLabel(d) + '</text>';
+  });
+  s += '</svg>';
+  $('ch-min').innerHTML = s; bindTips($('ch-min'));
+}
+function roundTop(x, y, w, h) { var r = Math.min(4, w / 2, h); return 'M' + x + ',' + (y + h) + 'V' + (y + r) + 'Q' + x + ',' + y + ' ' + (x + r) + ',' + y + 'H' + (x + w - r) + 'Q' + (x + w) + ',' + y + ' ' + (x + w) + ',' + (y + r) + 'V' + (y + h) + 'Z'; }
+
+function chartDone(rows, days) {
+  var done = rows.filter(function (r) { return r.outcome === 'completed'; });
+  var ss = sessions.map(function (s) { return s.session; });
+  done.forEach(function (r) { if (ss.indexOf(Number(r.session)) < 0) ss.push(Number(r.session)); });
+  ss.sort(function (a, b) { return a - b; });
+  var W = Math.max(300, Math.min(640, $('ch-done').clientWidth || 340)), L = 28, R = 4, T = 6, rowH = 28, B = 24, H = T + ss.length * rowH + B, pw = W - L - R, bw = pw / days.length;
+  var s = '<svg viewBox="0 0 ' + W + ' ' + H + '" role="img" aria-label="Day each part was finished, per session">';
+  ss.forEach(function (sn, i) {
+    var cy = T + i * rowH + rowH / 2;
+    s += '<line x1="' + L + '" x2="' + (W - R) + '" y1="' + cy + '" y2="' + cy + '" class="grid"/><text x="' + (L - 6) + '" y="' + (cy + 4) + '" class="ax" text-anchor="end">S' + sn + '</text>';
+    days.forEach(function (d, j) {
+      ORDER.forEach(function (b, k) {
+        var hits = done.filter(function (r) { return Number(r.session) === sn && r.block === b && dayKey(r.end) === d; });
+        if (!hits.length) return;
+        var cx = L + j * bw + bw / 2 + (k - 1) * Math.min(11, bw / 3.2);
+        var times = hits.map(function (r) { return new Date(r.end).toLocaleTimeString('en-US', { hour: 'numeric', minute: '2-digit' }); }).join(', ');
+        var tip = '<b>Session ' + sn + ' - ' + NAMES[b] + '</b><br>Finished ' + dayLabel(d) + ' at ' + times;
+        s += '<circle cx="' + cx + '" cy="' + cy + '" r="4" fill="' + COLORS[b] + '" class="ring"/>' +
+             '<circle cx="' + cx + '" cy="' + cy + '" r="11" fill="transparent" data-tip="' + esc(tip).replace(/"/g, '&quot;') + '"/>';
+      });
+    });
+  });
+  days.forEach(function (d, j) { if ((days.length - 1 - j) % Math.ceil(days.length / 7) === 0) s += '<text x="' + (L + j * bw + bw / 2) + '" y="' + (H - 8) + '" class="ax" text-anchor="middle">' + dayLabel(d) + '</text>'; });
+  s += '</svg>';
+  $('ch-done').innerHTML = ss.length ? s : '<div class="mut">Nothing finished yet.</div>'; bindTips($('ch-done'));
+}
+function tiles(rows) {
+  var mins = rows.reduce(function (a, r) { return a + (Number(r.listenedSec) || 0); }, 0) / 60;
+  var parts = rows.filter(function (r) { return r.outcome === 'completed'; }).length;
+  var days = {}; rows.forEach(function (r) { if ((Number(r.listenedSec) || 0) > 30) days[dayKey(r.end)] = 1; });
+  var full = sessions.filter(function (s) { return ORDER.every(function (b) { return progress(s.session, b).done; }); }).length;
+  var streak = 0, d = new Date(); if (!days[dayKey(d.toISOString())]) d.setDate(d.getDate() - 1);
+  while (days[dayKey(d.toISOString())]) { streak++; d.setDate(d.getDate() - 1); }
+  var t = [['Practice time', mins >= 60 ? Math.floor(mins / 60) + ' h ' + Math.round(mins % 60) + ' m' : Math.round(mins) + ' min'],
+           ['Parts finished', parts], ['Sessions complete', full + ' of ' + sessions.length], ['Days practiced', Object.keys(days).length + (streak > 1 ? ' (' + streak + ' in a row)' : '')]];
+  $('tiles').innerHTML = t.map(function (x) { return '<div class="tile"><div class="lab">' + x[0] + '</div><div class="tv">' + esc(x[1]) + '</div></div>'; }).join('');
+}
+function runsTable(rows) {
+  var r = rows.slice().sort(function (a, b) { return String(b.end).localeCompare(String(a.end)); }).slice(0, 60);
+  if (!r.length) { $('runs').innerHTML = 'No practice logged yet. Play any part and it appears here.'; return; }
+  var res = { completed: 'Finished', paused: 'Paused', stopped: 'Stopped', interrupted: 'Interrupted' };
+  $('runs').innerHTML = '<table><thead><tr><th>When</th><th>Session</th><th>Part</th><th class="n">Minutes</th><th>Position</th><th class="n">Answers</th><th>Result</th><th>Device</th></tr></thead><tbody>' +
+    r.map(function (x) {
+      var d = new Date(x.start || x.end);
+      return '<tr><td>' + d.toLocaleDateString('en-US', { month: 'short', day: 'numeric' }) + ' ' + d.toLocaleTimeString('en-US', { hour: 'numeric', minute: '2-digit' }) + '</td><td>' + esc(x.session) +
+        '</td><td><i class="sw" style="background:' + (COLORS[x.block] || 'var(--line)') + '"></i>' + esc(NAMES[x.block] || x.block) + '</td><td class="n">' + ((Number(x.listenedSec) || 0) / 60).toFixed(1) +
+        '</td><td>' + fmt(x.fromSec) + ' to ' + fmt(x.toSec) + '</td><td class="n">' + esc(x.answers || 0) + '</td><td>' + (res[x.outcome] || esc(x.outcome)) + '</td><td>' + esc(x.device || '') + '</td></tr>';
+    }).join('') + '</tbody></table>';
+}
+async function loadReview() {
+  legend('leg1'); legend('leg2');
+  try { usage = await call('usageList'); } catch (e) { $('runs').textContent = 'Could not load: ' + e.message; }
+  var days = dayRange(usage);
+  tiles(usage); chartMinutes(usage, days); chartDone(usage, days); runsTable(usage);
+}
 async function loadHist() {
   try {
-    var h = await call('history', { limit: 40 }), out = '';
+    var h = await call('history', { limit: 60 }), out = '';
     if (!h.length) { $('hist').textContent = 'Nothing recorded yet.'; return; }
     h.forEach(function (r) {
-      out += '<div class="h"><div class="lab">Session ' + esc(r.session) + ' - ' + esc(r.block) + ' - ' + esc(r.durationSec) + 's</div>' +
+      out += '<div class="h"><div class="lab">Session ' + esc(r.session) + ' - ' + esc(NAMES[r.block] || r.block) + ' - ' + esc(r.durationSec) + 's</div>' +
         '<div class="mut">Claude asked: ' + esc(String(r.prompt).slice(0, 220)) + '</div>' +
         '<div><b>I said:</b> ' + (esc(r.transcript) || '<span class="mut">(no transcript)</span>') + '</div>' +
         (r.feedback ? '<div class="fb"><b>Claude:</b> ' + esc(r.feedback) + (r.suggestion ? '<br><b>Try:</b> ' + esc(r.suggestion) : '') + '</div>' : '<div class="mut">No feedback yet.</div>') + '</div>';
@@ -527,7 +896,7 @@ async function loadHist() {
 $('exp').onclick = async function () { try { $('exp-t').value = await call('export', { n: chosen || 1 }); } catch (e) { $('exp-t').value = 'Error: ' + e.message; } };
 $('copy').onclick = function () { var t = $('exp-t'); t.select(); try { navigator.clipboard.writeText(t.value); } catch (e) { document.execCommand('copy'); } };
 $('imp').onclick = async function () {
-  try { $('imp-m').textContent = await call('import', { json: $('imp-t').value }); sessions = await call('sessions'); renderList(); setStart(); }
+  try { $('imp-m').textContent = await call('import', { json: $('imp-t').value }); sessions = await call('sessions'); renderList(); }
   catch (e) { $('imp-m').textContent = 'Error: ' + e.message; }
 };
 $('auto').onclick = async function () { $('auto-m').textContent = 'Working...'; try { $('auto-m').textContent = await call('feedback', { n: chosen || 1 }); } catch (e) { $('auto-m').textContent = e.message; } };
@@ -548,6 +917,7 @@ async function loadGuide() {
       var ping = await call('ping');
       h += chk('ok', 'Sheet reachable. Tabs: ' + esc(ping.tabs.join(', ')) + (ping.sheetUrl ? ' - <a href="' + esc(ping.sheetUrl) + '" target="_blank">open Sheet</a>' : '') + (ping.folderUrl ? ' - <a href="' + esc(ping.folderUrl) + '" target="_blank">open audio folder</a>' : ''));
       var s = await call('sessions'); h += chk(s.length ? 'ok' : 'warn', s.length + ' session(s) in the sheet');
+      try { var u = await call('usageList'); h += chk('ok', 'Usage log reachable: ' + u.length + ' practice record(s)'); } catch (e2) { h += chk('warn', 'No usage log yet: update Code.gs to v1.4 and deploy a new version.'); }
       if (chosen) { var m = await call('audioMeta', { n: chosen }); var n = Object.keys(m).length;
         h += chk(n ? 'ok' : 'warn', n ? 'Studio audio registered for ' + n + ' part(s) of session ' + chosen : 'No studio audio registered for session ' + chosen + ' (phone voice will be used)'); }
       var about = await call('about'); vs = about.changelog;
@@ -565,7 +935,7 @@ $('cfg-save').onclick = async function () {
 };
 $('sync-drive').onclick = async function () {
   $('sync-m').textContent = 'Loading... (can take up to a minute)';
-  try { var r = await call('syncDrive'); $('sync-m').textContent = r.message; sessions = await call('sessions'); renderList(); setStart(); }
+  try { var r = await call('syncDrive'); $('sync-m').textContent = r.message; itemsBy = {}; metaBy = {}; sessions = await call('sessions'); renderList(); }
   catch (e) { $('sync-m').textContent = 'Error: ' + (e.message === 'unknown action syncDrive' ? 'the backend is older than v1.3. Paste the new Code.gs and deploy a new version.' : e.message); }
 };
 $('mic-test').onclick = async function () {
