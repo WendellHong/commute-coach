@@ -129,6 +129,12 @@ label.row{display:flex;gap:8px;align-items:center;font-size:14px;margin:6px 0}
     <label class="row"><input id="cfg-stt" type="checkbox" checked> Transcribe my answers with the browser (needs Chrome, Edge or Safari)</label>
     <button class="alt" id="cfg-save">Save and check</button>
   </div>
+  <div class="card">
+    <h2>New sessions</h2>
+    <div class="mut">After you upload DayNN.json files and their MP3s to the Drive folder "Commute Coach audio", tap this once.</div>
+    <button class="alt" id="sync-drive">Load new sessions from Drive</button>
+    <div id="sync-m" class="mut"></div>
+  </div>
   <div class="card"><h2>Checks</h2><div id="checks" class="mut">Press "Save and check".</div>
     <button class="alt" id="mic-test">Test microphone</button>
     <div class="meter" style="margin-top:8px"><i id="mic-meter"></i></div></div>
@@ -136,7 +142,7 @@ label.row{display:flex;gap:8px;align-items:center;font-size:14px;margin:6px 0}
     <h2>How the app works</h2>
     <div class="flow">
       <div class="step"><b class="n">1</b><div><div class="who">Claude, in your project chat</div>Writes the session: spoken script, answer windows, and the MP3 audio with caption timings.</div></div>
-      <div class="step"><b class="n">2</b><div><div class="who">You, once per session, 2 minutes</div>Paste Claude's JSON into Sync, Import. Upload the MP3 files to the Drive folder "Commute Coach audio" and run registerAudio in Apps Script.</div></div>
+      <div class="step"><b class="n">2</b><div><div class="who">You, once per batch, 2 minutes</div>Upload Claude's files (DayNN.json plus its three MP3s) to the Drive folder "Commute Coach audio". Then tap "Load new sessions from Drive" above.</div></div>
       <div class="step"><b class="n">3</b><div><div class="who">This page</div>Downloads the audio once and keeps it on your device, so later plays start fast.</div></div>
       <div class="step"><b class="n">4</b><div><div class="who">Your commute</div>Tap Start while parked. The coach and interviewer speak; captions follow. At each chime the microphone opens; stop talking for a few seconds and it moves on.</div></div>
       <div class="step"><b class="n">5</b><div><div class="who">Saved automatically</div>Each answer goes to the Google Sheet (transcript, length) and your recording to Drive.</div></div>
@@ -154,8 +160,9 @@ label.row{display:flex;gap:8px;align-items:center;font-size:14px;margin:6px 0}
 </main>
 
 <script>
-var APP_VERSION = '1.2.0';
+var APP_VERSION = '1.3.0';
 var LOCAL_CHANGES = [
+  { v: '1.3.0', date: '2026-11-05', notes: ['Load new sessions from Drive with one tap (Guide tab)', 'Links to your Sheet and audio folder in Checks', 'Works with the single-file backend'] },
   { v: '1.2.0', date: '2026-11-01', notes: ['Hosted page so the microphone prompt works', 'Captions follow the audio', 'Faster audio with on-device cache', 'Guide tab and version history'] },
   { v: '1.1.0', date: '2026-11-01', notes: ['Studio-quality MP3 playback with answer windows'] },
   { v: '1.0.0', date: '2026-11-01', notes: ['First version'] }
@@ -539,7 +546,7 @@ async function loadGuide() {
   else {
     try {
       var ping = await call('ping');
-      h += chk('ok', 'Sheet reachable. Tabs: ' + esc(ping.tabs.join(', ')));
+      h += chk('ok', 'Sheet reachable. Tabs: ' + esc(ping.tabs.join(', ')) + (ping.sheetUrl ? ' - <a href="' + esc(ping.sheetUrl) + '" target="_blank">open Sheet</a>' : '') + (ping.folderUrl ? ' - <a href="' + esc(ping.folderUrl) + '" target="_blank">open audio folder</a>' : ''));
       var s = await call('sessions'); h += chk(s.length ? 'ok' : 'warn', s.length + ' session(s) in the sheet');
       if (chosen) { var m = await call('audioMeta', { n: chosen }); var n = Object.keys(m).length;
         h += chk(n ? 'ok' : 'warn', n ? 'Studio audio registered for ' + n + ' part(s) of session ' + chosen : 'No studio audio registered for session ' + chosen + ' (phone voice will be used)'); }
@@ -555,6 +562,11 @@ async function loadGuide() {
 $('cfg-save').onclick = async function () {
   cfg.url = $('cfg-url').value.trim(); cfg.token = $('cfg-tok').value.trim(); cfg.stt = $('cfg-stt').checked; saveCfg();
   await loadGuide(); loadSessions();
+};
+$('sync-drive').onclick = async function () {
+  $('sync-m').textContent = 'Loading... (can take up to a minute)';
+  try { var r = await call('syncDrive'); $('sync-m').textContent = r.message; sessions = await call('sessions'); renderList(); setStart(); }
+  catch (e) { $('sync-m').textContent = 'Error: ' + (e.message === 'unknown action syncDrive' ? 'the backend is older than v1.3. Paste the new Code.gs and deploy a new version.' : e.message); }
 };
 $('mic-test').onclick = async function () {
   $('mic-test').textContent = 'Listening...';
