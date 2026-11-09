@@ -90,6 +90,39 @@ table{border-collapse:collapse;width:100%;font-size:13px;white-space:nowrap}
 th,td{text-align:left;padding:6px 8px;border-top:1px solid var(--line)}
 th{color:var(--mut);font-weight:600;font-size:12px}
 td.n,th.n{text-align:right;font-variant-numeric:tabular-nums}
+.filters{display:flex;flex-wrap:wrap;gap:8px;align-items:center;margin-bottom:8px}
+.filters select{padding:8px;border:1px solid var(--line);border-radius:10px;background:var(--card);color:var(--ink);font-size:14px;max-width:100%}
+.seg{display:flex;border:1px solid var(--line);border-radius:999px;overflow:hidden}
+.seg button{border:0;background:var(--card);color:var(--ink);padding:7px 10px;font-size:13px;margin:0}
+.seg button.on{background:var(--acc);color:#fff}
+.sm2{font-size:12px}
+details.day{background:var(--card);border:1px solid var(--line);border-radius:14px;padding:4px 12px 10px;margin-bottom:10px}
+details.day>summary{list-style:none;cursor:pointer;padding:8px 0;display:flex;justify-content:space-between;gap:8px;align-items:baseline;flex-wrap:wrap}
+details.day>summary::-webkit-details-marker{display:none}
+details.day>summary:before{content:'\25B8';color:var(--mut);margin-right:4px}
+details.day[open]>summary:before{content:'\25BE'}
+.blk{margin:12px 0 4px}
+.chip{display:inline-block;font-size:12px;font-weight:700;letter-spacing:.04em;text-transform:uppercase;padding:3px 9px;border-radius:999px;color:#fff}
+.chip.c-mindset{background:#2a78d6}.chip.c-interview{background:#c4521f}.chip.c-market{background:#14845c}
+.q{border-top:1px solid var(--line);padding:10px 0}
+.q-p{color:var(--mut);font-size:14px;margin-bottom:6px}
+.att{margin:6px 0;padding-left:10px;border-left:3px solid var(--line)}
+.att .lab{font-size:11px}
+.fb{background:var(--bg);border-radius:10px;padding:8px 10px;margin:8px 0;font-size:14px}
+.fb .try{margin-top:4px}
+mark{background:#fff1a8;color:inherit;border-radius:3px;padding:0 2px}
+@media (prefers-color-scheme:dark){mark{background:#5c4d00}}
+b.num{color:var(--acc)}
+.kw{display:inline-block;border:1px solid var(--acc);color:var(--acc);border-radius:999px;padding:1px 8px;font-size:12px;margin:2px 2px 0 0}
+.kws{margin-top:6px}
+.legend2{margin:0 0 8px}
+.sheet{position:fixed;left:0;right:0;bottom:0;z-index:20;background:rgba(0,0,0,.35);top:0;display:flex;align-items:flex-end;justify-content:center}
+.sheet.hide{display:none}
+.sheet-in{background:var(--card);width:100%;max-width:640px;border-radius:16px 16px 0 0;padding:16px;max-height:88vh;overflow:auto}
+.rep h3{font-size:14px;margin:12px 0 4px}
+.rep ul{margin:4px 0 4px 18px;padding:0}.rep ul.good li::marker{color:var(--ok)}.rep ul.fix li::marker{color:var(--warn)}
+.scores div{margin:3px 0;font-size:13px}.scores .lab{display:inline-block;width:90px;text-transform:capitalize}
+.score{display:inline-block;width:90px;height:8px;background:var(--line);border-radius:4px;vertical-align:middle;overflow:hidden}.score i{display:block;height:100%;background:var(--acc)}
 </style>
 </head>
 <body>
@@ -160,7 +193,7 @@ td.n,th.n{text-align:right;font-variant-numeric:tabular-nums}
 </section>
 
 <section id="v-review" class="hide">
-  <div class="subnav"><button id="r-use" class="on">Practice</button><button id="r-ans">Answers and feedback</button></div>
+  <div class="subnav"><button id="r-use" class="on">Practice</button><button id="r-ans">Answers</button><button id="r-rep">Daily reports</button></div>
   <div id="rv-use">
     <div class="tiles" id="tiles"></div>
     <div class="card viz-root">
@@ -179,7 +212,34 @@ td.n,th.n{text-align:right;font-variant-numeric:tabular-nums}
       <div class="tblwrap mut" id="runs">Loading...</div>
     </div>
   </div>
-  <div id="rv-ans" class="hide"><div class="card"><h2>What I said and what Claude replied</h2><div id="hist" class="mut">Loading...</div></div></div>
+  <div id="rv-ans" class="hide">
+    <div class="filters">
+      <select id="a-sess" aria-label="Day"></select>
+      <div class="seg" id="a-blocks"><button data-b="all" class="on">All</button><button data-b="mindset">Mindset</button><button data-b="interview">Interview</button><button data-b="market">Market</button></div>
+      <label class="mut sm2"><input type="checkbox" id="a-fb"> Only with feedback</label>
+    </div>
+    <div class="legend2 mut sm2"><mark>keyword</mark> technical term or phrase Claude asked for - <b class="num">12%</b> number</div>
+    <div id="hist"></div>
+  </div>
+  <div id="rv-rep" class="hide"><div id="reports"></div></div>
+  <div id="retry" class="sheet hide">
+    <div class="sheet-in">
+      <div class="lab" id="rt-h"></div>
+      <div class="q-p" id="rt-p"></div>
+      <button class="alt sm" id="rt-show">Show the hint</button>
+      <div id="rt-hint" class="fb hide"></div>
+      <div class="state" id="rt-state">Ready</div>
+      <div class="meter"><i id="rt-meter"></i></div>
+      <div id="rt-m" class="mut sm2"></div>
+      <div class="ctl two">
+        <button id="rt-play">Play question</button>
+        <button id="rt-rec" class="main">Record</button>
+        <button id="rt-stop" disabled>Stop</button>
+        <button id="rt-close">Close</button>
+      </div>
+      <button class="alt sm" id="rt-next">Next question</button>
+    </div>
+  </div>
   <div id="tip" class="tip hide"></div>
 </section>
 
@@ -269,8 +329,9 @@ td.n,th.n{text-align:right;font-variant-numeric:tabular-nums}
 </main>
 
 <script>
-var APP_VERSION = '1.6.0';
+var APP_VERSION = '1.7.0';
 var LOCAL_CHANGES = [
+  { v: '1.7.0', date: '2026-11-09', notes: ['Answers grouped by day and part, with keywords and numbers marked', 'Practice again: replay the question and record a second attempt, one or all with feedback', 'Daily reports from Claude, with a trend table'] },
   { v: '1.6.0', date: '2026-11-09', notes: ['Sync: Pack new answers makes a zip of your recordings and prompts to attach in the Claude chat'] },
   { v: '1.5.1', date: '2026-11-09', notes: ['Speech-to-text restarts if the browser stops listening early, and waits for the last words', 'If no transcript, the reason is saved with the answer and shown on screen', 'Guide: Test speech-to-text button'] },
   { v: '1.5.0', date: '2026-11-07', notes: ['Seek bar, back and forward 15 s, previous and next sentence, previous and next part', 'Caption box no longer moves the buttons up and down', 'Daily market briefs listed on Today', 'Automation card on Guide: Google voices, daily brief, automatic feedback'] },
@@ -864,8 +925,6 @@ $('resume-end').onclick = function () { if (!run) return; stopFlag = true; quiet
 
 /* ---- review: practice log, tiles, two charts; answers ---- */
 var COLORS = { mindset: 'var(--s1)', interview: 'var(--s2)', market: 'var(--s3)' };
-$('r-use').onclick = function () { $('r-use').classList.add('on'); $('r-ans').classList.remove('on'); $('rv-use').classList.remove('hide'); $('rv-ans').classList.add('hide'); };
-$('r-ans').onclick = function () { $('r-ans').classList.add('on'); $('r-use').classList.remove('on'); $('rv-ans').classList.remove('hide'); $('rv-use').classList.add('hide'); loadHist(); };
 function dayKey(iso) { var d = new Date(iso); return d.getFullYear() + '-' + ('0' + (d.getMonth() + 1)).slice(-2) + '-' + ('0' + d.getDate()).slice(-2); }
 function dayLabel(k) { var p = k.split('-'); return Number(p[1]) + '/' + Number(p[2]); }
 function dayRange(rows) {
@@ -980,19 +1039,207 @@ async function loadReview() {
   var days = dayRange(usage);
   tiles(usage); chartMinutes(usage, days); chartDone(usage, days); runsTable(usage);
 }
-async function loadHist() {
-  try {
-    var h = await call('history', { limit: 60 }), out = '';
-    if (!h.length) { $('hist').textContent = 'Nothing recorded yet.'; return; }
-    h.forEach(function (r) {
-      out += '<div class="h"><div class="lab">Session ' + esc(r.session) + ' - ' + esc(NAMES[r.block] || r.block) + ' - ' + esc(r.durationSec) + 's</div>' +
-        '<div class="mut">Claude asked: ' + esc(String(r.prompt).slice(0, 220)) + '</div>' +
-        '<div><b>I said:</b> ' + (esc(r.transcript) || '<span class="mut">(no transcript)</span>') + '</div>' +
-        (r.feedback ? '<div class="fb"><b>Claude:</b> ' + esc(r.feedback) + (r.suggestion ? '<br><b>Try:</b> ' + esc(r.suggestion) : '') + '</div>' : '<div class="mut">No feedback yet.</div>') + '</div>';
-    });
-    $('hist').innerHTML = out;
-  } catch (e) { $('hist').textContent = 'Could not load: ' + e.message; }
+/* ---- review: answers grouped by day and part, keywords marked, second chance; daily reports ---- */
+var hist = [], reports = [], aBlock = 'all';
+var GLOSS = ['A14', 'A16', 'backside power', 'Super Power Rail', 'power delivery', 'gate-all-around', 'nanosheets?', 'FinFETs?', 'forksheet', 'CFET',
+  'epitaxy', 'WAT', 'wafer sort', 'bin maps?', 'yield', 'PDKs?', 'SPICE', 'corners?', 'mismatch', 'DTCO', 'PPA', 'overlay', 'test structures?', 'test ?keys?',
+  'tape-outs?', 'imec', 'TSMC', 'Intel', 'Nvidia', 'Google', 'Apple', 'AMD', 'TPUs?', 'HBM', 'packaging', 'root cause', 'baselines?', 'adopted',
+  'defect density', 'design rules', 'trade-offs?', 'patents?', 'papers?', 'proposal', 'vice president', 'directors?'];
+function rx(s) { return s.replace(/[.*+?^${}()|[\]\\]/g, '\\$&'); }
+function hl(text, kws) {
+  var extra = (kws || []).filter(function (k) { return k && k.length > 1; }).map(rx);
+  var terms = extra.concat(GLOSS).sort(function (a, b) { return b.length - a.length; });
+  var re = new RegExp('\\b(' + terms.join('|') + ')\\b|(\\b\\d+(?:\\.\\d+)?(?:\\s?(?:%|percent|x\\b))?)', 'gi');
+  return esc(pretty(text || '')).replace(re, function (m, kw, num) { return kw ? '<mark>' + m + '</mark>' : '<b class="num">' + m + '</b>'; });
 }
+function shortDate2(t) { var d = new Date(t); return isNaN(d) ? '' : d.toLocaleDateString('en-US', { month: 'short', day: 'numeric' }); }
+function keyOf(r) { return r.session + '|' + r.block + '|' + r.seq; }
+
+$('r-rep').onclick = function () { subTab('rep'); loadReports(); };
+function subTab(w) {
+  ['use', 'ans', 'rep'].forEach(function (x) { $('r-' + x).classList.toggle('on', x === w); $('rv-' + x).classList.toggle('hide', x !== w); });
+}
+$('r-use').onclick = function () { subTab('use'); };
+$('r-ans').onclick = function () { subTab('ans'); loadHist(); };
+Array.prototype.forEach.call(document.querySelectorAll('#a-blocks button'), function (b) {
+  b.onclick = function () { aBlock = b.dataset.b; Array.prototype.forEach.call(document.querySelectorAll('#a-blocks button'), function (x) { x.classList.toggle('on', x === b); }); renderHist(); };
+});
+$('a-sess').onchange = renderHist; $('a-fb').onchange = renderHist;
+
+async function loadHist() {
+  $('hist').innerHTML = '<div class="mut">Loading...</div>';
+  try { hist = await call('history', { limit: 600 }); } catch (e) { $('hist').textContent = 'Could not load: ' + e.message; return; }
+  var seen = {}, opts = '<option value="">All days</option>';
+  hist.slice().sort(function (a, b) { return b.session - a.session; }).forEach(function (r) {
+    if (seen[r.session]) return; seen[r.session] = 1;
+    opts += '<option value="' + r.session + '">' + (r.session > 999 ? 'Market brief ' + r.session : 'Day ' + r.session) + (r.title ? ' - ' + esc(String(r.title).replace(/^Day \d+:\s*/, '')) : '') + '</option>';
+  });
+  var cur = $('a-sess').value; $('a-sess').innerHTML = opts; $('a-sess').value = cur;
+  renderHist();
+}
+function groups() {
+  var bySess = {}, onlyFb = $('a-fb').checked, sel = $('a-sess').value;
+  hist.forEach(function (r) {
+    if (sel && String(r.session) !== sel) return;
+    if (aBlock !== 'all' && r.block !== aBlock) return;
+    var s = bySess[r.session] = bySess[r.session] || { session: Number(r.session), title: r.title, keys: {}, last: '' };
+    var q = s.keys[keyOf(r)] = s.keys[keyOf(r)] || { session: Number(r.session), block: r.block, seq: Number(r.seq), prompt: r.prompt, attempts: [], feedbacks: r.feedbacks || [] };
+    q.attempts.push(r); if (String(r.timestamp) > s.last) s.last = String(r.timestamp);
+  });
+  return Object.keys(bySess).map(function (k) { return bySess[k]; }).sort(function (a, b) { return b.session - a.session; }).map(function (s) {
+    s.qs = Object.keys(s.keys).map(function (k) { return s.keys[k]; })
+      .filter(function (q) { return !onlyFb || q.feedbacks.length; })
+      .sort(function (a, b) { return (ORDER.indexOf(a.block) - ORDER.indexOf(b.block)) || (a.seq - b.seq); });
+    s.qs.forEach(function (q) {
+      q.attempts.sort(function (a, b) { return String(a.timestamp).localeCompare(String(b.timestamp)); });
+      // a filled attempt is the one to show; very short empty ones are false starts
+      q.real = q.attempts.filter(function (a) { return String(a.transcript || '').trim() && String(a.transcript).charAt(0) !== '(' || Number(a.durationSec) >= 8; });
+      if (!q.real.length) q.real = q.attempts.slice(-1);
+    });
+    return s;
+  }).filter(function (s) { return s.qs.length; });
+}
+function renderHist() {
+  var gs = groups();
+  if (!gs.length) { $('hist').innerHTML = '<div class="mut">Nothing to show with these filters.</div>'; return; }
+  $('hist').innerHTML = gs.map(function (s, i) {
+    var nfb = s.qs.filter(function (q) { return q.feedbacks.length; }).length;
+    var h = '<details class="day"' + (i === 0 ? ' open' : '') + '><summary><div><b>' + (s.session > 999 ? 'Market brief' : 'Day ' + s.session) + '</b> <span class="mut">' +
+      esc(String(s.title || '').replace(/^Day \d+:\s*/, '')) + '</span></div><div class="mut sm2">' + s.qs.length + (s.qs.length === 1 ? ' question, ' : ' questions, ') + nfb + ' with feedback, last ' + shortDate2(s.last) + '</div></summary>';
+    if (nfb) h += '<button class="alt sm" data-retry-day="' + s.session + '">Practice again: all ' + nfb + ' with feedback</button>';
+    var lastBlock = '';
+    s.qs.forEach(function (q) {
+      if (q.block !== lastBlock) { h += '<div class="blk"><span class="chip c-' + q.block + '">' + NAMES[q.block] + '</span></div>'; lastBlock = q.block; }
+      var f = q.feedbacks[0], kws = f ? f.keywords : [];
+      h += '<div class="q"><div class="q-p">' + hl(String(q.prompt).slice(-260), []) + '</div>';
+      q.real.forEach(function (a, j) {
+        h += '<div class="att"><div class="lab">' + (j === 0 ? 'First answer' : 'Attempt ' + (j + 1)) + ' - ' + shortDate2(a.timestamp) + ' - ' + esc(a.durationSec) + ' s</div>' +
+             '<div>' + (String(a.transcript || '').trim() ? hl(a.transcript, kws) : '<span class="mut">(no transcript)</span>') + '</div></div>';
+      });
+      if (f) {
+        var norm = function (t) { return ' ' + String(t || '').toLowerCase().replace(/%/g, ' percent').replace(/[^a-z0-9 ]+/g, ' ').replace(/\s+/g, ' ') + ' '; };
+        var lastText = norm(q.real[q.real.length - 1].transcript);
+        var missing = kws.filter(function (k) { return lastText.indexOf(norm(k)) < 0; });
+        h += '<div class="fb"><div><b>Claude:</b> ' + hl(f.feedback, kws) + '</div>' + (f.suggestion ? '<div class="try"><b>Try:</b> ' + hl(f.suggestion, kws) + '</div>' : '') +
+             (missing.length ? '<div class="kws"><span class="mut">Include next time:</span> ' + missing.map(function (k) { return '<span class="kw">' + esc(k) + '</span>'; }).join(' ') + '</div>' : '') +
+             (q.feedbacks.length > 1 ? '<div class="mut sm2">' + (q.feedbacks.length - 1) + ' earlier note(s)</div>' : '') + '</div>';
+      } else h += '<div class="mut sm2">No feedback yet.</div>';
+      h += '<button class="alt sm" data-retry="' + q.session + '|' + q.block + '|' + q.seq + '">Practice again</button></div>';
+    });
+    return h + '</details>';
+  }).join('');
+  Array.prototype.forEach.call(document.querySelectorAll('[data-retry]'), function (b) { b.onclick = function () { startRetry([b.dataset.retry]); }; });
+  Array.prototype.forEach.call(document.querySelectorAll('[data-retry-day]'), function (b) {
+    b.onclick = function () { var s = gs.filter(function (x) { return String(x.session) === b.dataset.retryDay; })[0];
+      startRetry(s.qs.filter(function (q) { return q.feedbacks.length; }).map(function (q) { return q.session + '|' + q.block + '|' + q.seq; })); };
+  });
+}
+
+/* ---- second chance ---- */
+var rq = { keys: [], i: 0, R: null, busy: false, audio: null };
+function qFor(key) {
+  var p = key.split('|'), q = null;
+  groups().forEach(function (s) { s.qs.forEach(function (x) { if (x.session + '|' + x.block + '|' + x.seq === key) q = x; }); });
+  if (!q) { var r = hist.filter(function (h) { return keyOf(h) === key; })[0]; q = { session: Number(p[0]), block: p[1], seq: Number(p[2]), prompt: r ? r.prompt : '', feedbacks: r ? r.feedbacks || [] : [] }; }
+  return q;
+}
+function startRetry(keys) {
+  if (running && !paused) { alert2('Pause or stop the session first.'); return; }
+  rq.keys = keys; rq.i = 0; $('retry').classList.remove('hide'); showRetry();
+}
+function alert2(m) { $('rt-m').textContent = m; $('retry').classList.remove('hide'); }
+function showRetry() {
+  var q = qFor(rq.keys[rq.i]), f = q.feedbacks[0];
+  $('rt-h').textContent = 'Second chance ' + (rq.keys.length > 1 ? (rq.i + 1) + ' of ' + rq.keys.length + ' - ' : '- ') + (q.session > 999 ? 'Market brief' : 'Day ' + q.session) + ' - ' + NAMES[q.block];
+  $('rt-p').innerHTML = hl(String(q.prompt).slice(-260), []);
+  $('rt-hint').innerHTML = f ? '<b>Claude:</b> ' + hl(f.feedback, f.keywords) + (f.suggestion ? '<br><b>Try:</b> ' + hl(f.suggestion, f.keywords) : '') +
+    (f.keywords && f.keywords.length ? '<div class="kws">' + f.keywords.map(function (k) { return '<span class="kw">' + esc(k) + '</span>'; }).join(' ') + '</div>' : '') : 'No feedback for this question yet.';
+  $('rt-hint').classList.add('hide'); $('rt-show').textContent = 'Show the hint';
+  $('rt-m').textContent = ''; $('rt-state').textContent = 'Ready'; $('rt-state').className = 'state';
+  $('rt-next').classList.toggle('hide', rq.i >= rq.keys.length - 1);
+  $('rt-rec').disabled = false; $('rt-play').disabled = false; $('rt-stop').disabled = true;
+}
+$('rt-show').onclick = function () { var h = $('rt-hint').classList.toggle('hide'); this.textContent = h ? 'Show the hint' : 'Hide the hint'; };
+$('rt-close').onclick = function () { rq.stop = true; if (rq.audio) rq.audio.pause(); $('retry').classList.add('hide'); if (rq.saved) { rq.saved = false; loadHist(); } };
+$('rt-next').onclick = function () { rq.stop = true; if (rq.audio) rq.audio.pause(); rq.i++; showRetry(); };
+$('rt-play').onclick = async function () {
+  var q = qFor(rq.keys[rq.i]); this.disabled = true; $('rt-m').textContent = 'Loading the question...';
+  try {
+    await ensureSession(q.session);
+    var rows = itemsBy[q.session].filter(function (x) { return x.block === q.block; });
+    var pr = rows.filter(function (x) { return x.seq < q.seq && x.type === 'say'; }).pop();
+    var meta = metaBy[q.session] && metaBy[q.session][q.block];
+    var caps = meta ? (meta.captions || []).filter(function (c) { return pr && c.seq === pr.seq; }) : [];
+    if (caps.length) {
+      var url = await blockUrl(q.session, q.block);
+      rq.audio = rq.audio || new Audio(); rq.audio.src = url;
+      await new Promise(function (r) { rq.audio.onloadedmetadata = r; setTimeout(r, 3000); });
+      rq.audio.currentTime = Math.max(0, caps[0].t0 - 0.2); rq.stop = false;
+      $('rt-m').textContent = ''; $('rt-state').textContent = pr.voice === 'interviewer' ? 'Interviewer' : 'Coach'; $('rt-state').className = 'state say';
+      await rq.audio.play();
+      var end = caps[caps.length - 1].t1 + 0.3;
+      while (!rq.stop && !rq.audio.paused && rq.audio.currentTime < end) await sleep(100);
+      rq.audio.pause();
+    } else if (pr) { $('rt-m').textContent = ''; await say(pr.text, pr.voice); }
+    $('rt-state').textContent = 'Your turn: tap Record'; $('rt-state').className = 'state';
+  } catch (e) { $('rt-m').textContent = 'Could not play the question: ' + e.message; }
+  this.disabled = false;
+};
+$('rt-rec').onclick = async function () {
+  var q = qFor(rq.keys[rq.i]), btn = this;
+  if (rq.audio) rq.audio.pause();
+  btn.disabled = true; $('rt-play').disabled = true;
+  var own = !stream; if (!stream && !(await openMic())) { $('rt-m').textContent = micAdvice(); btn.disabled = false; $('rt-play').disabled = false; return; }
+  var maxSec = 90;
+  try { await ensureSession(q.session); var row = itemsBy[q.session].filter(function (x) { return x.block === q.block && x.seq === q.seq; })[0]; if (row && row.sec) maxSec = Math.max(30, Number(row.sec) + 15); } catch (e) {}
+  beep(700); var R = beginRec(); if (!R) { $('rt-m').textContent = 'Recording is not supported here.'; btn.disabled = false; return; }
+  rq.stop = false; $('rt-stop').disabled = false; $('rt-state').textContent = 'Recording'; $('rt-state').className = 'state rec';
+  var spoke = false, lastVoice = Date.now();
+  while (!rq.stop && (Date.now() - R.t0) < maxSec * 1000) {
+    await sleep(120);
+    var lv = level(R, 'rt-meter'); if (lv > 0.03) { spoke = true; lastVoice = Date.now(); }
+    $('rt-m').textContent = Math.round((Date.now() - R.t0) / 1000) + ' s of up to ' + maxSec + ' s. Stop talking for 4 s, or tap Stop.';
+    if (spoke && Date.now() - lastVoice > 4000 && (Date.now() - R.t0) > 6000) break;
+  }
+  beep(520); $('rt-stop').disabled = true; $('rt-state').textContent = 'Saving...'; $('rt-state').className = 'state';
+  await finishRec(R, { session: q.session, block: q.block, seq: q.seq }, String(q.prompt || ''));
+  await Promise.all(pending); pending = [];
+  if (own && !running && stream) { stream.getTracks().forEach(function (t) { t.stop(); }); stream = null; }
+  rq.saved = true;
+  $('rt-state').textContent = 'Saved'; $('rt-m').innerHTML = 'Your new attempt is saved' + (R.transcript && R.transcript.charAt(0) !== '(' ? ': <i>' + hl(R.transcript, (q.feedbacks[0] || {}).keywords) + '</i>' : '.') + ' It will be in your next answer pack.';
+  btn.disabled = false; $('rt-play').disabled = false;
+};
+$('rt-stop').onclick = function () { rq.stop = true; };
+
+/* ---- daily reports ---- */
+function scoreBar(v) { v = Number(v) || 0; return '<span class="score"><i style="width:' + Math.max(0, Math.min(100, v * 20)) + '%"></i></span> ' + (v ? v.toFixed(1).replace(/\.0$/, '') : '-') + '/5'; }
+async function loadReports() {
+  $('reports').innerHTML = '<div class="mut">Loading...</div>';
+  try { reports = await call('reports'); } catch (e) { $('reports').textContent = /unknown action/.test(e.message) ? 'Reports need backend v1.7: paste the new Code.gs and deploy a new version.' : 'Could not load: ' + e.message; return; }
+  if (!reports.length) { $('reports').innerHTML = '<div class="mut">No reports yet. Send an answer pack to Claude; the reply includes a report you import on the Sync tab.</div>'; return; }
+  var trend = '<div class="card"><h2>Trend</h2><div class="tblwrap"><table><thead><tr><th>Date</th><th>Days</th><th class="n">Answers</th><th class="n">Overall</th><th class="n">Pace (wpm)</th><th class="n">Fillers/min</th></tr></thead><tbody>' +
+    reports.map(function (r) { var m = r.metrics || {}, s = r.scores || {};
+      return '<tr><td>' + esc(r.date) + '</td><td>' + esc([].concat(r.sessions || []).join(', ')) + '</td><td class="n">' + esc(m.answers == null ? '' : m.answers) + '</td><td class="n">' + esc(s.overall == null ? '' : s.overall) +
+        '</td><td class="n">' + esc(m.avgWpm == null ? '-' : m.avgWpm) + '</td><td class="n">' + esc(m.fillersPerMin == null ? '-' : m.fillersPerMin) + '</td></tr>'; }).join('') + '</tbody></table></div></div>';
+  $('reports').innerHTML = trend + reports.map(function (r, i) {
+    var m = r.metrics || {}, s = r.scores || {}, kws = r.keywords || [];
+    var tiles = [['Answers', m.answers], ['Speaking time', m.minutes != null ? m.minutes + ' min' : null], ['Pace', m.avgWpm != null ? m.avgWpm + ' wpm' : null], ['Fillers', m.fillersPerMin != null ? m.fillersPerMin + ' per min' : null], ['Longest pause', m.longestPause != null ? m.longestPause + ' s' : null]]
+      .filter(function (t) { return t[1] != null && t[1] !== ''; });
+    return '<details class="day rep"' + (i === 0 ? ' open' : '') + '><summary><div><b>' + esc(r.date) + '</b> <span class="mut">' + esc(r.title || '') + '</span></div><div class="mut sm2">' +
+      ([].concat(r.sessions || []).length ? 'Days ' + esc([].concat(r.sessions).join(', ')) + ' - ' : '') + (s.overall != null ? 'overall ' + esc(s.overall) + '/5' : '') + '</div></summary>' +
+      (r.summary ? '<p>' + hl(r.summary, kws) + '</p>' : '') +
+      (tiles.length ? '<div class="tiles">' + tiles.map(function (t) { return '<div class="tile"><div class="lab">' + t[0] + '</div><div class="tv">' + esc(t[1]) + '</div></div>'; }).join('') + '</div>' : '') +
+      (Object.keys(s).length ? '<div class="scores">' + Object.keys(s).filter(function (k) { return k !== 'overall'; }).map(function (k) { return '<div><span class="lab">' + esc(k) + '</span> ' + scoreBar(s[k]) + '</div>'; }).join('') + '</div>' : '') +
+      (r.wins && r.wins.length ? '<h3>What went well</h3><ul class="good">' + r.wins.map(function (w) { return '<li>' + hl(w, kws) + '</li>'; }).join('') + '</ul>' : '') +
+      (r.fixes && r.fixes.length ? '<h3>Fix next</h3><ul class="fix">' + r.fixes.map(function (w) { return '<li>' + hl(w, kws) + '</li>'; }).join('') + '</ul>' : '') +
+      (r.nextFocus ? '<h3>Practice next</h3><p>' + hl(r.nextFocus, kws) + '</p>' : '') +
+      (r.items && r.items.length ? '<h3>Question by question</h3><div class="tblwrap"><table><tbody>' + r.items.map(function (it) {
+        return '<tr><td>' + esc(it.key || '') + '</td><td class="n">' + esc(it.score == null ? '' : it.score + '/5') + '</td><td style="white-space:normal">' + hl(it.note || '', kws) + '</td></tr>'; }).join('') + '</tbody></table></div>' : '') +
+      (kws.length ? '<h3>Key phrases</h3><div class="kws">' + kws.map(function (k) { return '<span class="kw">' + esc(k) + '</span>'; }).join(' ') + '</div>' : '') +
+      '</details>';
+  }).join('');
+}
+
 
 /* ---- sync ---- */
 $('exp').onclick = async function () { try { $('exp-t').value = await call('export', { n: chosen || 1 }); } catch (e) { $('exp-t').value = 'Error: ' + e.message; } };
