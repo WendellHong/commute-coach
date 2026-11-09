@@ -185,7 +185,14 @@ td.n,th.n{text-align:right;font-variant-numeric:tabular-nums}
 
 <section id="v-sync" class="hide">
   <div class="card">
-    <h2>1. Copy my answers for Claude</h2>
+    <h2>1. Send my recordings to Claude (best feedback)</h2>
+    <div class="mut">Makes one zip file with your recorded answers and their prompts. Download it and attach it in the Claude chat. Claude transcribes the audio accurately and reviews content, length, pace and pauses.</div>
+    <button class="alt" id="pack-new">Pack new answers</button>
+    <button class="alt" id="pack-s">Pack this session</button>
+    <div id="pack-m" class="mut"></div>
+  </div>
+  <div class="card">
+    <h2>1b. Or copy the text version</h2>
     <div class="mut">Paste the result into the Claude chat. Claude replies with feedback and tomorrow's session.</div>
     <button class="alt" id="exp">Build text for this session</button>
     <textarea id="exp-t" readonly></textarea>
@@ -211,6 +218,7 @@ td.n,th.n{text-align:right;font-variant-numeric:tabular-nums}
     <div id="cfg-url-wrap"><div class="lab">Apps Script web app URL (ends in /exec)</div><input id="cfg-url" type="text" placeholder="https://script.google.com/macros/s/.../exec"></div>
     <div class="lab">API token (from the Apps Script log)</div><input id="cfg-tok" type="password" placeholder="token">
     <label class="row"><input id="cfg-stt" type="checkbox" checked> Transcribe my answers with the browser (needs Chrome, Edge or Safari)</label>
+    <button class="alt" id="stt-test">Test speech-to-text (8 seconds)</button> <span id="stt-m" class="mut"></span>
     <button class="alt" id="cfg-save">Save and check</button>
   </div>
   <div class="card">
@@ -261,8 +269,10 @@ td.n,th.n{text-align:right;font-variant-numeric:tabular-nums}
 </main>
 
 <script>
-var APP_VERSION = '1.5.0';
+var APP_VERSION = '1.6.0';
 var LOCAL_CHANGES = [
+  { v: '1.6.0', date: '2026-11-09', notes: ['Sync: Pack new answers makes a zip of your recordings and prompts to attach in the Claude chat'] },
+  { v: '1.5.1', date: '2026-11-09', notes: ['Speech-to-text restarts if the browser stops listening early, and waits for the last words', 'If no transcript, the reason is saved with the answer and shown on screen', 'Guide: Test speech-to-text button'] },
   { v: '1.5.0', date: '2026-11-07', notes: ['Seek bar, back and forward 15 s, previous and next sentence, previous and next part', 'Caption box no longer moves the buttons up and down', 'Daily market briefs listed on Today', 'Automation card on Guide: Google voices, daily brief, automatic feedback'] },
   { v: '1.4.0', date: '2026-11-06', notes: ['Pick any part of any session; each part keeps its own status and place', 'Pause, switch to another part or tab, and resume where you left off', 'Review, Practice: when, how long and which part, with two charts', 'More natural voices'] },
   { v: '1.3.0', date: '2026-11-05', notes: ['Load new sessions from Drive with one tap (Guide tab)', 'Links to your Sheet and audio folder in Checks', 'Works with the single-file backend'] },
@@ -529,8 +539,13 @@ function beginRec() {
   R.mr.ondataavailable = function (e) { if (e.data && e.data.size) R.chunks.push(e.data); };
   if (SR && cfg.stt && !FAST) {
     try { R.rec = new SR(); R.rec.lang = 'en-US'; R.rec.continuous = true; R.rec.interimResults = false;
-      R.rec.onresult = function (e) { for (var i = e.resultIndex; i < e.results.length; i++) if (e.results[i].isFinal) R.transcript += e.results[i][0].transcript + ' '; };
-      R.rec.onerror = function () {}; R.rec.start(); } catch (e) { R.rec = null; }
+      R.rec.interimResults = true; R.interim = ''; R.sttErr = ''; R.ended = false;
+      R.rec.onresult = function (e) { var it = ''; for (var i = e.resultIndex; i < e.results.length; i++) { if (e.results[i].isFinal) R.transcript += e.results[i][0].transcript + ' '; else it += e.results[i][0].transcript; } R.interim = it; };
+      R.rec.onerror = function (e) { if (e && e.error && e.error !== 'no-speech' && e.error !== 'aborted') R.sttErr = e.error; };
+      R.rec.onend = function () { R.ended = true; if (R.onEnd) R.onEnd();
+        // Safari and Chrome sometimes stop listening early; restart while the answer window is still open
+        if (!R.stopping && !R.sttErr) { try { R.ended = false; R.rec.start(); } catch (x) {} } };
+      R.rec.start(); } catch (e) { R.rec = null; R.sttErr = 'start failed'; }
   }
   try { actx = actx || new (window.AudioContext || window.webkitAudioContext)();
     var src = actx.createMediaStreamSource(stream); R.an = actx.createAnalyser(); R.an.fftSize = 512; src.connect(R.an); R.buf = new Uint8Array(R.an.fftSize); } catch (e) {}
@@ -548,7 +563,16 @@ function level(R, meterId) {
 async function finishRec(R, item, prompt) {
   $('p-meter').style.width = '0';
   await new Promise(function (r) { R.mr.onstop = r; try { R.mr.stop(); } catch (e) { r(); } });
-  if (R.rec) { try { R.rec.stop(); } catch (e) {} }
+  if (R.rec) { // wait for the last words: the final result arrives after stop()
+    R.stopping = true;
+    await new Promise(function (r) { if (R.ended) return r(); R.onEnd = r; try { R.rec.stop(); } catch (e) { r(); } setTimeout(r, 2500); });
+  }
+  var text = (R.transcript + ' ' + (R.interim || '')).trim();
+  if (!text && cfg.stt) {
+    text = SR ? (R.sttErr ? '(speech-to-text failed: ' + R.sttErr + ')' : '(no words recognized)') : '(speech-to-text not available in this browser)';
+    sttWarn(R.sttErr);
+  }
+  R.transcript = text;
   var dur = Math.round((Date.now() - R.t0) / 1000), blob = new Blob(R.chunks, { type: R.mime || 'audio/webm' });
   pending.push((async function () {
     var a = { id: '', url: '' };
@@ -556,6 +580,15 @@ async function finishRec(R, item, prompt) {
     await call('response', { session: item.session, block: item.block, seq: item.seq, prompt: prompt.slice(0, 500), transcript: R.transcript.trim(), durationSec: dur, audioFileId: a.id, audioUrl: a.url });
   })().catch(function () {}));
 }
+function sttAdvice(err) {
+  if (!SR) return 'This browser has no speech-to-text. Use Chrome on PC, or Safari on iPhone.';
+  if (err === 'not-allowed' || err === 'service-not-allowed') return /iPhone|iPad/.test(navigator.userAgent) ? 'iPhone: turn on Settings, General, Keyboard, Enable Dictation, and allow Speech Recognition for Safari. Then reload.' : 'Speech recognition was blocked: allow the microphone for this site and reload.';
+  if (err === 'network') return 'Speech-to-text needs an internet connection (Chrome sends audio to Google to transcribe).';
+  if (err === 'audio-capture') return 'The browser could not share the microphone between recording and speech-to-text.';
+  return err ? 'Speech-to-text error: ' + err : 'No words were recognized. Speak a little closer to the phone, or check the Guide tab test.';
+}
+var sttWarned = false;
+function sttWarn(err) { if (sttWarned) return; sttWarned = true; $('p-hint').textContent = 'Your recording was saved, but no transcript. ' + sttAdvice(err); }
 async function recordTts(item, prompt) {
   var maxMs = item.sec * 1000;
   showCap(null, pretty(prompt), null, 'you');
@@ -1038,6 +1071,29 @@ $('a-sample').onclick = function () { autoAct(this, 'voiceSample', {}, 'Making a
 $('a-revoice').onclick = function () { autoAct(this, 'revoice', {}, 'Queuing all sessions. They switch over in the background, about one part per minute.'); };
 $('a-market').onclick = function () { autoAct(this, 'marketNow', {}, 'Researching today\'s news and writing the brief. This takes 1 to 2 minutes...'); };
 $('a-fb').onclick = function () { autoAct(this, 'feedback', {}, 'Asking Claude for feedback on new answers...'); };
+$('stt-test').onclick = async function () {
+  var btn = this; btn.disabled = true; $('stt-m').textContent = 'Opening the microphone...';
+  var had = !!stream; if (!stream && !(await openMic())) { $('stt-m').textContent = micAdvice(); btn.disabled = false; return; }
+  $('stt-m').textContent = 'Say: I work on device performance and yield at an advanced node.';
+  var R = beginRec(); if (!R) { $('stt-m').textContent = 'Recording is not supported in this browser.'; btn.disabled = false; return; }
+  await sleep(8000);
+  R.stopping = true; try { R.mr.stop(); } catch (e) {}
+  if (R.rec) await new Promise(function (r) { if (R.ended) return r(); R.onEnd = r; try { R.rec.stop(); } catch (e) { r(); } setTimeout(r, 2500); });
+  var text = (R.transcript + ' ' + (R.interim || '')).trim();
+  $('stt-m').textContent = text ? 'Heard: "' + text + '"' : sttAdvice(R.sttErr || (R.rec ? '' : 'start failed'));
+  if (!had && stream) { stream.getTracks().forEach(function (t) { t.stop(); }); stream = null; }
+  btn.disabled = false;
+};
+async function makePack(btn, p) {
+  btn.disabled = true; $('pack-m').textContent = 'Packing your recordings...';
+  try {
+    var r = await call('answerPack', p);
+    $('pack-m').innerHTML = r.count ? esc(r.message) + '<br><a href="' + esc(r.downloadUrl) + '" target="_blank">Download ' + esc(r.name) + '</a> (or <a href="' + esc(r.url) + '" target="_blank">open in Drive</a>). Then attach it in the Claude chat.' : esc(r.message);
+  } catch (e) { $('pack-m').textContent = 'Error: ' + (/unknown action/.test(e.message) ? 'the backend is older than v1.6. Paste the new Code.gs and deploy a new version.' : e.message); }
+  btn.disabled = false;
+}
+$('pack-new').onclick = function () { makePack(this, {}); };
+$('pack-s').onclick = function () { if (!chosen) { $('pack-m').textContent = 'Pick a session on the Today tab first.'; return; } makePack(this, { session: chosen }); };
 $('mic-test').onclick = async function () {
   $('mic-test').textContent = 'Listening...';
   var ok = await openMic(), R = null;
