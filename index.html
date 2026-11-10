@@ -123,6 +123,8 @@ b.num{color:var(--acc)}
 .rep ul{margin:4px 0 4px 18px;padding:0}.rep ul.good li::marker{color:var(--ok)}.rep ul.fix li::marker{color:var(--warn)}
 .scores div{margin:3px 0;font-size:13px}.scores .lab{display:inline-block;width:90px;text-transform:capitalize}
 .score{display:inline-block;width:90px;height:8px;background:var(--line);border-radius:4px;vertical-align:middle;overflow:hidden}.score i{display:block;height:100%;background:var(--acc)}
+#book-t{width:100%;padding:10px;border:1px solid var(--line);border-radius:10px;background:var(--bg);color:var(--ink);font-size:15px;margin-top:8px}
+.filebtn{display:inline-block;padding:10px 14px;border:1px solid var(--line);border-radius:10px;cursor:pointer;margin:8px 8px 0 0;font-size:15px}
 </style>
 </head>
 <body>
@@ -260,9 +262,22 @@ b.num{color:var(--acc)}
   </div>
   <div class="card">
     <h2>2. Import what Claude sent back</h2>
+    <div class="mut">Feedback, daily reports and book entries carry an id: importing the same block twice updates it instead of adding a copy.</div>
     <textarea id="imp-t" placeholder='{"content":[...],"audio":[...],"feedback":[...]}'></textarea>
+    <label class="alt filebtn">Load a .json file<input type="file" id="imp-f" accept=".json,.txt,application/json,text/plain" hidden></label>
     <button class="alt" id="imp">Import</button>
     <div id="imp-m" class="mut"></div>
+  </div>
+  <div class="card">
+    <h2>3. Prep book (Google Doc + PDF)</h2>
+    <div class="mut">Collects your book entries (track record, stories, company notes, resume lines), your latest answers with Claude's suggested wording, and your progress. You get an editable Google Doc and a PDF copy in your Drive folder.</div>
+    <select id="book-t" aria-label="Target">
+      <option value="general">General interview prep</option><option value="resume">Resume and LinkedIn lines</option>
+      <option value="nvidia">Nvidia</option><option value="google">Google</option><option value="apple">Apple</option>
+      <option value="amd">AMD</option><option value="broadcom">Broadcom</option><option value="marvell">Marvell</option><option value="ailab">AI labs and hyperscalers</option>
+    </select>
+    <button class="alt" id="book-go">Make prep book</button>
+    <div id="book-m" class="mut"></div>
   </div>
   <div class="card">
     <h2>Optional: automatic feedback</h2>
@@ -329,8 +344,9 @@ b.num{color:var(--acc)}
 </main>
 
 <script>
-var APP_VERSION = '1.7.0';
+var APP_VERSION = '1.8.0';
 var LOCAL_CHANGES = [
+  { v: '1.8.0', date: '2026-11-10', notes: ['No more duplicate feedback or reports: everything imported has an id', 'Sync: Make prep book creates an editable Google Doc and a PDF, general or for one company or for resume lines'] },
   { v: '1.7.0', date: '2026-11-09', notes: ['Answers grouped by day and part, with keywords and numbers marked', 'Practice again: replay the question and record a second attempt, one or all with feedback', 'Daily reports from Claude, with a trend table'] },
   { v: '1.6.0', date: '2026-11-09', notes: ['Sync: Pack new answers makes a zip of your recordings and prompts to attach in the Claude chat'] },
   { v: '1.5.1', date: '2026-11-09', notes: ['Speech-to-text restarts if the browser stops listening early, and waits for the last words', 'If no transcript, the reason is saved with the answer and shown on screen', 'Guide: Test speech-to-text button'] },
@@ -1341,6 +1357,15 @@ async function makePack(btn, p) {
 }
 $('pack-new').onclick = function () { makePack(this, {}); };
 $('pack-s').onclick = function () { if (!chosen) { $('pack-m').textContent = 'Pick a session on the Today tab first.'; return; } makePack(this, { session: chosen }); };
+$('imp-f').onchange = function () { var f = this.files && this.files[0]; if (!f) return; var r = new FileReader(); r.onload = function () { $('imp-t').value = String(r.result); $('imp-m').textContent = 'Loaded ' + f.name + '. Tap Import.'; }; r.readAsText(f); };
+$('book-go').onclick = async function () {
+  var btn = this; btn.disabled = true; $('book-m').textContent = 'Building your book in Google Docs (about 20 to 60 seconds)...';
+  try {
+    var r = await call('makeBook', { target: $('book-t').value });
+    $('book-m').innerHTML = esc(r.message) + '<br><a target="_blank" href="' + esc(r.docUrl) + '">Open the Google Doc (edit)</a> - <a target="_blank" href="' + esc(r.pdfDownload) + '">Download the PDF</a>';
+  } catch (e) { $('book-m').textContent = /unknown action/.test(e.message) ? 'The backend is older than v1.8: paste the new Code.gs, run setup once to approve Google Docs access, and deploy a new version.' : 'Error: ' + e.message + (/authoriz|permission/i.test(e.message) ? ' Open Apps Script, run setup once to approve Google Docs access, then try again.' : ''); }
+  btn.disabled = false;
+};
 $('mic-test').onclick = async function () {
   $('mic-test').textContent = 'Listening...';
   var ok = await openMic(), R = null;
