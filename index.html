@@ -99,8 +99,6 @@ td.n,th.n{text-align:right;font-variant-numeric:tabular-nums}
 details.day{background:var(--card);border:1px solid var(--line);border-radius:14px;padding:4px 12px 10px;margin-bottom:10px}
 details.day>summary{list-style:none;cursor:pointer;padding:8px 0;display:flex;justify-content:space-between;gap:8px;align-items:baseline;flex-wrap:wrap}
 details.day>summary::-webkit-details-marker{display:none}
-details.day>summary:before{content:'\25B8';color:var(--mut);margin-right:4px}
-details.day[open]>summary:before{content:'\25BE'}
 .blk{margin:12px 0 4px}
 .chip{display:inline-block;font-size:12px;font-weight:700;letter-spacing:.04em;text-transform:uppercase;padding:3px 9px;border-radius:999px;color:#fff}
 .chip.c-mindset{background:#2a78d6}.chip.c-interview{background:#c4521f}.chip.c-market{background:#14845c}
@@ -121,7 +119,7 @@ b.num{color:var(--acc)}
 .sc{display:inline-flex;align-items:center;justify-content:center;min-width:34px;height:26px;padding:0 6px;border-radius:8px;font-weight:700;font-size:13px;color:#fff;flex:none;line-height:1}
 .legend2 .sc{min-width:20px;height:18px;font-size:11px;border-radius:5px;padding:0 4px}
 .s-hi{background:#12805c}.s-mid{background:#a15c00}.s-lo{background:#c4281c}.s-na{background:var(--line);color:var(--mut)}
-details.day>summary:before{content:none}details.day>summary .dh{min-width:0;flex:1}.dh:before{content:'\25B8';color:var(--mut);margin-right:6px}details.day[open] .dh:before{content:'\25BE'}details.day>summary .dm{display:flex;gap:8px;align-items:center}
+details.day>summary:before{content:none}details.day>summary .dh{min-width:0;flex:1 1 220px}.dh:before{content:'\25B8';color:var(--mut);margin-right:6px}details.day[open] .dh:before{content:'\25BE'}details.day>summary .dm{display:flex;gap:8px;align-items:center}
 .dayrep{border:1px solid var(--line);border-radius:12px;padding:10px 12px;margin:4px 0 8px;font-size:14px}
 .dayrep .dr-row{margin-top:4px}
 details.qa{border-top:1px solid var(--line)}
@@ -327,7 +325,7 @@ details.older>summary{cursor:pointer;margin:6px 0}
     <h2>Connection</h2>
     <div id="cfg-url-wrap"><div class="lab">Apps Script web app URL (ends in /exec)</div><input id="cfg-url" type="text" placeholder="https://script.google.com/macros/s/.../exec"></div>
     <div class="lab">API token (from the Apps Script log)</div><input id="cfg-tok" type="password" placeholder="token">
-    <label class="row"><input id="cfg-stt" type="checkbox" checked> Transcribe my answers with the browser (needs Chrome, Edge or Safari)</label>
+    <label class="row"><input id="cfg-stt" type="checkbox" checked> Also transcribe with the browser (optional: Claude transcribes your recordings; on iPhone this can compete with the recording for the microphone, so leave it off)</label>
     <button class="alt" id="stt-test">Test speech-to-text (8 seconds)</button> <span id="stt-m" class="mut"></span>
     <button class="alt" id="cfg-save">Save and check</button>
   </div>
@@ -379,8 +377,9 @@ details.older>summary{cursor:pointer;margin:6px 0}
 </main>
 
 <script>
-var APP_VERSION = '1.9.0';
+var APP_VERSION = '1.9.1';
 var LOCAL_CHANGES = [
+  { v: '1.9.1', date: '2026-11-11', notes: ['Lost recordings: if the phone cuts the microphone off, the app says so right away and reopens the microphone for the next answer', 'The microphone is checked and reopened before every answer and when you come back to the app', 'Browser transcription is now described as optional (Claude transcribes your recordings)', 'Review: day headers fixed (one arrow, title on its own line); better question titles'] },
   { v: '1.9.0', date: '2026-11-10', notes: ['Answers show Claude\'s transcript first; the phone version is one tap away', 'Review cards: a score badge, the question, Claude\'s note and "Say it like this"; tap to open', 'Each day shows its average score and Claude\'s report: fix first, practice next', 'Sort by "Needs work first"; Practice again on the answers that need work', 'Claude replies folder in Drive: save reply files there, then Load now on Review or Sync', 'Fixed: the "Only with feedback" box no longer triggers the automation button'] },
   { v: '1.8.0', date: '2026-11-10', notes: ['No more duplicate feedback or reports: everything imported has an id', 'Sync: Make prep book creates an editable Google Doc and a PDF, general or for one company or for resume lines'] },
   { v: '1.7.0', date: '2026-11-09', notes: ['Answers grouped by day and part, with keywords and numbers marked', 'Practice again: replay the question and record a second attempt, one or all with feedback', 'Daily reports from Claude, with a trend table'] },
@@ -642,6 +641,10 @@ function micAdvice() {
   if (micError === 'unsupported') return 'This browser or address cannot use the microphone (it needs https).';
   return 'Microphone error: ' + micError;
 }
+function micLive() { try { return !!stream && stream.getAudioTracks().some(function (t) { return t.readyState === 'live' && t.enabled; }); } catch (e) { return false; } }
+async function freshMic() { if (micLive()) return true; try { if (stream) stream.getTracks().forEach(function (t) { t.stop(); }); } catch (e) {} stream = null; return await openMic(); }
+document.addEventListener('visibilitychange', function () { if (document.visibilityState === 'visible' && stream && !micLive()) freshMic(); });
+var lostCount = 0;
 function b64(blob) { return new Promise(function (r) { var f = new FileReader(); f.onload = function () { r(String(f.result).split(',')[1]); }; f.readAsDataURL(blob); }); }
 function beginRec() {
   var R = { chunks: [], mime: '', transcript: '', rec: null, an: null, buf: null, t0: Date.now(), mr: null };
@@ -669,7 +672,7 @@ function level(R, meterId) {
   if (!R || !R.an) return 0;
   R.an.getByteTimeDomainData(R.buf);
   var s = 0; for (var i = 0; i < R.buf.length; i++) { var d = (R.buf[i] - 128) / 128; s += d * d; }
-  var lv = Math.sqrt(s / R.buf.length);
+  var lv = Math.sqrt(s / R.buf.length); R.peak = Math.max(R.peak || 0, lv);
   $(meterId || 'p-meter').style.width = Math.min(100, lv * 400) + '%';
   return lv;
 }
@@ -685,8 +688,14 @@ async function finishRec(R, item, prompt) {
     text = SR ? (R.sttErr ? '(speech-to-text failed: ' + R.sttErr + ')' : '(no words recognized)') : '(speech-to-text not available in this browser)';
     sttWarn(R.sttErr);
   }
-  R.transcript = text;
   var dur = Math.round((Date.now() - R.t0) / 1000), blob = new Blob(R.chunks, { type: R.mime || 'audio/webm' });
+  R.lost = blob.size < 2000 && dur >= 2; // the phone cut the microphone off: nothing was captured
+  if (R.lost) {
+    lostCount++; text = '(recording lost: no audio was captured' + (text && text.charAt(0) !== '(' ? '; phone heard: ' + text : '') + ')';
+    $('p-hint').textContent = 'Nothing was recorded for that answer: the phone cut the microphone off. The app reopened it for the next answer. Use Practice again on this question later' + (lostCount > 1 ? ' (' + lostCount + ' lost this session).' : '.');
+    stream = null; freshMic();
+  }
+  R.transcript = text;
   pending.push((async function () {
     var a = { id: '', url: '' };
     try { if (blob.size > 0 && blob.size < 6000000) a = await call('audio', { session: item.session, block: item.block, seq: item.seq, b64: await b64(blob), mime: R.mime || 'audio/webm' }); } catch (e) {}
@@ -707,8 +716,8 @@ async function recordTts(item, prompt) {
   showCap(null, pretty(prompt), null, 'you');
   if (!stream) { beep(700); $('p-state').textContent = 'Your turn (no mic)'; $('p-state').className = 'state rec';
     var t = Date.now(); while (!stopFlag && !leaveFlag && !skipFlag && Date.now() - t < (FAST ? 100 : maxMs)) await sleep(200); beep(520); return; }
-  beep(700);
-  var R = beginRec(); if (!R) return;
+  await freshMic(); beep(700);
+  var R = stream ? beginRec() : null; if (!R) return;
   $('p-state').textContent = 'Your turn'; $('p-state').className = 'state rec';
   var spoke = false, lastVoice = Date.now();
   while (!stopFlag && !leaveFlag && !skipFlag && !paused && (Date.now() - R.t0) < (FAST ? 300 : maxMs)) {
@@ -904,6 +913,7 @@ async function playAudioPart(s, b, bItems, meta, startPos) {
           if (t >= c.start && t < c.end - 0.8) {
             var item = bItems.filter(function (x) { return x.seq === c.seq; })[0] || { session: s, block: b, seq: c.seq };
             var prompt = promptFor(bItems, c.seq);
+            if (stream && !micLive()) await freshMic();
             active = { c: c, item: item, prompt: prompt, R: stream ? beginRec() : null, spoke: false, lastVoice: t, force: false };
             $('p-state').textContent = active.R ? 'Your turn' : 'Your turn (no mic)'; $('p-state').className = 'state rec';
             showCap(null, pretty(prompt), null, 'you');
@@ -1131,7 +1141,7 @@ function qTitle(p) {
   var all = (pretty(String(p || '')).replace(/\s+/g, ' ').trim().match(/[^.?!]+[.?!]*/g) || []).map(function (x) { return x.trim(); });
   var filler = /^(\w+(-\w+)? seconds|go|your turn|ready|just one sentence|one sentence|slower this time|say it out loud)\b[^a-z]*$/i;
   var s = all.filter(function (x) { return x.length > 3 && !filler.test(x); }); if (!s.length) s = all;
-  var lead = /^((now|then|first|after the chime|this time|and|so|ok|okay),?\s+)+/i, imp = /^(say|name|tell|walk|describe|give|explain|imagine|pick|choose|list|answer|repeat)\b/i;
+  var lead = /^((now|then|first|to start|after the chime|this time|and|so|ok|okay),?\s+)+/i, imp = /^(say|name|tell|walk|describe|give|explain|imagine|pick|choose|list|answer|repeat)\b/i;
   var qi = -1; s.forEach(function (x, i) { if (/\?$/.test(x) && !/^ready\b/i.test(x)) qi = i; });
   var t;
   if (qi >= 0) { t = s[qi]; if (t.split(' ').length < 6 && qi > 0) t = s[qi - 1] + ' ' + t; }
@@ -1344,6 +1354,7 @@ $('rt-play').onclick = async function () {
   this.disabled = false;
 };
 $('rt-rec').onclick = async function () {
+  await freshMic();
   var q = qFor(rq.keys[rq.i]), btn = this;
   if (rq.audio) rq.audio.pause();
   btn.disabled = true; $('rt-play').disabled = true;
