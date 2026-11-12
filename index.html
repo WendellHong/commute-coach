@@ -13,9 +13,52 @@ body{margin:0;background:var(--bg);color:var(--ink);font:16px/1.5 system-ui,-app
 main{max-width:660px;margin:0 auto;padding:12px 16px 40px}
 header{display:flex;justify-content:space-between;align-items:baseline;margin:4px 0 10px}
 header b{font-size:20px}header span{font-size:12px;color:var(--mut)}
-nav{display:flex;gap:6px;margin-bottom:12px}
-nav button{flex:1;padding:10px 4px;border:1px solid var(--line);background:var(--card);color:var(--ink);border-radius:10px;font-size:14px}
-nav button.on{border-color:var(--acc);color:var(--acc);font-weight:600}
+nav{display:flex;gap:4px;position:fixed;left:0;right:0;bottom:0;z-index:20;background:var(--card);border-top:1px solid var(--line);padding:6px max(8px,calc(50vw - 322px)) calc(8px + env(safe-area-inset-bottom))}
+main{padding-bottom:96px}
+nav button{flex:1;min-height:52px;padding:6px 4px;border:0;background:none;color:var(--mut);font-size:14px;font-weight:600;margin:0;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:5px}
+nav button:before{content:'';width:24px;height:4px;border-radius:2px;background:transparent}
+nav button.on{color:var(--acc)}nav button.on:before{background:var(--acc)}
+.lab2{font-size:13px;font-weight:700;letter-spacing:.06em;text-transform:uppercase;color:var(--mut);margin:16px 2px 6px;display:flex;justify-content:space-between;align-items:baseline}
+.lab2 span{font-weight:400;letter-spacing:0;text-transform:none}
+.hero .hd{font-size:15px;font-weight:700;color:var(--acc)}
+.hero h1{font-size:23px;line-height:1.2;margin:2px 0 6px}
+.hero .hp{display:flex;gap:10px;align-items:center;width:100%;min-height:52px;margin:0;padding:8px 0;background:none;border:0;border-top:1px solid var(--line);color:var(--ink);text-align:left;font-size:15px}
+.hero .hp .chip{flex:none;min-width:80px;text-align:center}
+.hero .hp .ht{flex:1;min-width:0;font-weight:600;line-height:1.3}
+.hero .hp .ht small{display:block;font-weight:400;color:var(--mut);font-size:12.5px}
+.hero .hp .hm{flex:none;color:var(--mut);font-size:13px}
+.hero .go{display:flex;align-items:center;justify-content:center;gap:12px;width:100%;min-height:76px;margin:12px 0 2px;border:0;border-radius:18px;background:var(--acc);color:#fff;font-size:22px;font-weight:700}
+.hero .go svg{flex:none}
+.hero .sub{text-align:center;font-size:13px;color:var(--mut);margin-top:6px}
+.wk{display:flex;gap:10px;align-items:center;padding:10px 0;border-top:1px solid var(--line)}
+.wk:first-child{border-top:0;padding-top:2px}
+.wk .wt{flex:1;min-width:0}.wk .wt b{display:block;font-size:15px;line-height:1.3}.wk .wt span{font-size:13px;color:var(--mut)}
+.wk button{flex:none;margin:0;min-height:44px;padding:0 14px;border-radius:12px;border:1px solid var(--acc);background:var(--card);color:var(--acc);font-size:14px;font-weight:700}
+.arow{display:flex;justify-content:space-between;align-items:center;gap:10px;width:100%;min-height:52px;margin:0;padding:10px 0;background:none;border:0;border-top:1px solid var(--line);color:var(--acc);font-size:15px;font-weight:600;text-align:left}
+#after .furow:first-child{border-top:0}
+#all-sess>summary{cursor:pointer;font-weight:700;font-size:16px;list-style:none;display:flex;justify-content:space-between;align-items:center;min-height:32px}
+#all-sess>summary::-webkit-details-marker{display:none}
+#all-sess>summary:after{content:'\25BE';color:var(--mut)}#all-sess[open]>summary:after{content:'\25B4'}
+body.driving{--bg:#0F1620;--card:#18212D;--ink:#F2F5F9;--mut:#A9B4C2;--line:#3A4656;--acc:#8FB6FF;--ok:#6FE0B0;--warn:#FFC46B;--rec:#FF8A7A}
+body.driving header{display:none}
+body.driving main{padding-top:8px}
+.drv{display:flex;flex-direction:column;min-height:calc(100vh - 110px);min-height:calc(100dvh - 110px)}
+.drv-top{display:flex;justify-content:space-between;align-items:center;gap:10px}
+.drv-title{font-size:18px;font-weight:700;line-height:1.25}
+.drv-top #b-stop{flex:none;margin:0;min-width:72px;height:52px;border-radius:26px;border:1px solid var(--line);background:none;color:var(--ink);font-size:16px;font-weight:600}
+.drv .state{font-size:16px;letter-spacing:.08em;text-transform:uppercase;margin:14px 0 0}
+.drv .stage{flex:1;height:auto;min-height:300px;justify-content:center}
+.drv .stage .cap{flex:none;height:236px}
+.drv .stage.answering .cap{height:auto}
+.drv .cap .c{font-size:26px;line-height:1.3}
+.drv .cnum{font-size:min(54vw,210px)}
+.drv .clab{font-size:22px}.drv .cbar{height:16px;margin-top:14px}
+.drv-main{display:flex;gap:12px;align-items:center;margin-top:12px}
+.drv-main button{margin:0;border-radius:24px;border:1px solid var(--line);background:var(--card);color:var(--ink);font-size:20px;font-weight:700;width:96px;height:96px;line-height:1.15}
+.drv-main #b-pause{flex:1;width:auto;height:120px;border-radius:28px;border:0;background:var(--ink);color:var(--bg);font-size:28px;font-weight:800}
+.drv-main button:disabled{opacity:.4}
+.drv-more{margin-top:10px}.drv-more>summary{cursor:pointer;color:var(--mut);font-size:14px;min-height:36px;display:flex;align-items:center;justify-content:center}
+.drv-more .ctl{grid-template-columns:repeat(3,1fr)}
 .card{background:var(--card);border:1px solid var(--line);border-radius:14px;padding:16px;margin-bottom:12px}
 h1{font-size:20px;margin:0 0 4px}h2{font-size:17px;margin:0 0 8px}h3{font-size:15px;margin:14px 0 4px}
 .mut{color:var(--mut);font-size:14px}
@@ -114,8 +157,56 @@ b.num{color:var(--acc)}
 .kw{display:inline-block;border:1px solid var(--acc);color:var(--acc);border-radius:999px;padding:1px 8px;font-size:12px;margin:2px 2px 0 0}
 .kws{margin-top:6px}
 .legend2{margin:0 0 8px}
+.stage{height:300px;display:flex;flex-direction:column;margin-top:12px}
+.stage .cap{margin-top:0;height:auto;flex:1;min-height:0}
+.count{display:none;flex:none;text-align:center}
+.count.on{display:block}
+.cnum{font-size:min(36vw,150px);line-height:.95;font-weight:800;font-variant-numeric:tabular-nums;color:var(--ok);letter-spacing:-.02em}
+.count.warn .cnum{color:var(--warn)}.count.end .cnum{color:var(--rec)}
+.clab{font-size:18px;font-weight:600;color:var(--mut);margin-top:2px}
+.cbar{height:14px;background:var(--line);border-radius:8px;overflow:hidden;margin:8px 0 4px}
+.cbar i{display:block;height:100%;width:100%;background:var(--ok)}
+.count.warn .cbar i{background:var(--warn)}.count.end .cbar i{background:var(--rec)}
+.stage.answering .cap .p,.stage.answering .cap .n,.stage.answering .cap .slot{display:none}
+.stage.answering .cap .c{font-size:15px;font-weight:500;-webkit-line-clamp:3}
+.count.sm .cnum{font-size:64px}.count.sm .clab{font-size:14px}
+.s-title{font-weight:600;margin-top:1px}.clamp2{display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;overflow:hidden}
+.p-title{font-weight:600;font-size:15px;margin-top:2px}
+.pill{display:inline-block;font-size:11px;font-weight:600;padding:1px 8px;border-radius:999px;border:1px solid var(--line);color:var(--mut);white-space:nowrap}
+.pill.open{border-color:var(--warn);color:var(--warn)}.pill.ok{border-color:var(--ok);color:var(--ok)}
+.subnav.wrap{flex-wrap:wrap}.subnav.wrap button{flex:1 1 30%}
+.sescard{display:block;width:100%;text-align:left;background:var(--card);border:1px solid var(--line);border-radius:14px;padding:12px 14px;margin:0 0 10px;color:var(--ink);font-size:15px;cursor:pointer}
+.sc-h{display:flex;justify-content:space-between;gap:8px;align-items:flex-start}.sc-f{margin-top:6px}
+.furow{display:flex;justify-content:space-between;gap:8px;align-items:flex-start;padding:7px 0;border-top:1px solid var(--line)}
+.furow label{display:flex;gap:10px;align-items:flex-start;flex:1;cursor:pointer}.furow input{width:20px;height:20px;margin-top:1px;flex:none}
+.furow.done span{color:var(--mut);text-decoration:line-through}.furow.done span .mut{text-decoration:none}.furow.skip span{color:var(--mut)}
+details.fu>summary{cursor:pointer;list-style:none}details.fu>summary::-webkit-details-marker{display:none}
+.fu h3{margin:0 0 4px}.fu-add{display:flex;gap:6px;margin-top:8px}.fu-add input{flex:1;margin:0}.fu-add button{margin:0}
+.bk-top{display:flex;justify-content:space-between;align-items:center;margin-bottom:6px}.bk-top .alt{margin:0}
+.bk-head h1{margin:2px 0 6px;font-size:24px;line-height:1.2}.bk-intro{font-size:16px;margin:0 0 8px}.bk-meta{display:flex;gap:8px;align-items:center;margin-bottom:10px}
+.bk-toc{display:flex;flex-direction:column;gap:6px;margin:10px 0}.bk-toc a{color:var(--ink);text-decoration:none;font-weight:600}
+.bk-mode{margin:6px 0 4px}
+.bk-body{background:var(--card);border:1px solid var(--line);border-radius:14px;padding:6px 16px 16px}
+.bk-body h2{margin:18px 0 4px;font-size:18px;line-height:1.3}.bk-pintro{color:var(--mut);margin:0 0 10px;font-size:14px}
+.ln{font-family:Georgia,'Times New Roman',serif;font-size:17px;line-height:1.6;margin:0 0 10px}
+.ln.iv{border-left:3px solid var(--acc);padding-left:10px}.ln .who{font-family:system-ui,-apple-system,sans-serif;font-size:11px;text-transform:uppercase;letter-spacing:.06em;color:var(--acc);display:block}
+.ln.q{font-weight:600}
+.qa-only .ln:not(.q){display:none}
+.qa-box{border:1px solid var(--line);border-radius:12px;padding:10px 12px;margin:4px 0 16px;background:var(--bg)}
+.qa-box .box{background:var(--card)}.qa-h{display:flex;justify-content:space-between;align-items:center}
+.box.sample{border-left:3px solid var(--warn)}.box.sample p{margin:0 0 6px}
+.loading,.prog-t{display:flex;gap:8px;align-items:center;color:var(--mut);padding:6px 0}
+.spin{width:16px;height:16px;border:2px solid var(--line);border-top-color:var(--acc);border-radius:50%;display:inline-block;animation:sp .8s linear infinite;flex:none}
+@keyframes sp{to{transform:rotate(360deg)}}
+@media (prefers-reduced-motion:reduce){.spin{animation-duration:2.4s}}
+.prog{width:100%}.prog-b{height:8px;background:var(--line);border-radius:6px;overflow:hidden}.prog-b i{display:block;height:100%;background:var(--acc);transition:width .3s}
+.inbox.busy{display:block}
+#toast{position:fixed;left:50%;bottom:18px;transform:translateX(-50%);background:var(--ink);color:var(--bg);padding:10px 16px;border-radius:999px;font-size:14px;opacity:0;pointer-events:none;transition:opacity .2s;z-index:50;max-width:90vw}
+#toast.on{opacity:1}
+@media print{nav,.lab2,.subnav,button,.inbox,#fu-open,.bk-mode,.fu-add,#toast{display:none!important}body{background:#fff;color:#000}.bk-body,.qa-box,.card{border-color:#bbb;background:#fff}.qa-box{break-inside:avoid}}
 .inbox{display:flex;justify-content:space-between;gap:10px;align-items:center;background:var(--card);border:1px solid var(--acc);border-radius:12px;padding:10px 12px;margin:0 0 10px}
-.inbox.hide{display:none}.inbox button{margin:0;flex:none}
+.inbox.hide{display:none}.inbox button{margin:0;flex:none;min-height:44px;padding:0 14px;border-radius:12px;border:0;background:var(--acc);color:#fff;font-size:15px;font-weight:700}
+.drv .cap .who{display:none}
 .sc{display:inline-flex;align-items:center;justify-content:center;min-width:34px;height:26px;padding:0 6px;border-radius:8px;font-weight:700;font-size:13px;color:#fff;flex:none;line-height:1}
 .legend2 .sc{min-width:20px;height:18px;font-size:11px;border-radius:5px;padding:0 4px}
 .s-hi{background:#12805c}.s-mid{background:#a15c00}.s-lo{background:#c4281c}.s-na{background:var(--line);color:var(--mut)}
@@ -142,7 +233,7 @@ button.link{background:none;border:0;color:var(--acc);padding:0;font-size:13px;m
 details.older>summary{cursor:pointer;margin:6px 0}
 .qfull{font-size:13px;color:var(--mut);margin:8px 0}
 @media (max-width:480px){.qb{padding-left:0}}
-.sheet{position:fixed;left:0;right:0;bottom:0;z-index:20;background:rgba(0,0,0,.35);top:0;display:flex;align-items:flex-end;justify-content:center}
+.sheet{position:fixed;left:0;right:0;bottom:0;z-index:40;background:rgba(0,0,0,.35);top:0;display:flex;align-items:flex-end;justify-content:center}
 .sheet.hide{display:none}
 .sheet-in{background:var(--card);width:100%;max-width:640px;border-radius:16px 16px 0 0;padding:16px;max-height:88vh;overflow:auto}
 .rep h3{font-size:14px;margin:12px 0 4px}
@@ -156,51 +247,72 @@ details.older>summary{cursor:pointer;margin:6px 0}
 <body>
 <main>
 <header><b>Commute Coach</b><span id="vtag"></span></header>
+<div id="toast" role="status"></div>
 <nav>
-  <button id="t-home" class="on">Today</button>
+  <button id="t-home" class="on">Drive</button>
   <button id="t-review">Review</button>
   <button id="t-sync">Sync</button>
-  <button id="t-guide">Guide</button>
+  <button id="t-guide">Setup</button>
 </nav>
 
 <section id="v-home">
+  <div id="inbox-h" class="inbox hide"></div>
   <div class="card hide" id="resume-card">
     <div class="lab">Paused</div>
     <div id="resume-txt" style="font-weight:600;margin:2px 0 4px"></div>
     <button class="alt" id="resume-go">Resume</button>
     <button class="alt" id="resume-end">End and save</button>
   </div>
-  <div class="card">
-    <h1>Sessions</h1>
-    <div class="mut">Pick a session, then play all three parts or any single part. Your place in each part is saved, so you can pause, switch, and come back.</div>
-    <div id="list"></div>
-    <div class="mut" id="prep" style="margin-top:8px"></div>
-    <div class="mut" id="micnote" style="margin-top:8px"></div>
+  <div class="lab2">Next drive <span id="hero-n"></span></div>
+  <div class="card hero" id="hero"><div class="mut">Loading...</div></div>
+  <div class="mut" id="prep" style="margin-top:6px"></div>
+  <div class="mut" id="micnote" style="margin-top:6px"></div>
+  <div id="weak-w" class="hide">
+    <div class="lab2">Needs work <span>your lowest answers</span></div>
+    <div class="card" id="weak"></div>
   </div>
+  <div id="after-w" class="hide">
+    <div class="lab2">After the drive</div>
+    <div class="card" id="after"></div>
+  </div>
+  <details class="card" id="all-sess" style="margin-top:16px">
+    <summary>All sessions</summary>
+    <div class="mut sm2">Tap a day to make it the next drive.</div>
+    <div id="list"></div>
+  </details>
 </section>
 
 <section id="v-play" class="hide">
-  <div class="card">
-    <div class="mut" id="p-block"></div>
-    <div class="state" id="p-state">Ready</div>
-    <input type="range" id="p-seek" min="0" max="600" step="1" value="0" aria-label="Position in this part">
-    <div class="mut" id="p-time"></div>
-    <div class="meter"><i id="p-meter"></i></div>
-    <div class="ctl">
-      <button id="b-back" aria-label="Back 15 seconds">&minus;15s</button>
-      <button id="b-prevl" aria-label="Previous sentence">&lsaquo; Line</button>
-      <button id="b-pause" class="main">Pause</button>
-      <button id="b-nextl" aria-label="Next sentence">Line &rsaquo;</button>
-      <button id="b-fwd" aria-label="Forward 15 seconds">+15s</button>
-    </div>
-    <div class="ctl two">
-      <button id="b-prevp">&lsaquo; Part</button>
-      <button id="b-skip">Skip answer</button>
-      <button id="b-nextp">Part &rsaquo;</button>
+  <div class="drv">
+    <div class="drv-top">
+      <div><div class="mut" id="p-block"></div><div class="drv-title" id="p-title"></div></div>
       <button id="b-stop">Stop</button>
     </div>
-    <div class="cap" id="cap"></div>
-    <div class="mut" id="p-hint" style="margin-top:8px"></div>
+    <div class="state" id="p-state">Ready</div>
+    <div class="stage" id="stage">
+      <div class="count" id="p-count"><div class="cnum" id="p-cnum">0</div><div class="clab" id="p-clab">seconds left</div><div class="cbar"><i id="p-cbar"></i></div></div>
+      <div class="cap" id="cap"></div>
+    </div>
+    <div class="meter"><i id="p-meter"></i></div>
+    <div class="mut" id="p-time" style="margin-top:4px"></div>
+    <div class="mut" id="p-hint" style="margin-top:4px"></div>
+    <div class="drv-main">
+      <button id="b-back" aria-label="Back 15 seconds">&minus;15 s</button>
+      <button id="b-pause">Pause</button>
+      <button id="b-smart" aria-label="Forward 15 seconds">+15 s</button>
+    </div>
+    <details class="drv-more">
+      <summary>More controls</summary>
+      <input type="range" id="p-seek" min="0" max="600" step="1" value="0" aria-label="Position in this part">
+      <div class="ctl">
+        <button id="b-prevl" aria-label="Previous sentence">&lsaquo; Line</button>
+        <button id="b-nextl" aria-label="Next sentence">Line &rsaquo;</button>
+        <button id="b-fwd" aria-label="Forward 15 seconds">+15s</button>
+        <button id="b-prevp">&lsaquo; Part</button>
+        <button id="b-nextp">Part &rsaquo;</button>
+        <button id="b-skip">Skip answer</button>
+      </div>
+    </details>
   </div>
 </section>
 
@@ -222,8 +334,9 @@ details.older>summary{cursor:pointer;margin:6px 0}
 
 <section id="v-review" class="hide">
   <div id="inbox-b" class="inbox hide"></div>
-  <div class="subnav"><button id="r-use" class="on">Practice</button><button id="r-ans">Answers</button><button id="r-rep">Daily reports</button></div>
-  <div id="rv-use">
+  <div class="subnav"><button id="r-ses" class="on">Sessions</button><button id="r-ans">Answers</button><button id="r-rep">Reports</button><button id="r-use">Practice</button></div>
+  <div id="rv-ses"><div id="fu-open"></div><div id="ses-list"></div><div id="ses-page" class="hide"></div></div>
+  <div id="rv-use" class="hide">
     <div class="tiles" id="tiles"></div>
     <div class="card viz-root">
       <h2>Minutes practiced per day</h2>
@@ -252,24 +365,6 @@ details.older>summary{cursor:pointer;margin:6px 0}
     <div id="hist"></div>
   </div>
   <div id="rv-rep" class="hide"><div id="reports"></div></div>
-  <div id="retry" class="sheet hide">
-    <div class="sheet-in">
-      <div class="lab" id="rt-h"></div>
-      <div class="q-p" id="rt-p"></div>
-      <button class="alt sm" id="rt-show">Show the hint</button>
-      <div id="rt-hint" class="fb hide"></div>
-      <div class="state" id="rt-state">Ready</div>
-      <div class="meter"><i id="rt-meter"></i></div>
-      <div id="rt-m" class="mut sm2"></div>
-      <div class="ctl two">
-        <button id="rt-play">Play question</button>
-        <button id="rt-rec" class="main">Record</button>
-        <button id="rt-stop" disabled>Stop</button>
-        <button id="rt-close">Close</button>
-      </div>
-      <button class="alt sm" id="rt-next">Next question</button>
-    </div>
-  </div>
   <div id="tip" class="tip hide"></div>
 </section>
 
@@ -313,6 +408,12 @@ details.older>summary{cursor:pointer;margin:6px 0}
     <div id="book-m" class="mut"></div>
   </div>
   <div class="card">
+    <h2>4. Clean up duplicates</h2>
+    <div class="mut">Removes answers that were saved twice, repeated notes and reports, repeated script and practice-log lines, and moves older copies of session files in Drive to a folder called "Old copies". Your recordings are never deleted.</div>
+    <button class="alt" id="tidy-go">Clean up duplicates</button>
+    <div id="tidy-m" class="mut"></div>
+  </div>
+  <div class="card auto hide" id="auto-sync">
     <h2>Optional: automatic feedback</h2>
     <div class="mut">Needs your own API key in the Apps Script properties; it costs API usage.</div>
     <button class="alt" id="auto">Get feedback now</button>
@@ -321,20 +422,63 @@ details.older>summary{cursor:pointer;margin:6px 0}
 </section>
 
 <section id="v-guide" class="hide">
-  <div class="card">
-    <h2>Connection</h2>
-    <div id="cfg-url-wrap"><div class="lab">Apps Script web app URL (ends in /exec)</div><input id="cfg-url" type="text" placeholder="https://script.google.com/macros/s/.../exec"></div>
-    <div class="lab">API token (from the Apps Script log)</div><input id="cfg-tok" type="password" placeholder="token">
-    <label class="row"><input id="cfg-stt" type="checkbox" checked> Also transcribe with the browser (optional: Claude transcribes your recordings; on iPhone this can compete with the recording for the microphone, so leave it off)</label>
-    <button class="alt" id="stt-test">Test speech-to-text (8 seconds)</button> <span id="stt-m" class="mut"></span>
-    <button class="alt" id="cfg-save">Save and check</button>
+  <div class="subnav wrap"><button id="g-start" class="on">Start here</button><button id="g-conn">Connect</button><button id="g-opt">Options</button><button id="g-help">Help</button><button id="g-ver">Versions</button></div>
+
+  <div id="gv-start">
+    <div class="card">
+      <h2>Every day</h2>
+      <div class="flow">
+        <div class="step"><b class="n">1</b><div><div class="who">Drive</div>The Drive tab shows the next drive with its three parts. Tap "Start drive", or one part by its name; other days are under "All sessions". The screen turns dark with three large buttons: back 15 seconds, Pause, and forward (it becomes Done while you answer). At each chime, answer out loud: a large countdown shows the seconds left, and a beep sounds 5 seconds before the end.</div></div>
+        <div class="step"><b class="n">2</b><div><div class="who">After the drive - Sync</div>Tap "Pack new answers", download the zip, and attach it in the Claude chat.</div></div>
+        <div class="step"><b class="n">3</b><div><div class="who">Claude</div>Sends back one Claude-reply file per day: an accurate transcript of every answer, a scored note with a better wording, and the day's report.</div></div>
+        <div class="step"><b class="n">4</b><div><div class="who">You - Drive, then Review</div>Save the reply files into Drive, folder "Commute Coach audio &gt; Claude replies". Open Review and tap "Load now". A progress bar shows each file; loaded files move to "Imported".</div></div>
+        <div class="step"><b class="n">5</b><div><div class="who">Review - Sessions</div>Open the day's page: the script, your answers in every version, sample answers, Claude's notes, and the follow-ups to tick off. Tap "Practice again" on any answer you want to improve; the new version goes into your next pack.</div></div>
+      </div>
+    </div>
+    <div class="card">
+      <h2>Once a week</h2>
+      <div class="flow">
+        <div class="step"><b class="n">1</b><div><div class="who">Claude</div>Ask for next week's sessions. You get a zip with one DayNN.json and three MP3 files per day.</div></div>
+        <div class="step"><b class="n">2</b><div><div class="who">You - Drive</div>Unzip and upload all files to the Drive folder "Commute Coach audio".</div></div>
+        <div class="step"><b class="n">3</b><div><div class="who">Setup - Connect</div>Tap "Load new sessions from Drive". The new days appear on the Drive tab, under All sessions, with their titles and introductions.</div></div>
+      </div>
+    </div>
+    <div class="card">
+      <h2>When you need it</h2>
+      <div class="mut"><b>Reports</b> (Review): scores and trends by day. <b>Answers</b> (Review): every answer, sortable by "Needs work first". <b>Prep book</b> (Sync): an editable Google Doc and a PDF of your stories, answers and company notes. <b>Clean up duplicates</b> (Sync): one tap, safe to run any time.</div>
+    </div>
   </div>
-  <div class="card">
-    <h2>New sessions</h2>
-    <div class="mut">After you upload DayNN.json files and their MP3s to the Drive folder "Commute Coach audio", tap this once.</div>
-    <button class="alt" id="sync-drive">Load new sessions from Drive</button>
-    <div id="sync-m" class="mut"></div>
+
+  <div id="gv-conn" class="hide">
+    <div class="card">
+      <h2>Connection</h2>
+      <div id="cfg-url-wrap"><div class="lab">Apps Script web app URL (ends in /exec)</div><input id="cfg-url" type="text" placeholder="https://script.google.com/macros/s/.../exec"></div>
+      <div class="lab">API token (from the Apps Script log)</div><input id="cfg-tok" type="password" placeholder="token">
+      <button class="alt" id="cfg-save">Save and check</button>
+    </div>
+    <div class="card">
+      <h2>New sessions</h2>
+      <div class="mut">After you upload DayNN.json files and their MP3s to the Drive folder "Commute Coach audio", tap this once.</div>
+      <button class="alt" id="sync-drive">Load new sessions from Drive</button>
+      <div id="sync-m" class="mut"></div>
+    </div>
+    <div class="card"><h2>Checks</h2><div id="checks" class="mut">Press "Save and check".</div>
+      <button class="alt" id="mic-test">Test microphone</button>
+      <div class="meter" style="margin-top:8px"><i id="mic-meter"></i></div></div>
   </div>
+
+  <div id="gv-opt" class="hide">
+    <div class="card">
+      <h2>Answer windows</h2>
+      <label class="row"><input id="cfg-auto" type="checkbox" checked> Move on when I stop talking (after 3 seconds of silence; the screen shows "moving on")</label>
+      <label class="row"><input id="cfg-tick" type="checkbox" checked> Beep 5 seconds before the answer time ends</label>
+      <div id="clock-m" class="mut sm2" style="margin-top:8px"></div>
+    </div>
+    <div class="card">
+      <h2>Transcripts</h2>
+      <label class="row"><input id="cfg-stt" type="checkbox" checked> Also transcribe with the browser (optional: Claude transcribes your recordings; on iPhone this can compete with the recording for the microphone, so leave it off)</label>
+      <button class="alt" id="stt-test">Test speech-to-text (8 seconds)</button> <span id="stt-m" class="mut"></span>
+    </div>
   <div class="card auto hide" id="auto-card">
     <h2>Automation (optional)</h2>
     <div class="mut">Natural Google voices, a fresh market brief every weekday morning, and automatic feedback on your answers. Each needs a key you create once; see the plan doc for steps and costs. Keys are stored in your Apps Script project, not on this device.</div>
@@ -352,33 +496,63 @@ details.older>summary{cursor:pointer;margin:6px 0}
     <div id="a-m" class="mut" style="margin-top:8px"></div>
     <div id="a-st" class="mut" style="margin-top:6px"></div>
   </div>
-  <div class="card"><h2>Checks</h2><div id="checks" class="mut">Press "Save and check".</div>
-    <button class="alt" id="mic-test">Test microphone</button>
-    <div class="meter" style="margin-top:8px"><i id="mic-meter"></i></div></div>
-  <div class="card">
-    <h2>How the app works</h2>
-    <div class="flow">
-      <div class="step"><b class="n">1</b><div><div class="who">Claude, in your project chat</div>Writes the session: spoken script, answer windows, and the MP3 audio with caption timings.</div></div>
-      <div class="step"><b class="n">2</b><div><div class="who">You, once per batch, 2 minutes</div>Upload Claude's files (DayNN.json plus its three MP3s) to the Drive folder "Commute Coach audio". Then tap "Load new sessions from Drive" above.</div></div>
-      <div class="step"><b class="n">3</b><div><div class="who">This page</div>Downloads the audio once and keeps it on your device, so later plays start fast.</div></div>
-      <div class="step"><b class="n">4</b><div><div class="who">Your commute</div>Pick a session, then Play all 3 parts or one part, while parked. Captions follow the audio. At each chime the microphone opens; stop talking for a few seconds and it moves on. Pause keeps your place: you can switch to another part and come back.</div></div>
-      <div class="step"><b class="n">5</b><div><div class="who">Saved automatically</div>Each answer goes to the Google Sheet (transcript, length) and your recording to Drive. Every part you play is logged in the Usage tab: when, how long, from where to where. Review, Practice shows it as charts.</div></div>
-      <div class="step"><b class="n">6</b><div><div class="who">Evening, Sync tab</div>Tap "Pack new answers", download the zip, attach it in the Claude chat. Claude transcribes your recordings itself.</div></div>
-      <div class="step"><b class="n">7</b><div><div class="who">Claude, then you</div>Claude replies with a Claude-reply file: accurate transcripts, a scored note per answer, and the day's report. Save it into Drive, Commute Coach audio &gt; Claude replies, and tap "Load now" on Review or Sync. Review, Answers shows Claude's transcript first.</div></div>
-    </div>
-    <h3>Where things live</h3>
-    <div class="mut">Google Sheet "Commute Coach data": Content, Responses, Feedback, Log, Usage, Audio, Versions. Drive folder "Commute Coach audio": lesson MP3s and your answer recordings; inside it, "Claude replies" (drop Claude's reply files here) and "Claude replies &gt; Imported" (already loaded). This page: only your settings and a cached copy of the audio.</div>
-    <h3>If the microphone does not ask for permission</h3>
-    <div class="mut">The page must be opened from its own https address (GitHub Pages or similar), not inside Google's Apps Script page or another app's embedded view. On iPhone use Safari, tap the aA icon, Website Settings, Microphone, Allow. On a PC click the lock icon next to the address, allow Microphone, and reload.</div>
   </div>
-  <div class="card"><h2>Versions</h2>
-    <div class="mut" id="vinfo"></div><div id="vlist"></div></div>
+
+  <div id="gv-help" class="hide">
+    <div class="card">
+      <h2>If something goes wrong</h2>
+      <h3>The microphone does not ask for permission</h3>
+      <div class="mut">The page must be opened from its own https address (GitHub Pages), not inside another app. On iPhone use Safari: tap the aA icon, Website Settings, Microphone, Allow. On a PC click the lock icon next to the address, allow Microphone, and reload.</div>
+      <h3>"Nothing was recorded for that answer"</h3>
+      <div class="mut">The phone cut the microphone off, usually because the screen locked or another app took the audio. The app reopens the microphone for the next answer. Keep the screen on while driving, and use "Practice again" for the lost answer.</div>
+      <h3>The countdown ends early</h3>
+      <div class="mut">With "Move on when I stop talking" on, 3 seconds of silence after you have spoken ends the window; the screen says "Silence: moving on". Turn it off under Options if you want the full time every time.</div>
+      <h3>A new session does not appear</h3>
+      <div class="mut">Check that DayNN.json and its three MP3s are in the Drive folder itself, not in a subfolder, then tap "Load new sessions from Drive" under Connect.</div>
+      <h3>Review looks out of date, or shows something twice</h3>
+      <div class="mut">Tap "Load now" if a reply is waiting. For repeats, use Sync, "Clean up duplicates".</div>
+    </div>
+    <div class="card">
+      <h2>Where things live</h2>
+      <div class="mut">Google Sheet "Commute Coach data": Content (scripts), Meta (titles and introductions), Responses (your answers), Feedback, Reports, Followups, Book, Usage, Audio, Log, Versions. Drive folder "Commute Coach audio": session files and MP3s, your answer recordings, answer packs; inside it "Claude replies" (drop reply files here), "Claude replies &gt; Imported" (already loaded) and "Old copies". This page keeps only your settings and a cached copy of the audio.</div>
+    </div>
+    <div class="card">
+      <h2>Updating the app</h2>
+      <div class="mut"><b>Backend:</b> in Apps Script, replace the code with the new Code.gs, save, run setup() once, then Deploy, Manage deployments, Edit, New version, Deploy. <b>Page:</b> replace index.html on GitHub. Versions shows whether the two match.</div>
+    </div>
+  </div>
+
+  <div id="gv-ver" class="hide">
+    <div class="card"><h2>Versions</h2>
+      <div class="mut" id="vinfo"></div><div id="vlist"></div></div>
+  </div>
 </section>
+  <div id="retry" class="sheet hide">
+    <div class="sheet-in">
+      <div class="lab" id="rt-h"></div>
+      <div class="q-p" id="rt-p"></div>
+      <button class="alt sm" id="rt-show">Show the hint</button>
+      <div id="rt-hint" class="fb hide"></div>
+      <div class="state" id="rt-state">Ready</div>
+      <div class="count sm" id="rt-count"><div class="cnum" id="rt-cnum">0</div><div class="clab" id="rt-clab">seconds left</div><div class="cbar"><i id="rt-cbar"></i></div></div>
+      <div class="meter"><i id="rt-meter"></i></div>
+      <div id="rt-m" class="mut sm2"></div>
+      <div class="ctl two">
+        <button id="rt-play">Play question</button>
+        <button id="rt-rec" class="main">Record</button>
+        <button id="rt-stop" disabled>Stop</button>
+        <button id="rt-close">Close</button>
+      </div>
+      <button class="alt sm" id="rt-next">Next question</button>
+    </div>
+  </div>
 </main>
 
 <script>
-var APP_VERSION = '1.9.1';
+var APP_VERSION = '2.1.0';
 var LOCAL_CHANGES = [
+  { v: '2.1.0', date: '2026-11-12', notes: ['New layout, Drive first: the home screen shows the next drive with one large Start button; all other sessions are one tap below', 'Needs work: your three lowest answers on the home screen, each with a Practice button', 'After the drive: open follow-ups, the newest review and the answer pack in one place', 'Driving screen: dark, three large buttons (back 15 s, Pause, forward or Done) and a larger countdown; the other controls are under More controls', 'Tabs moved to the bottom of the screen'] },
+  { v: '2.0.0', date: '2026-11-11', notes: ['Review, Sessions: one book-like page per session with the script, your answers in every version, sample answers, Claude\'s notes and follow-ups', 'Follow-ups: tick off or skip the actions each session asked for; add your own', 'Today: every session and part shows its title and a short introduction', 'Answer countdown: large digits you can read at a glance, counted in real seconds, with a beep 5 seconds before the end and a visible "moving on" notice', 'Load now shows progress file by file', 'Sync: Clean up duplicates', 'Guide is now Setup, in five short pages that match the current workflow'] },
   { v: '1.9.1', date: '2026-11-11', notes: ['Lost recordings: if the phone cuts the microphone off, the app says so right away and reopens the microphone for the next answer', 'The microphone is checked and reopened before every answer and when you come back to the app', 'Browser transcription is now described as optional (Claude transcribes your recordings)', 'Review: day headers fixed (one arrow, title on its own line); better question titles'] },
   { v: '1.9.0', date: '2026-11-10', notes: ['Answers show Claude\'s transcript first; the phone version is one tap away', 'Review cards: a score badge, the question, Claude\'s note and "Say it like this"; tap to open', 'Each day shows its average score and Claude\'s report: fix first, practice next', 'Sort by "Needs work first"; Practice again on the answers that need work', 'Claude replies folder in Drive: save reply files there, then Load now on Review or Sync', 'Fixed: the "Only with feedback" box no longer triggers the automation button'] },
   { v: '1.8.0', date: '2026-11-10', notes: ['No more duplicate feedback or reports: everything imported has an id', 'Sync: Make prep book creates an editable Google Doc and a PDF, general or for one company or for resume lines'] },
@@ -426,14 +600,15 @@ var views = ['home', 'play', 'done', 'review', 'sync', 'guide'];
 function show(v) {
   views.forEach(function (x) { $('v-' + x).classList.toggle('hide', x !== v); });
   ['home', 'review', 'sync', 'guide'].forEach(function (x) { $('t-' + x).classList.toggle('on', x === v); });
+  document.body.classList.toggle('driving', v === 'play'); if (v !== 'play') window.scrollTo(0, 0);
 }
 /* ---- tabs (locked only while a part is actively playing) ---- */
 var running = false, paused = false;
 function locked() { return running && !paused; }
-$('t-home').onclick = function () { if (!locked()) { show('home'); renderList(); } };
-$('t-review').onclick = function () { if (!locked()) { show('review'); loadReview(); peekInbox(); } };
-$('t-sync').onclick = function () { if (!locked()) { show('sync'); peekInbox(); } };
-$('t-guide').onclick = function () { if (!locked()) { show('guide'); loadGuide(); } };
+$('t-home').onclick = function () { if (!locked()) { show('home'); renderList(); homeData(false); } };
+$('t-review').onclick = function () { if (!locked()) { show('review'); if (!$('rv-ses').classList.contains('hide')) loadSes(); else if (!$('rv-use').classList.contains('hide')) loadReview(); peekInbox(); } };
+$('t-sync').onclick = function () { if (!locked()) { show('sync'); peekInbox(); loadAuto(); } };
+$('t-guide').onclick = function () { if (!locked()) { show('guide'); var w = 'start'; try { w = localStorage.getItem('cc.setup') || (cfg.token ? 'start' : 'conn'); } catch (e) {} setupTab(w); loadGuide(); } };
 $('vtag').textContent = 'v' + APP_VERSION;
 
 /* ---- names, device, local state ---- */
@@ -474,52 +649,131 @@ function sessionStatus(s) {
   var started = bl.some(function (b) { var p = progress(s, b); return p.pos || p.idx; });
   return n === bl.length ? (bl.length > 1 ? 'All ' + n + ' done' : 'Done') : n ? n + ' of ' + bl.length + ' done' : started ? 'Started' : 'New';
 }
+function partMin(sn, b) { var m = metaBy[sn] && metaBy[sn][b]; return m && m.durationSec ? Math.round(m.durationSec / 60) : 0; }
+function renderHero() {
+  var s = sessions.filter(function (x) { return x.session === chosen; })[0];
+  if (!s) { $('hero').innerHTML = '<div class="mut">No sessions yet. Open Setup, Connect.</div>'; $('hero-n').textContent = ''; return; }
+  var bl = blocksOf(s.session), total = 0, h = '';
+  var first = bl.filter(function (b) { return !progress(s.session, b).done; })[0] || bl[0], allDone = bl.every(function (b) { return progress(s.session, b).done; });
+  $('hero-n').textContent = sessionStatus(s.session);
+  h += '<div class="hd">' + (s.session > 999 ? 'Market brief' : 'Day ' + s.session) + '</div><h1>' + esc(pretty(shortTitle(s.title))) + '</h1>' + (s.intro ? '<div class="mut" style="font-size:14px;margin-bottom:8px">' + esc(pretty(s.intro)) + '</div>' : '');
+  bl.forEach(function (b) {
+    var st = partStatus(s.session, b), inf = (s.info || {})[b] || {}, min = partMin(s.session, b); total += min;
+    var resume = st.p.pos || st.p.idx || (run && run.s === s.session && run.b === b && paused);
+    h += '<button class="hp" data-play="' + b + '" aria-label="Play ' + NAMES[b] + '"><span class="chip sm c-' + b + '">' + NAMES[b] + '</span><span class="ht">' + esc(pretty(inf.title || NAMES[b])) +
+         '<small>' + esc(resume ? st.text + ' - tap to resume' : st.text) + '</small></span><span class="hm">' + (min ? min + ' min' : '') + '</span></button>';
+    if (resume) h += '<button class="link" data-restart="' + b + '" style="margin:0 0 6px 90px">Restart ' + NAMES[b] + ' from the beginning</button>';
+  });
+  var label = allDone ? 'Play again' : first === bl[0] ? 'Start drive' : 'Continue: ' + NAMES[first];
+  var left = bl.slice(bl.indexOf(first)).reduce(function (t, b) { return t + partMin(s.session, b); }, 0);
+  h += '<button class="go" data-all="' + (allDone ? bl[0] : first) + '"><svg width="26" height="26" viewBox="0 0 24 24" aria-hidden="true"><path d="M7 4.5v15l12-7.5z" fill="#fff"/></svg>' + label + ((allDone ? total : left) ? ', ' + (allDone ? total : left) + ' min' : '') + '</button>';
+  h += '<div class="sub">Or play one part: tap its name. <button class="link" data-hero-page="' + s.session + '">Open this day\'s page</button></div>';
+  $('hero').innerHTML = h;
+}
 function renderList() {
+  renderHero();
   var h = '', briefs = sessions.filter(function (s) { return s.session > 999; }).slice(-5).reverse();
   var list = sessions.filter(function (s) { return s.session <= 999; });
   if (briefs.length) list = briefs.concat([{ grp: 'Sessions' }]).concat(list);
   if (briefs.length) h += '<div class="grp">Daily market briefs</div>';
   list.forEach(function (s) {
     if (s.grp) { h += '<div class="grp">' + s.grp + '</div>'; return; }
-    var sel = chosen === s.session;
-    h += '<div class="sess ' + (sel ? 'sel' : '') + '" data-s="' + s.session + '"><div class="sess-h"><div><b>' + (s.session > 999 ? 'Market brief' : 'Session ' + s.session) +
-         '</b><div class="mut">' + esc(s.session > 999 ? String(s.title).replace(/^Market brief,\s*/, '') : s.title) + '</div></div><div class="mut">' + sessionStatus(s.session) + '</div></div>';
-    if (sel) {
-      blocksOf(s.session).forEach(function (b) {
-        var st = partStatus(s.session, b), m = metaBy[s.session] && metaBy[s.session][b];
-        var len = m && m.durationSec ? Math.round(m.durationSec / 60) + ' min' : '';
-        var resume = st.p.pos || st.p.idx || (run && run.s === s.session && run.b === b && paused);
-        h += '<div class="part"><div class="part-t"><b>' + NAMES[b] + '</b> <span class="mut">' + len + '</span><div class="mut st">' + esc(st.text) + '</div></div>' +
-             '<div class="part-b"><button class="alt sm pri" data-play="' + b + '">' + (resume ? 'Resume' : st.p.done ? 'Play again' : 'Play') + '</button>' +
-             (resume ? '<button class="alt sm" data-restart="' + b + '">Restart</button>' : '') + '</div></div>';
-      });
-      var bl = blocksOf(s.session), first = bl.filter(function (b) { return !progress(s.session, b).done; })[0] || bl[0];
-      if (bl.length > 1) h += '<button class="big" data-all="' + first + '">Play ' + (first === bl[0] ? 'all ' + bl.length + ' parts' : 'from ' + NAMES[first]) + '</button>';
-    }
-    h += '</div>';
+    var sel = chosen === s.session, fo = s.follow || { open: 0 };
+    h += '<div class="sess ' + (sel ? 'sel' : '') + '" data-s="' + s.session + '"><div class="sess-h"><div><b>' + (s.session > 999 ? 'Market brief' : 'Day ' + s.session) + '</b>' +
+         (fo.open ? ' <span class="pill open">' + fo.open + ' follow-up' + (fo.open > 1 ? 's' : '') + '</span>' : '') +
+         '<div class="s-title">' + esc(pretty(shortTitle(s.title))) + '</div>' + (s.intro ? '<div class="mut sm2 clamp2">' + esc(pretty(s.intro)) + '</div>' : '') +
+         '</div><div class="mut" style="white-space:nowrap">' + sessionStatus(s.session) + '</div></div></div>';
   });
-  $('list').innerHTML = h || '<div class="mut">No sessions yet. Open the Guide tab to connect.</div>';
-  Array.prototype.forEach.call(document.querySelectorAll('.sess-h'), function (el) {
-    el.onclick = function () { var s = Number(el.parentNode.dataset.s); chosen = chosen === s ? null : s; renderList(); if (chosen) prefetch(chosen); };
+  $('list').innerHTML = h || '<div class="mut">No sessions yet. Open Setup, Connect.</div>';
+  Array.prototype.forEach.call(document.querySelectorAll('#list .sess-h'), function (el) {
+    el.onclick = function () { chosen = Number(el.parentNode.dataset.s); $('all-sess').open = false; renderList(); prefetch(chosen); window.scrollTo(0, 0); };
   });
-  Array.prototype.forEach.call(document.querySelectorAll('[data-play]'), function (el) {
+  Array.prototype.forEach.call(document.querySelectorAll('#hero [data-play]'), function (el) {
     el.onclick = function () { startParts(chosen, [el.dataset.play], false); };
   });
-  Array.prototype.forEach.call(document.querySelectorAll('[data-restart]'), function (el) {
+  Array.prototype.forEach.call(document.querySelectorAll('#hero [data-restart]'), function (el) {
     el.onclick = function () { startParts(chosen, [el.dataset.restart], true); };
   });
-  Array.prototype.forEach.call(document.querySelectorAll('[data-all]'), function (el) {
+  Array.prototype.forEach.call(document.querySelectorAll('#hero [data-all]'), function (el) {
     el.onclick = function () { var b = el.dataset.all, bl = blocksOf(chosen); startParts(chosen, bl.slice(bl.indexOf(b)), false); };
   });
-  renderResume();
+  Array.prototype.forEach.call(document.querySelectorAll('#hero [data-hero-page]'), function (el) {
+    el.onclick = function () { goPage(Number(el.dataset.heroPage)); };
+  });
+  renderResume(); renderWeak(); renderAfter();
 }
+/* ---- home: needs work, after the drive ---- */
+var homeAt = 0, homeOld = false;
+async function homeData(force) {
+  if (!cfg.token || (!IS_AS && !cfg.url)) return;
+  if (!force && Date.now() - homeAt < 5 * 60000) { renderWeak(); renderAfter(); return; }
+  homeAt = Date.now();
+  var got = await Promise.all([
+    call('history', { limit: 800 }).catch(function () { return hist; }),
+    call('reports').catch(function () { return reports; }),
+    call('followups', {}).catch(function () { return null; }),
+    call('inbox').catch(function () { return null; })
+  ]);
+  var arr = function (x, d) { return Array.isArray(x) ? x : d; };
+  hist = arr(got[0], []); reports = arr(got[1], []); homeOld = got[2] === null; fuAll = arr(got[2], fuAll); inboxInfo = got[3];
+  itemScore = {}; reports.slice().reverse().forEach(function (r) { (r.items || []).forEach(function (it) { if (it.key && it.score != null) itemScore[it.key] = Number(it.score); }); });
+  renderInbox(); renderWeak(); renderAfter();
+}
+function weakest(n) {
+  var by = {}, out = [];
+  hist.forEach(function (r) { var k = keyOf(r); (by[k] = by[k] || []).push(r); });
+  Object.keys(by).forEach(function (k) {
+    var at = by[k].slice().sort(function (a, b) { return tms(a.timestamp) - tms(b.timestamp); }), last = at[at.length - 1], f = (last.feedbacks || [])[0];
+    if (!f) return;
+    var sc = f.score != null && !isNaN(f.score) ? Number(f.score) : itemScore[k];
+    if (sc == null || isNaN(sc) || sc >= 3.5) return;
+    var retried = at.length > 1 && !String(last.claudeText || '').trim() && tms(last.timestamp) > tms(f.timestamp) && realText(txtOf(last));
+    out.push({ key: k, score: sc, r: last, f: f, retried: !!retried });
+  });
+  out.sort(function (a, b) { return (a.retried - b.retried) || (a.score - b.score) || (tms(b.r.timestamp) - tms(a.r.timestamp)); });
+  return { top: out.slice(0, n), total: out.length };
+}
+function renderWeak() {
+  var w = weakest(3);
+  $('weak-w').classList.toggle('hide', !w.top.length);
+  if (!w.top.length) return;
+  $('weak').innerHTML = w.top.map(function (x) {
+    return '<div class="wk">' + badge(x.score) + '<div class="wt"><b>' + esc(qTitle(x.r.prompt)) + '</b><span>' + (x.r.session > 999 ? 'Market brief' : 'Day ' + x.r.session) + ' - ' + NAMES[x.r.block] +
+      (x.retried ? ' - practised again, waiting for Claude' : '') + '</span></div><button data-weak="' + esc(x.key) + '">Practice</button></div>';
+  }).join('') + (w.total > 3 ? '<button class="arow" data-weak-all>See all ' + w.total + ' answers that need work<span aria-hidden="true">&rsaquo;</span></button>' : '');
+}
+function sesStarted(n) { return usage.some(function (r) { return Number(r.session) === Number(n); }) || hist.some(function (r) { return Number(r.session) === Number(n); }); }
+function fuOpenNow() { // open follow-ups of the days you have started, newest day first
+  return fuAll.filter(function (f) { return f.status !== 'done' && f.status !== 'skip' && sesStarted(f.session); }).sort(function (a, b) { return b.session - a.session; });
+}
+function renderAfter() {
+  var open = fuOpenNow(), h = '';
+  h += open.slice(0, 3).map(function (f) { return fuRow(f, true); }).join('');
+  if (open.length > 3) h += '<button class="arow" data-after="fu">All ' + open.length + ' open follow-ups<span aria-hidden="true">&rsaquo;</span></button>';
+  var rp = reports.slice().sort(function (x, y) { return String(y.date).localeCompare(String(x.date)) || (Number([].concat(y.sessions || [])[0]) - Number([].concat(x.sessions || [])[0])); })[0], rs = rp && [].concat(rp.sessions || [])[0];
+  if (rp && rs != null) h += '<button class="arow" data-after="page" data-n="' + esc(rs) + '">' + esc((Number(rs) > 999 ? 'Market brief' : 'Day ' + rs) + ' review is ready' + (rp.scores && rp.scores.overall != null ? ': ' + rp.scores.overall + ' out of 5' : '')) + '<span aria-hidden="true">&rsaquo;</span></button>';
+  h += '<button class="arow" data-after="sync">Pack new answers for Claude<span aria-hidden="true">&rsaquo;</span></button>';
+  if (homeOld) h += '<div class="mut sm2">Follow-ups need backend v2.0 or later.</div>';
+  $('after').innerHTML = h; $('after-w').classList.remove('hide');
+}
+function goPage(n) { show('review'); subTab('ses'); loadSes(); openPage(n); }
+$('v-home').addEventListener('click', function (e) {
+  var b = e.target.closest('button'); if (!b) return;
+  if (b.dataset.weak) { startRetry([b.dataset.weak]); }
+  else if (b.hasAttribute('data-weak-all')) { show('review'); subTab('ans'); aSort = 'weak'; $('a-sort').value = 'weak'; loadHist(); }
+  else if (b.dataset.after === 'fu') { show('review'); subTab('ses'); loadSes(); }
+  else if (b.dataset.after === 'page') { goPage(Number(b.dataset.n)); }
+  else if (b.dataset.after === 'sync') { show('sync'); peekInbox(); loadAuto(); }
+  else if (b.dataset.fuSkip) { setFu(b.dataset.fuSkip, 'skip'); }
+});
+$('v-home').addEventListener('change', function (e) { var c = e.target; if (c && c.dataset && c.dataset.fu) { setFu(c.dataset.fu, c.checked ? 'done' : 'open'); toast('Marked done. It stays on that day\'s page.'); } });
 function renderResume() {
   var on = !!(run && paused);
   $('resume-card').classList.toggle('hide', !on);
-  if (on) $('resume-txt').textContent = 'Session ' + run.s + ' - ' + NAMES[run.b] + ' at ' + fmt(run.pos);
+  if (on) $('resume-txt').textContent = 'Day ' + run.s + ' - ' + NAMES[run.b] + ' at ' + fmt(run.pos);
 }
 async function loadSessions() {
-  if (!cfg.token || (!IS_AS && !cfg.url)) { $('list').innerHTML = '<div class="mut">Not connected yet. Open the Guide tab, enter the URL and token.</div>'; return; }
+  if (!cfg.token || (!IS_AS && !cfg.url)) { $('hero').innerHTML = $('list').innerHTML = '<div class="mut">Not connected yet. Open Setup, Connect, and enter the URL and token.</div>'; return; }
   try {
     await flushOpen();
     var r = await Promise.all([call('sessions'), call('usageList').catch(function () { return []; })]);
@@ -528,8 +782,8 @@ async function loadSessions() {
       var next = sessions.filter(function (s) { return s.session <= 999 && blocksOf(s.session).some(function (b) { return !progress(s.session, b).done; }); })[0] || sessions[sessions.length - 1];
       chosen = next ? next.session : null;
     }
-    renderList(); if (chosen) prefetch(chosen);
-  } catch (e) { $('list').innerHTML = '<div class="mut">Could not reach your sheet: ' + esc(e.message) + '. Check the Guide tab.</div>'; }
+    renderList(); if (chosen) prefetch(chosen); homeData(true);
+  } catch (e) { $('hero').innerHTML = '<div class="mut">Could not reach your sheet: ' + esc(e.message) + '. Check Setup, Connect.</div>'; $('list').innerHTML = '<div class="mut">Could not reach your sheet: ' + esc(e.message) + '. Check Setup, Connect.</div>'; }
 }
 
 /* IndexedDB cache for audio: key = file id + file revision, so a replaced MP3 is downloaded again */
@@ -707,7 +961,7 @@ function sttAdvice(err) {
   if (err === 'not-allowed' || err === 'service-not-allowed') return /iPhone|iPad/.test(navigator.userAgent) ? 'iPhone: turn on Settings, General, Keyboard, Enable Dictation, and allow Speech Recognition for Safari. Then reload.' : 'Speech recognition was blocked: allow the microphone for this site and reload.';
   if (err === 'network') return 'Speech-to-text needs an internet connection (Chrome sends audio to Google to transcribe).';
   if (err === 'audio-capture') return 'The browser could not share the microphone between recording and speech-to-text.';
-  return err ? 'Speech-to-text error: ' + err : 'No words were recognized. Speak a little closer to the phone, or check the Guide tab test.';
+  return err ? 'Speech-to-text error: ' + err : 'No words were recognized. Speak a little closer to the phone, or use the test under Setup, Options.';
 }
 var sttWarned = false;
 function sttWarn(err) { if (sttWarned) return; sttWarned = true; $('p-hint').textContent = 'Your recording was saved, but no transcript. ' + sttAdvice(err); }
@@ -719,13 +973,9 @@ async function recordTts(item, prompt) {
   await freshMic(); beep(700);
   var R = stream ? beginRec() : null; if (!R) return;
   $('p-state').textContent = 'Your turn'; $('p-state').className = 'state rec';
-  var spoke = false, lastVoice = Date.now();
-  while (!stopFlag && !leaveFlag && !skipFlag && !paused && (Date.now() - R.t0) < (FAST ? 300 : maxMs)) {
-    await sleep(120);
-    var lv = level(R); if (lv > 0.03) { spoke = true; lastVoice = Date.now(); }
-    if (spoke && Date.now() - lastVoice > 3500 && (Date.now() - R.t0) > 6000) break;
-  }
-  beep(520); await finishRec(R, item, prompt);
+  var W = newWindow(FAST ? 0.3 : item.sec);
+  while (!stopFlag && !leaveFlag && !skipFlag && !paused) { await sleep(120); if (windowStep(W, level(R), 'p').done) break; }
+  setCount('p', null); beep(520); await finishRec(R, item, prompt);
 }
 
 /* ---- playing parts: one run = a chain of parts; each part's time is logged as a usage segment ---- */
@@ -804,7 +1054,8 @@ async function runChain(s, blocks, fromStart) {
             pos: 0, idx: 0, from: 0, dur: meta ? meta.durationSec : 0, mode: meta ? 'audio' : 'voice' };
     var startPos = (fromStart || i > 0) ? 0 : pr.pos, startIdx = (fromStart || i > 0) ? 0 : pr.idx;
     run.multi = blocks.length - i > 1;
-    $('p-block').textContent = (s > 999 ? 'Market brief' : 'Session ' + s) + ' - ' + NAMES[b] + (blocks.length > 1 ? ' (' + (i + 1) + ' of ' + blocks.length + ')' : '');
+    $('p-block').textContent = (s > 999 ? 'Market brief' : 'Day ' + s) + ' - ' + NAMES[b] + (blocks.length > 1 ? ' - part ' + (i + 1) + ' of ' + blocks.length : '');
+    var _si = sessions.filter(function (x) { return x.session === s; })[0], _pi = _si && (_si.info || {})[b]; $('p-title').textContent = pretty((_pi && _pi.title) || (_si ? shortTitle(_si.title) : ''));
     var bl0 = blocksOf(s), bi = bl0.indexOf(b); $('b-prevp').disabled = bi <= 0; $('b-nextp').disabled = bi < 0 || bi >= bl0.length - 1;
     $('b-prevl').disabled = $('b-nextl').disabled = false;
     var res = 'completed';
@@ -828,7 +1079,7 @@ async function runChain(s, blocks, fromStart) {
 
 function showDone(s, finished) {
   var left = blocksOf(s).filter(function (b) { return !progress(s, b).done; });
-  $('d-title').textContent = finished.length > 1 ? 'Session ' + s + ': ' + finished.length + ' parts finished' : 'Session ' + s + ': ' + NAMES[finished[0]] + ' finished';
+  $('d-title').textContent = finished.length > 1 ? 'Day ' + s + ': ' + finished.length + ' parts finished' : 'Day ' + s + ': ' + NAMES[finished[0]] + ' finished';
   $('d-sum').textContent = 'Saved to your sheet. Your answers are in Review.';
   $('d-parts').innerHTML = blocksOf(s).map(function (b) { return '<div class="chk"><span class="dot ' + (progress(s, b).done ? 'ok' : '') + '"></span><div>' + NAMES[b] + ' - ' + esc(partStatus(s, b).text) + '</div></div>'; }).join('');
   var nb = left[0] || null;
@@ -869,6 +1120,7 @@ async function playAudioPart(s, b, bItems, meta, startPos) {
       if (busy) return; busy = true;
       try {
         tick();
+        if (!active && $('stage').classList.contains('answering')) setCount('p', null);
         var t = player.currentTime, dur = player.duration || meta.durationSec || 1;
         run.pos = t; run.dur = dur;
         if (!dragging) { $('p-seek').max = Math.round(dur); $('p-seek').value = Math.round(t); }
@@ -914,19 +1166,18 @@ async function playAudioPart(s, b, bItems, meta, startPos) {
             var item = bItems.filter(function (x) { return x.seq === c.seq; })[0] || { session: s, block: b, seq: c.seq };
             var prompt = promptFor(bItems, c.seq);
             if (stream && !micLive()) await freshMic();
-            active = { c: c, item: item, prompt: prompt, R: stream ? beginRec() : null, spoke: false, lastVoice: t, force: false };
+            active = { c: c, item: item, prompt: prompt, R: stream ? beginRec() : null, force: false, W: newWindow(c.end - 0.6 - t) };
             $('p-state').textContent = active.R ? 'Your turn' : 'Your turn (no mic)'; $('p-state').className = 'state rec';
             showCap(null, pretty(prompt), null, 'you');
           } else if (t >= c.end - 0.8) ci++;
         }
         if (active) {
-          var lv = active.R ? level(active.R) : 0;
-          if (lv > 0.03) { active.spoke = true; active.lastVoice = t; }
-          var left = Math.max(0, Math.round(active.c.end - 0.6 - t));
-          $('p-time').textContent = 'Answer time left about ' + left + ' s. Stop talking for 3 s to continue.';
-          if (active.force || t >= active.c.end - 0.6 || (active.spoke && t - active.lastVoice > 3.5 && t - active.c.start > 6)) {
+          var ws = windowStep(active.W, active.R ? level(active.R) : 0, 'p'), atEnd = t >= active.c.end - 0.6;
+          $('p-time').textContent = cfg.autoNext !== false ? 'Stop talking for 3 seconds, or tap Skip answer, to move on.' : 'Tap Done if you finish early.';
+          if (active.force || ws.done || atEnd) {
+            if (!active.force && (ws.left <= 0 || atEnd)) noteDrift(active.W, active.c.end - 0.6 - t);
             if (t < active.c.end - 1) player.currentTime = active.c.end - 0.6;
-            var a = active; active = null; ci++;
+            var a = active; active = null; ci++; setCount('p', null);
             if (a.R) { await finishRec(a.R, a.item, a.prompt); run.answers++; }
             $('p-state').textContent = 'Coach'; $('p-state').className = 'state say';
           }
@@ -973,6 +1224,8 @@ $('b-skip').onclick = function () { skipFlag = true; if (window.speechSynthesis)
 function rel(d) { if (!run) return; if (run.mode === 'audio') seekTo = (player.currentTime || 0) + d; else if (d < 0) { stepBack = true; skipFlag = true; if (window.speechSynthesis) speechSynthesis.cancel(); } else { skipFlag = true; if (window.speechSynthesis) speechSynthesis.cancel(); } }
 $('b-back').onclick = function () { rel(-15); };
 $('b-fwd').onclick = function () { rel(15); };
+$('b-smart').onclick = function () { ($('p-count').classList.contains('on') ? $('b-skip') : $('b-fwd')).click(); };
+new MutationObserver(function () { var on = $('p-count').classList.contains('on'); $('b-smart').textContent = on ? 'Done' : '+15 s'; $('b-smart').setAttribute('aria-label', on ? 'I am done with this answer' : 'Forward 15 seconds'); }).observe($('p-count'), { attributes: true, attributeFilter: ['class'] });
 $('b-prevl').onclick = function () { if (run && run.mode === 'audio') seekLine = -1; else rel(-1); };
 $('b-nextl').onclick = function () { if (run && run.mode === 'audio') seekLine = 1; else rel(1); };
 $('p-seek').addEventListener('input', function () { dragging = true; if (run && run.mode === 'audio') $('p-time').textContent = 'Go to ' + fmt(this.value); });
@@ -1061,7 +1314,7 @@ function chartDone(rows, days) {
         if (!hits.length) return;
         var cx = L + j * bw + bw / 2 + (k - 1) * Math.min(11, bw / 3.2);
         var times = hits.map(function (r) { return new Date(r.end).toLocaleTimeString('en-US', { hour: 'numeric', minute: '2-digit' }); }).join(', ');
-        var tip = '<b>' + (sn === 9999 ? 'Market brief' : 'Session ' + sn + ' - ' + NAMES[b]) + '</b><br>Finished ' + dayLabel(d) + ' at ' + times;
+        var tip = '<b>' + (sn === 9999 ? 'Market brief' : 'Day ' + sn + ' - ' + NAMES[b]) + '</b><br>Finished ' + dayLabel(d) + ' at ' + times;
         s += '<circle cx="' + cx + '" cy="' + cy + '" r="4" fill="' + COLORS[b] + '" class="ring"/>' +
              '<circle cx="' + cx + '" cy="' + cy + '" r="11" fill="transparent" data-tip="' + esc(tip).replace(/"/g, '&quot;') + '"/>';
       });
@@ -1119,9 +1372,9 @@ function keyOf(r) { return r.session + '|' + r.block + '|' + r.seq; }
 
 $('r-rep').onclick = function () { subTab('rep'); loadReports(); };
 function subTab(w) {
-  ['use', 'ans', 'rep'].forEach(function (x) { $('r-' + x).classList.toggle('on', x === w); $('rv-' + x).classList.toggle('hide', x !== w); });
+  ['ses', 'use', 'ans', 'rep'].forEach(function (x) { $('r-' + x).classList.toggle('on', x === w); $('rv-' + x).classList.toggle('hide', x !== w); });
 }
-$('r-use').onclick = function () { subTab('use'); };
+$('r-use').onclick = function () { subTab('use'); loadReview(); };
 $('r-ans').onclick = function () { subTab('ans'); loadHist(); };
 Array.prototype.forEach.call(document.querySelectorAll('#a-blocks button'), function (b) {
   b.onclick = function () { aBlock = b.dataset.b; Array.prototype.forEach.call(document.querySelectorAll('#a-blocks button'), function (x) { x.classList.toggle('on', x === b); }); renderHist(); };
@@ -1277,23 +1530,12 @@ try { var _s = localStorage.getItem('cc_sort'); if (_s) { aSort = _s; $('a-sort'
 /* ---- Claude replies from Drive ---- */
 function renderInbox() {
   var n = inboxInfo && inboxInfo.count || 0;
-  ['inbox-b', 'inbox-s'].forEach(function (id) {
+  ['inbox-b', 'inbox-s', 'inbox-h'].forEach(function (id) {
     var b = $(id); if (!b) return;
     if (!n) { b.classList.add('hide'); b.innerHTML = ''; return; }
     b.innerHTML = '<div><b>' + n + ' Claude repl' + (n === 1 ? 'y' : 'ies') + ' waiting in Drive</b><div class="mut sm2">' + inboxInfo.files.map(function (f) { return esc(f.name); }).join(', ') + '</div></div><button class="pri" data-load-drive>Load now</button>';
     b.classList.remove('hide');
   });
-}
-async function loadDrive(btn) {
-  var out = $('drive-m'); btn.disabled = true; out.textContent = 'Loading Claude\'s replies from Drive...';
-  try {
-    var r = await call('loadInbox');
-    out.innerHTML = esc(r.message) + (r.results.length ? '<ul class="sm2">' + r.results.map(function (x) { return '<li>' + esc(x.name) + ': ' + esc(x.message) + '</li>'; }).join('') + '</ul>' : '');
-    inboxInfo = { count: r.failed, files: r.results.filter(function (x) { return !x.ok; }).map(function (x) { return { name: x.name }; }), url: r.url };
-    renderInbox();
-    if (!$('v-review').classList.contains('hide')) { await loadHist(); $('hist').insertAdjacentHTML('afterbegin', '<div class="card mut sm2">' + esc(r.message) + '</div>'); }
-  } catch (e) { out.textContent = /unknown action/.test(e.message) ? 'The backend is older than v1.9: paste the new Code.gs and deploy a new version.' : 'Error: ' + e.message; renderInbox(); }
-  btn.disabled = false;
 }
 document.addEventListener('click', function (e) { var b = e.target.closest('[data-load-drive]'); if (b) loadDrive(b); });
 $('drive-check').onclick = async function () {
@@ -1363,14 +1605,9 @@ $('rt-rec').onclick = async function () {
   try { await ensureSession(q.session); var row = itemsBy[q.session].filter(function (x) { return x.block === q.block && x.seq === q.seq; })[0]; if (row && row.sec) maxSec = Math.max(30, Number(row.sec) + 15); } catch (e) {}
   beep(700); var R = beginRec(); if (!R) { $('rt-m').textContent = 'Recording is not supported here.'; btn.disabled = false; return; }
   rq.stop = false; $('rt-stop').disabled = false; $('rt-state').textContent = 'Recording'; $('rt-state').className = 'state rec';
-  var spoke = false, lastVoice = Date.now();
-  while (!rq.stop && (Date.now() - R.t0) < maxSec * 1000) {
-    await sleep(120);
-    var lv = level(R, 'rt-meter'); if (lv > 0.03) { spoke = true; lastVoice = Date.now(); }
-    $('rt-m').textContent = Math.round((Date.now() - R.t0) / 1000) + ' s of up to ' + maxSec + ' s. Stop talking for 4 s, or tap Stop.';
-    if (spoke && Date.now() - lastVoice > 4000 && (Date.now() - R.t0) > 6000) break;
-  }
-  beep(520); $('rt-stop').disabled = true; $('rt-state').textContent = 'Saving...'; $('rt-state').className = 'state';
+  var W = newWindow(maxSec); $('rt-m').textContent = 'Up to ' + maxSec + ' s. ' + (cfg.autoNext !== false ? 'Stop talking for 3 seconds, or tap Stop.' : 'Tap Stop when you finish.');
+  while (!rq.stop) { await sleep(120); if (windowStep(W, level(R, 'rt-meter'), 'rt').done) break; }
+  setCount('rt', null); beep(520); $('rt-stop').disabled = true; $('rt-state').textContent = 'Saving...'; $('rt-state').className = 'state';
   await finishRec(R, { session: q.session, block: q.block, seq: q.seq }, String(q.prompt || ''));
   await Promise.all(pending); pending = [];
   if (own && !running && stream) { stream.getTracks().forEach(function (t) { t.stop(); }); stream = null; }
@@ -1419,11 +1656,235 @@ $('imp').onclick = async function () {
 };
 $('auto').onclick = async function () { $('auto-m').textContent = 'Working...'; try { $('auto-m').textContent = await call('feedback', { n: chosen || 1 }); } catch (e) { $('auto-m').textContent = e.message; } };
 
+/* ================= v2.0: big countdown, session pages, follow-ups, load progress, clean-up, Setup pages ================= */
+
+/* ---- countdown: wall-clock seconds, large enough to read at a glance ---- */
+function setCount(pre, left, total, note) {
+  var box = $(pre + '-count'); if (!box) return;
+  if (left == null) { box.classList.remove('on', 'warn', 'end'); if (pre === 'p') $('stage').classList.remove('answering'); return; }
+  var n = Math.max(0, Math.ceil(left - 0.05));
+  box.classList.add('on'); box.classList.toggle('warn', n <= 10 && n > 5); box.classList.toggle('end', n <= 5);
+  if (pre === 'p') $('stage').classList.add('answering');
+  $(pre + '-cnum').textContent = n;
+  $(pre + '-clab').textContent = note || (n === 1 ? 'second left' : 'seconds left');
+  $(pre + '-cbar').style.width = Math.max(0, Math.min(100, 100 * left / Math.max(1, total))) + '%';
+}
+/* One answer window. Time is real seconds from when the window opened; the audio position is only compared against it. */
+function newWindow(total) { return { w0: performance.now(), total: Math.max(1, total), spoke: false, lastVoice: 0, floor: 1, ticked: false, drift: 0 }; }
+function windowStep(W, lv, pre) {
+  var el = (performance.now() - W.w0) / 1000, left = W.total - el;
+  if (el > 0.4 && lv > 0) W.floor = Math.min(W.floor, lv);
+  var thr = Math.max(0.03, (W.floor < 1 ? W.floor : 0) * 3 + 0.01);
+  if (lv > thr) { W.spoke = true; W.lastVoice = el; }
+  var quiet = W.spoke ? el - W.lastVoice : 0, auto = cfg.autoNext !== false && W.spoke && el > 6;
+  var note = auto && quiet > 1.5 ? 'Silence: moving on in ' + Math.max(1, Math.ceil(3.5 - quiet)) : '';
+  setCount(pre, left, W.total, note);
+  if (!W.ticked && left <= 5.05 && W.total >= 12) { W.ticked = true; if (cfg.tick !== false) beep(880); }
+  return { left: left, done: left <= 0 || (auto && quiet > 3.5) };
+}
+function noteDrift(W, audioLeft) { // how far the audio clock is from real time at the end of a window
+  try { var d = Math.round((audioLeft - (W.total - (performance.now() - W.w0) / 1000)) * 10) / 10, s = JSON.parse(localStorage.getItem('cc.drift') || '{"n":0,"max":0}');
+    s.n++; s.last = d; if (Math.abs(d) > Math.abs(s.max)) s.max = d; s.at = new Date().toISOString(); localStorage.setItem('cc.drift', JSON.stringify(s)); } catch (e) {}
+}
+
+/* ---- review: sessions list and the book-like session page ---- */
+var page = null, pageMode = 'full', fuAll = [];
+function dayName(n) { return n > 999 ? 'Market brief' : 'Day ' + n; }
+function shortTitle(t) { return String(t || '').replace(/^Day \d+:\s*/, '').replace(/^Market brief,\s*/, ''); }
+async function loadSes() {
+  $('ses-page').classList.add('hide'); $('ses-list').classList.remove('hide'); $('fu-open').classList.remove('hide');
+  $('ses-list').innerHTML = '<div class="loading"><span class="spin"></span> Loading your sessions...</div>';
+  var got = await Promise.all([
+    call('sessions').catch(function () { return sessions; }),
+    call('history', { limit: 800 }).catch(function () { return hist; }),
+    call('reports').catch(function () { return reports; }),
+    call('followups', {}).catch(function () { return null; })
+  ]);
+  sessions = got[0] || []; hist = got[1] || []; reports = got[2] || []; fuAll = got[3] || [];
+  itemScore = {}; reports.slice().reverse().forEach(function (r) { (r.items || []).forEach(function (it) { if (it.key && it.score != null) itemScore[it.key] = Number(it.score); }); });
+  renderSes(); renderFuOpen(got[3] === null);
+}
+function sesStats(n) {
+  var keys = {}, sc = {}, last = 0;
+  hist.forEach(function (r) {
+    if (Number(r.session) !== n) return;
+    var k = keyOf(r), f = (r.feedbacks || [])[0]; keys[k] = 1; last = Math.max(last, tms(r.timestamp));
+    var v = f && f.score != null && !isNaN(f.score) ? Number(f.score) : (itemScore[k] != null ? itemScore[k] : null);
+    if (v != null) sc[k] = v;
+  });
+  var vals = Object.keys(sc).map(function (k) { return sc[k]; });
+  return { answered: Object.keys(keys).length, avg: vals.length ? vals.reduce(function (x, y) { return x + y; }, 0) / vals.length : null, last: last };
+}
+function renderSes() {
+  var list = sessions.slice().sort(function (a, b) { return b.session - a.session; });
+  if (!list.length) { $('ses-list').innerHTML = '<div class="mut">No sessions yet.</div>'; return; }
+  $('ses-list').innerHTML = list.map(function (s) {
+    var st = sesStats(s.session), fo = s.follow || { open: 0, total: 0 };
+    return '<button class="sescard" data-open="' + s.session + '"><div class="sc-h"><div><b>' + dayName(s.session) + '</b> <span class="mut">' + esc(pretty(shortTitle(s.title))) + '</span></div>' + (st.avg != null ? badge(st.avg) : '') + '</div>' +
+      (s.intro ? '<div class="mut sm2 clamp2">' + esc(pretty(s.intro)) + '</div>' : '') +
+      '<div class="sc-f mut sm2">' + (st.answered ? st.answered + ' answered, last ' + shortDate2(st.last) : 'Not answered yet') +
+      (fo.total ? ' <span class="pill ' + (fo.open ? 'open' : 'ok') + '">' + (fo.open ? fo.open + ' follow-up' + (fo.open > 1 ? 's' : '') + ' open' : 'follow-ups done') + '</span>' : '') + '</div></button>';
+  }).join('');
+}
+function fuRow(f, withDay) {
+  var done = f.status === 'done', skip = f.status === 'skip';
+  return '<div class="furow ' + (done ? 'done' : skip ? 'skip' : '') + '"><label><input type="checkbox" data-fu="' + esc(f.id) + '"' + (done ? ' checked' : '') + '><span>' +
+    (withDay ? '<b>' + dayName(f.session) + '</b> ' : '') + (f.block && NAMES[f.block] ? '<span class="chip sm c-' + f.block + '">' + NAMES[f.block] + '</span> ' : '') + esc(pretty(f.text)) +
+    (done && f.updated ? ' <span class="mut sm2">done ' + shortDate2(f.updated) + '</span>' : '') + '</span></label>' +
+    '<button class="link" data-fu-skip="' + esc(f.id) + '">' + (skip ? 'Reopen' : done ? '' : 'Skip') + '</button></div>';
+}
+function renderFuOpen(old) {
+  var open = fuOpenNow(), later = fuAll.filter(function (f) { return f.status !== 'done' && f.status !== 'skip'; }).length - open.length;
+  if (old) { $('fu-open').innerHTML = '<div class="card mut sm2">Follow-ups and session pages need backend v2.0: paste the new Code.gs and deploy a new version.</div>'; return; }
+  if (!fuAll.length) { $('fu-open').innerHTML = ''; return; }
+  $('fu-open').innerHTML = '<details class="card fu"' + (open.length && open.length <= 6 ? ' open' : '') + '><summary><b>Open follow-ups</b> <span class="pill ' + (open.length ? 'open' : 'ok') + '">' + open.length + ' open</span> <span class="mut sm2">' + (later ? later + ' more come with later days' : 'of ' + fuAll.length) + '</span></summary>' +
+    (open.length ? open.map(function (f) { return fuRow(f, true); }).join('') : '<div class="mut sm2">Everything is done or skipped.</div>') + '</details>';
+}
+async function setFu(id, status) {
+  var f = fuAll.filter(function (x) { return x.id === id; })[0] || (page && page.followups.filter(function (x) { return x.id === id; })[0]); if (!f) return;
+  f.status = status; f.updated = new Date().toISOString();
+  if (page) page.followups.forEach(function (x) { if (x.id === id) { x.status = status; x.updated = f.updated; } });
+  fuAll.forEach(function (x) { if (x.id === id) { x.status = status; x.updated = f.updated; } });
+  sessions.forEach(function (s) { if (s.session === f.session && s.follow) s.follow.open = fuAll.filter(function (x) { return x.session === s.session && x.status !== 'done' && x.status !== 'skip'; }).length; });
+  renderFuOpen(); renderAfter(); if (page && !$('ses-page').classList.contains('hide')) renderFuPage();
+  try { await call('followSet', { id: id, status: status }); } catch (e) { toast('Could not save the follow-up: ' + e.message); }
+}
+function toast(m) { var t = $('toast'); t.textContent = m; t.classList.add('on'); clearTimeout(toast.t); toast.t = setTimeout(function () { t.classList.remove('on'); }, 4000); }
+
+async function openPage(n) {
+  $('ses-list').classList.add('hide'); $('fu-open').classList.add('hide'); $('ses-page').classList.remove('hide');
+  $('ses-page').innerHTML = '<div class="loading"><span class="spin"></span> Opening ' + dayName(n) + '...</div>';
+  try { page = await call('page', { n: n }); }
+  catch (e) { $('ses-page').innerHTML = '<button class="link" data-back>&lsaquo; All sessions</button><div class="card mut">' + (/unknown action/.test(e.message) ? 'Session pages need backend v2.0: paste the new Code.gs and deploy a new version.' : 'Could not open: ' + esc(e.message)) + '</div>'; return; }
+  // keep the answers where Practice again can find them
+  var have = {}; hist.forEach(function (h) { have[keyOf(h) + '|' + tms(h.timestamp)] = 1; });
+  page.answers.forEach(function (a) { if (!have[keyOf(a) + '|' + tms(a.timestamp)]) hist.push(a); });
+  renderPage(); window.scrollTo(0, 0);
+}
+function renderFuPage() {
+  var el = $('bk-fu'); if (!el) return;
+  el.innerHTML = '<h3>Follow-ups</h3>' + (page.followups.length ? page.followups.map(function (f) { return fuRow(f, false); }).join('') : '<div class="mut sm2">None for this session.</div>') +
+    '<div class="fu-add"><input type="text" id="fu-new" placeholder="Add your own follow-up" maxlength="200"><button class="alt sm" data-fu-add>Add</button></div>';
+}
+function renderPage() {
+  var P = page, n = P.session, by = {}, samp = {}, sampFor = {};
+  P.answers.forEach(function (a) { (by[a.block + '|' + a.seq] = by[a.block + '|' + a.seq] || []).push(a); });
+  (P.samples || []).forEach(function (s) { samp[s.block + '|' + s.seq] = 1; (sampFor[s.block + '|' + s.forSeq] = sampFor[s.block + '|' + s.forSeq] || []).push(s.seq); });
+  var st = sesStats(n), rp = P.report, blocks = ORDER.filter(function (b) { return P.content.some(function (r) { return r.block === b; }); });
+  var h = '<div class="bk-top"><button class="link" data-back>&lsaquo; All sessions</button><button class="alt sm" data-print>Print or save as PDF</button></div>' +
+    '<div class="bk-head"><div class="lab">' + dayName(n) + '</div><h1>' + esc(pretty(shortTitle(P.title))) + '</h1>' + (P.intro ? '<p class="bk-intro">' + esc(pretty(P.intro)) + '</p>' : '') +
+    '<div class="bk-meta">' + (st.avg != null ? badge(st.avg) + ' ' : '') + '<span class="mut sm2">' + (st.answered ? st.answered + ' questions answered, last ' + shortDate2(st.last) : 'Not answered yet') + '</span></div></div>';
+  if (rp) h += '<div class="dayrep"><div class="lab">Claude\'s report - ' + esc(rp.date) + (rp.scores && rp.scores.overall != null ? ' - overall ' + esc(rp.scores.overall) + '/5' : '') + '</div>' + (rp.summary ? '<div>' + esc(rp.summary) + '</div>' : '') +
+    ((rp.wins || []).length ? '<div class="dr-row"><b>Went well:</b> ' + esc(rp.wins[0]) + '</div>' : '') + ((rp.fixes || []).length ? '<div class="dr-row"><b>Fix first:</b> ' + esc(rp.fixes[0]) + '</div>' : '') +
+    (rp.nextFocus ? '<div class="dr-row"><b>Practice next:</b> ' + esc(rp.nextFocus) + '</div>' : '') + '</div>';
+  h += '<div class="card fu" id="bk-fu"></div>';
+  h += '<div class="bk-toc">' + blocks.map(function (b, i) { var inf = (P.info || {})[b] || {}; return '<a href="#bk-' + b + '" data-jump="bk-' + b + '"><span class="chip sm c-' + b + '">' + (i + 1) + ' ' + NAMES[b] + '</span> ' + esc(pretty(inf.title || '')) + '</a>'; }).join('') + '</div>';
+  h += '<div class="seg bk-mode"><button data-mode="full" class="' + (pageMode === 'full' ? 'on' : '') + '">Full script</button><button data-mode="qa" class="' + (pageMode === 'qa' ? 'on' : '') + '">Questions and answers</button></div>';
+  h += '<div class="bk-body ' + (pageMode === 'qa' ? 'qa-only' : '') + '">';
+  blocks.forEach(function (b, bi) {
+    var rows = P.content.filter(function (r) { return r.block === b; }), inf = (P.info || {})[b] || {};
+    h += '<h2 id="bk-' + b + '"><span class="chip c-' + b + '">Part ' + (bi + 1) + ' - ' + NAMES[b] + '</span> ' + esc(pretty(inf.title || '')) + '</h2>' + (inf.intro ? '<p class="bk-pintro">' + esc(pretty(inf.intro)) + '</p>' : '');
+    var qn = 0;
+    rows.forEach(function (r, i) {
+      var k = b + '|' + r.seq;
+      if (r.type === 'say') {
+        if (samp[k]) return; // shown inside the answer box it belongs to
+        var isQ = rows[i + 1] && rows[i + 1].type === 'record';
+        h += '<p class="ln' + (r.voice === 'interviewer' ? ' iv' : '') + (isQ ? ' q' : '') + '">' + (r.voice === 'interviewer' ? '<span class="who">Interviewer</span> ' : '') + hl(r.text, []) + '</p>';
+      } else if (r.type === 'record') {
+        qn++;
+        var at = (by[k] || []).slice().sort(function (x, y) { return tms(x.timestamp) - tms(y.timestamp); });
+        var real = at.filter(function (a) { return realText(txtOf(a)) || Number(a.durationSec) >= 8; }); if (!real.length) real = at.slice(-1);
+        var f = at.length ? (at[0].feedbacks || [])[0] : null, kws = f ? f.keywords || [] : [], key = n + '|' + k;
+        var sc = f && f.score != null && !isNaN(f.score) ? Number(f.score) : (itemScore[key] != null ? itemScore[key] : null);
+        h += '<div class="qa-box" id="qa-' + b + '-' + r.seq + '"><div class="qa-h"><span class="lab">Your answer ' + qn + ' - up to ' + r.sec + ' s</span>' + (f ? badge(sc) : '') + '</div>';
+        if (!real.length) h += '<div class="mut sm2">Not answered yet.</div>';
+        real.forEach(function (a, j) { h += '<div class="box said">' + attemptHtml(a, kws, real.length > 1 ? 'Version ' + (j + 1) : 'You said') + '</div>'; });
+        if (f) {
+          h += '<div class="box note"><div class="lab">Claude\'s note' + (sc != null ? ' - ' + scoreWord(sc).toLowerCase() + ' (' + sc + '/5)' : '') + '</div>' + hl(f.feedback, kws) + '</div>';
+          if (f.suggestion) h += '<div class="box better"><div class="lab">Say it like this (Claude)</div>' + hl(f.suggestion, kws) + '</div>';
+          if (kws.length && real.length) { var lt = normT(txtOf(real[real.length - 1]));
+            h += '<div class="kws"><span class="lab">Key phrases</span> ' + kws.map(function (w) { var u = lt.indexOf(normT(w)) >= 0; return '<span class="kw ' + (u ? 'ok' : 'miss') + '">' + esc(w) + '</span>'; }).join(' ') + '</div>'; }
+        }
+        if (sampFor[k]) h += '<div class="box sample"><div class="lab">Sample answer from the session</div>' + sampFor[k].map(function (sq) { var row = rows.filter(function (x) { return x.seq === sq; })[0]; return row ? '<p>' + hl(row.text, kws) + '</p>' : ''; }).join('') + '</div>';
+        h += '<button class="alt sm" data-retry="' + key + '">Practice again</button></div>';
+      }
+    });
+  });
+  h += '</div>';
+  $('ses-page').innerHTML = h; renderFuPage();
+}
+$('rv-ses').addEventListener('click', async function (e) {
+  var b = e.target.closest('button, a'); if (!b) return;
+  if (b.dataset.open) openPage(Number(b.dataset.open));
+  else if (b.hasAttribute('data-back')) { page = null; $('ses-page').classList.add('hide'); $('ses-list').classList.remove('hide'); $('fu-open').classList.remove('hide'); renderSes(); renderFuOpen(); }
+  else if (b.hasAttribute('data-print')) window.print();
+  else if (b.dataset.mode) { pageMode = b.dataset.mode; var y = window.scrollY; renderPage(); window.scrollTo(0, y); }
+  else if (b.dataset.jump) { e.preventDefault(); var t = $(b.dataset.jump); if (t) t.scrollIntoView({ behavior: 'smooth', block: 'start' }); }
+  else if (b.hasAttribute('data-retry')) startRetry([b.dataset.retry]);
+  else if (b.hasAttribute('data-phone')) { var p = b.nextElementSibling, hid = p.classList.toggle('hide'); b.textContent = hid ? 'Show what the phone heard' : 'Hide what the phone heard'; }
+  else if (b.dataset.fuSkip) { var f = fuAll.concat(page ? page.followups : []).filter(function (x) { return x.id === b.dataset.fuSkip; })[0]; if (f) setFu(f.id, f.status === 'skip' ? 'open' : 'skip'); }
+  else if (b.hasAttribute('data-fu-add')) {
+    var txt = $('fu-new').value.trim(); if (!txt || !page) return; b.disabled = true;
+    try { page.followups = await call('followSet', { session: page.session, text: txt }); fuAll = await call('followups', {}); renderFuPage(); } catch (x) { toast('Could not add: ' + x.message); }
+  }
+});
+$('rv-ses').addEventListener('change', function (e) { var c = e.target; if (c && c.dataset && c.dataset.fu) setFu(c.dataset.fu, c.checked ? 'done' : 'open'); });
+$('r-ses').onclick = function () { subTab('ses'); loadSes(); };
+
+/* ---- loading Claude's replies, one file at a time, with visible progress ---- */
+function progHtml(i, n, text) { return '<div class="prog"><div class="prog-t"><span class="spin"></span> ' + esc(text) + '</div><div class="prog-b"><i style="width:' + (n ? Math.round(100 * i / n) : 5) + '%"></i></div></div>'; }
+async function loadDrive(btn) {
+  var out = $('drive-m'), ban = $('inbox-b'), onReview = !$('v-review').classList.contains('hide');
+  var show = function (html) { out.innerHTML = html; if (onReview) { ban.classList.remove('hide'); ban.classList.add('busy'); ban.innerHTML = html; } };
+  Array.prototype.forEach.call(document.querySelectorAll('[data-load-drive]'), function (x) { x.disabled = true; });
+  var results = [], removed = 0;
+  try {
+    show(progHtml(0, 0, 'Looking in the Claude replies folder...'));
+    var box = await call('inbox'), files = box.files || [];
+    if (!files.length) { show(''); out.textContent = 'The folder is empty: nothing new to load.'; }
+    for (var i = 0; i < files.length; i++) {
+      show(progHtml(i, files.length + 1, 'Loading ' + (i + 1) + ' of ' + files.length + ': ' + files[i].name));
+      var r = await call('loadInbox', { id: files[i].id, name: files[i].name });
+      results = results.concat(r.results || []);
+      if ((r.results || []).length > 1) break; // an older backend loads everything in one call
+    }
+    if (files.length) {
+      show(progHtml(files.length, files.length + 1, 'Removing duplicates...'));
+      try { var t = await call('tidy'); removed = t.total || 0; } catch (x) {}
+      var good = results.filter(function (x) { return x.ok; }).length;
+      var sum = '<b>Loaded ' + good + ' of ' + results.length + ' repl' + (results.length === 1 ? 'y' : 'ies') + (removed ? ', removed ' + removed + ' duplicate' + (removed > 1 ? 's' : '') : '') + '.</b>';
+      out.innerHTML = sum + '<ul class="sm2">' + results.map(function (x) { return '<li>' + (x.ok ? '' : '<b>Not loaded:</b> ') + esc(x.name) + ': ' + esc(x.message) + '</li>'; }).join('') + '</ul>';
+      inboxInfo = { count: results.length - good, files: results.filter(function (x) { return !x.ok; }).map(function (x) { return { name: x.name }; }) };
+      ban.classList.remove('busy'); renderInbox();
+      if (onReview) { if (!$('rv-ses').classList.contains('hide')) await loadSes(); else if (!$('rv-ans').classList.contains('hide')) await loadHist(); toast('Loaded ' + good + ' of ' + results.length + ' repl' + (results.length === 1 ? 'y' : 'ies') + '.'); }
+    } else { ban.classList.remove('busy'); inboxInfo = { count: 0, files: [] }; renderInbox(); }
+  } catch (e) { ban.classList.remove('busy'); out.textContent = /unknown action/.test(e.message) ? 'The backend is older than this page: paste the new Code.gs and deploy a new version.' : 'Error: ' + e.message; renderInbox(); }
+  Array.prototype.forEach.call(document.querySelectorAll('[data-load-drive]'), function (x) { x.disabled = false; });
+}
+$('tidy-go').onclick = async function () {
+  var b = this; b.disabled = true; $('tidy-m').innerHTML = progHtml(1, 3, 'Checking every tab and the Drive folder for duplicates...');
+  try { var r = await call('tidy'); $('tidy-m').textContent = r.message; }
+  catch (e) { $('tidy-m').textContent = /unknown action/.test(e.message) ? 'Needs backend v2.0: paste the new Code.gs and deploy a new version.' : 'Error: ' + e.message; }
+  b.disabled = false;
+};
+
+/* ---- Setup: sub-pages and options ---- */
+function setupTab(w) { ['start', 'conn', 'opt', 'help', 'ver'].forEach(function (x) { $('g-' + x).classList.toggle('on', x === w); $('gv-' + x).classList.toggle('hide', x !== w); }); try { localStorage.setItem('cc.setup', w); } catch (e) {} }
+['start', 'conn', 'opt', 'help', 'ver'].forEach(function (x) { $('g-' + x).onclick = function () { setupTab(x); }; });
+function loadOpts() {
+  $('cfg-stt').checked = cfg.stt !== false; $('cfg-auto').checked = cfg.autoNext !== false; $('cfg-tick').checked = cfg.tick !== false;
+  var d = null; try { d = JSON.parse(localStorage.getItem('cc.drift') || 'null'); } catch (e) {}
+  $('clock-m').innerHTML = d && d.n ? 'Clock check over ' + d.n + ' answer window' + (d.n > 1 ? 's' : '') + ': the audio was at most <b>' + Math.abs(d.max).toFixed(1) + ' s</b> ' + (d.max > 0 ? 'behind' : 'ahead of') + ' real time (last: ' + Math.abs(d.last).toFixed(1) + ' s). The countdown always uses real seconds.'
+    : 'Clock check: no answer windows measured yet on this device. After your next session this shows how far the audio clock is from real time.';
+}
+['cfg-stt', 'cfg-auto', 'cfg-tick'].forEach(function (id) { $(id).onchange = function () { cfg.stt = $('cfg-stt').checked; cfg.autoNext = $('cfg-auto').checked; cfg.tick = $('cfg-tick').checked; saveCfg(); toast('Saved.'); }; });
+
 /* ---- guide: settings, checks, versions ---- */
 function chk(state, text) { return '<div class="chk"><span class="dot ' + state + '"></span><div>' + text + '</div></div>'; }
 async function loadGuide() {
   loadAuto();
-  $('cfg-url').value = cfg.url || ''; $('cfg-tok').value = cfg.token || ''; $('cfg-stt').checked = cfg.stt !== false;
+  $('cfg-url').value = cfg.url || ''; $('cfg-tok').value = cfg.token || ''; loadOpts();
   $('cfg-url-wrap').classList.toggle('hide', IS_AS);
   var h = '', vs = LOCAL_CHANGES;
   h += chk(window.isSecureContext ? 'ok' : 'bad', window.isSecureContext ? 'Secure (https) page' : 'Not a secure page: the microphone will not work');
@@ -1471,7 +1932,7 @@ function autoStatus(st) {
     '<br>Scheduled jobs: ' + esc((st.triggers || []).join(', ') || 'none (run setup again)');
 }
 async function loadAuto() {
-  try { autoStatus(await call('settings')); $('auto-card').classList.remove('hide'); }
+  try { autoStatus(await call('settings')); $('auto-card').classList.remove('hide'); $('auto-sync').classList.remove('hide'); }
   catch (e) { if (/unknown action/.test(e.message)) $('auto-card').classList.add('hide'); else $('a-st').textContent = 'Automation status unavailable: ' + e.message; }
 }
 async function autoAct(btn, action, p, msg) {
@@ -1509,7 +1970,7 @@ async function makePack(btn, p) {
   btn.disabled = false;
 }
 $('pack-new').onclick = function () { makePack(this, {}); };
-$('pack-s').onclick = function () { if (!chosen) { $('pack-m').textContent = 'Pick a session on the Today tab first.'; return; } makePack(this, { session: chosen }); };
+$('pack-s').onclick = function () { if (!chosen) { $('pack-m').textContent = 'Pick a day on the Drive tab first.'; return; } makePack(this, { session: chosen }); };
 $('imp-f').onchange = function () { var f = this.files && this.files[0]; if (!f) return; var r = new FileReader(); r.onload = function () { $('imp-t').value = String(r.result); $('imp-m').textContent = 'Loaded ' + f.name + '. Tap Import.'; }; r.readAsText(f); };
 $('book-go').onclick = async function () {
   var btn = this; btn.disabled = true; $('book-m').textContent = 'Building your book in Google Docs (about 20 to 60 seconds)...';
