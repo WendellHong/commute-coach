@@ -549,8 +549,9 @@ details.older>summary{cursor:pointer;margin:6px 0}
 </main>
 
 <script>
-var APP_VERSION = '2.1.0';
+var APP_VERSION = '2.1.1';
 var LOCAL_CHANGES = [
+  { v: '2.1.1', date: '2026-11-13', notes: ['Fixed: the next drive is now the day after the last one you played (it showed Day 1, because Day 1 was never finished)', 'The pack button now says which day it packs, and Pack new answers says when nothing new was recorded'] },
   { v: '2.1.0', date: '2026-11-12', notes: ['New layout, Drive first: the home screen shows the next drive with one large Start button; all other sessions are one tap below', 'Needs work: your three lowest answers on the home screen, each with a Practice button', 'After the drive: open follow-ups, the newest review and the answer pack in one place', 'Driving screen: dark, three large buttons (back 15 s, Pause, forward or Done) and a larger countdown; the other controls are under More controls', 'Tabs moved to the bottom of the screen'] },
   { v: '2.0.0', date: '2026-11-11', notes: ['Review, Sessions: one book-like page per session with the script, your answers in every version, sample answers, Claude\'s notes and follow-ups', 'Follow-ups: tick off or skip the actions each session asked for; add your own', 'Today: every session and part shows its title and a short introduction', 'Answer countdown: large digits you can read at a glance, counted in real seconds, with a beep 5 seconds before the end and a visible "moving on" notice', 'Load now shows progress file by file', 'Sync: Clean up duplicates', 'Guide is now Setup, in five short pages that match the current workflow'] },
   { v: '1.9.1', date: '2026-11-11', notes: ['Lost recordings: if the phone cuts the microphone off, the app says so right away and reopens the microphone for the next answer', 'The microphone is checked and reopened before every answer and when you come back to the app', 'Browser transcription is now described as optional (Claude transcribes your recordings)', 'Review: day headers fixed (one arrow, title on its own line); better question titles'] },
@@ -700,7 +701,7 @@ function renderList() {
   Array.prototype.forEach.call(document.querySelectorAll('#hero [data-hero-page]'), function (el) {
     el.onclick = function () { goPage(Number(el.dataset.heroPage)); };
   });
-  renderResume(); renderWeak(); renderAfter();
+  renderResume(); renderWeak(); renderAfter(); packLabel();
 }
 /* ---- home: needs work, after the drive ---- */
 var homeAt = 0, homeOld = false;
@@ -772,16 +773,22 @@ function renderResume() {
   $('resume-card').classList.toggle('hide', !on);
   if (on) $('resume-txt').textContent = 'Day ' + run.s + ' - ' + NAMES[run.b] + ' at ' + fmt(run.pos);
 }
+function nextDay() { // the day after the last day you played; that day itself if it is not finished
+  var days = sessions.filter(function (s) { return s.session <= 999; }).map(function (s) { return s.session; });
+  if (!days.length) return sessions.length ? sessions[sessions.length - 1].session : null;
+  var played = usage.map(function (r) { return Number(r.session); }).filter(function (n) { return days.indexOf(n) >= 0; });
+  if (!played.length) return days[0];
+  var last = Math.max.apply(null, played);
+  if (blocksOf(last).some(function (b) { return !progress(last, b).done; })) return last;
+  return days.filter(function (n) { return n > last; })[0] || last;
+}
 async function loadSessions() {
   if (!cfg.token || (!IS_AS && !cfg.url)) { $('hero').innerHTML = $('list').innerHTML = '<div class="mut">Not connected yet. Open Setup, Connect, and enter the URL and token.</div>'; return; }
   try {
     await flushOpen();
     var r = await Promise.all([call('sessions'), call('usageList').catch(function () { return []; })]);
     sessions = r[0]; usage = r[1] || [];
-    if (chosen == null) {
-      var next = sessions.filter(function (s) { return s.session <= 999 && blocksOf(s.session).some(function (b) { return !progress(s.session, b).done; }); })[0] || sessions[sessions.length - 1];
-      chosen = next ? next.session : null;
-    }
+    if (chosen == null) chosen = nextDay();
     renderList(); if (chosen) prefetch(chosen); homeData(true);
   } catch (e) { $('hero').innerHTML = '<div class="mut">Could not reach your sheet: ' + esc(e.message) + '. Check Setup, Connect.</div>'; $('list').innerHTML = '<div class="mut">Could not reach your sheet: ' + esc(e.message) + '. Check Setup, Connect.</div>'; }
 }
@@ -1965,12 +1972,14 @@ async function makePack(btn, p) {
   btn.disabled = true; $('pack-m').textContent = 'Packing your recordings...';
   try {
     var r = await call('answerPack', p);
+    if (!r.count && !p.session) r.message = 'Nothing new since your last pack. If you practised since then, the answers were not saved: check Review, Answers for that day.';
     $('pack-m').innerHTML = r.count ? esc(r.message) + '<br><a href="' + esc(r.downloadUrl) + '" target="_blank">Download ' + esc(r.name) + '</a> (or <a href="' + esc(r.url) + '" target="_blank">open in Drive</a>). Then attach it in the Claude chat.' : esc(r.message);
   } catch (e) { $('pack-m').textContent = 'Error: ' + (/unknown action/.test(e.message) ? 'the backend is older than v1.6. Paste the new Code.gs and deploy a new version.' : e.message); }
   btn.disabled = false;
 }
 $('pack-new').onclick = function () { makePack(this, {}); };
 $('pack-s').onclick = function () { if (!chosen) { $('pack-m').textContent = 'Pick a day on the Drive tab first.'; return; } makePack(this, { session: chosen }); };
+function packLabel() { $('pack-s').textContent = chosen ? 'Pack all of ' + (chosen > 999 ? 'this market brief' : 'Day ' + chosen) : 'Pack this session'; }
 $('imp-f').onchange = function () { var f = this.files && this.files[0]; if (!f) return; var r = new FileReader(); r.onload = function () { $('imp-t').value = String(r.result); $('imp-m').textContent = 'Loaded ' + f.name + '. Tap Import.'; }; r.readAsText(f); };
 $('book-go').onclick = async function () {
   var btn = this; btn.disabled = true; $('book-m').textContent = 'Building your book in Google Docs (about 20 to 60 seconds)...';
