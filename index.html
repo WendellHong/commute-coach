@@ -91,7 +91,10 @@ textarea{width:100%;min-height:110px;border:1px solid var(--line);border-radius:
 .step{display:grid;grid-template-columns:30px 1fr;gap:10px;padding:10px;border:1px solid var(--line);border-radius:10px;font-size:14px}
 .step b.n{display:flex;align-items:center;justify-content:center;width:26px;height:26px;border-radius:50%;background:var(--acc);color:#fff;font-size:13px}
 .step .who{font-size:11px;text-transform:uppercase;letter-spacing:.05em;color:var(--mut)}
-.ver{padding:8px 0;border-top:1px solid var(--line);font-size:14px}.ver ul{margin:4px 0 0 18px;padding:0}
+.ver{border-top:1px solid var(--line);font-size:14px}.ver ul{margin:0 0 8px 18px;padding:0}
+.ver>summary{cursor:pointer;list-style:none;display:flex;gap:10px;align-items:baseline;min-height:44px;padding:8px 0}
+.ver>summary::-webkit-details-marker{display:none}.ver>summary:before{content:'\25B8';color:var(--mut)}.ver[open]>summary:before{content:'\25BE'}
+.ver>summary .n{margin-left:auto}
 label.row{display:flex;gap:8px;align-items:center;font-size:14px;margin:6px 0}
 .sess{display:block;padding:0;cursor:pointer}
 .sess-h{display:flex;justify-content:space-between;align-items:center;gap:8px;padding:12px}
@@ -177,7 +180,16 @@ b.num{color:var(--acc)}
 .subnav.wrap{flex-wrap:wrap}.subnav.wrap button{flex:1 1 30%}
 .sescard{display:block;width:100%;text-align:left;background:var(--card);border:1px solid var(--line);border-radius:14px;padding:12px 14px;margin:0 0 10px;color:var(--ink);font-size:15px;cursor:pointer}
 .sc-h{display:flex;justify-content:space-between;gap:8px;align-items:flex-start}.sc-f{margin-top:6px}
-.furow{display:flex;justify-content:space-between;gap:8px;align-items:flex-start;padding:7px 0;border-top:1px solid var(--line)}
+.furow{padding:7px 0;border-top:1px solid var(--line)}
+.fu-line{display:flex;justify-content:space-between;gap:8px;align-items:flex-start}
+.fu-acts{display:flex;gap:12px;flex:none}
+.fu-ans{margin:6px 0 2px 30px;padding:8px 10px;border-radius:10px;background:var(--bg);font-size:14px;white-space:pre-wrap}
+.fu-ans .lab{display:flex;justify-content:space-between;gap:8px;margin-bottom:2px}
+.fu-ans textarea{width:100%;box-sizing:border-box;min-height:96px;font:inherit;font-size:15px;padding:8px;border:1px solid var(--line);border-radius:8px;background:var(--card);color:var(--ink);resize:vertical}
+.fu-ans .row{display:flex;gap:8px;margin-top:6px}.fu-ans .row button{margin:0}
+.fu-write{margin:4px 0 0 30px}
+.furow.done .fu-ans,.furow.done .fu-ans *{text-decoration:none;color:var(--ink)}
+.furow.done .chip{text-decoration:none;opacity:.6}
 .furow label{display:flex;gap:10px;align-items:flex-start;flex:1;cursor:pointer}.furow input{width:20px;height:20px;margin-top:1px;flex:none}
 .furow.done span{color:var(--mut);text-decoration:line-through}.furow.done span .mut{text-decoration:none}.furow.skip span{color:var(--mut)}
 details.fu>summary{cursor:pointer;list-style:none}details.fu>summary::-webkit-details-marker{display:none}
@@ -205,7 +217,9 @@ details.fu>summary{cursor:pointer;list-style:none}details.fu>summary::-webkit-de
 #toast.on{opacity:1}
 @media print{nav,.lab2,.subnav,button,.inbox,#fu-open,.bk-mode,.fu-add,#toast{display:none!important}body{background:#fff;color:#000}.bk-body,.qa-box,.card{border-color:#bbb;background:#fff}.qa-box{break-inside:avoid}}
 .inbox{display:flex;justify-content:space-between;gap:10px;align-items:center;background:var(--card);border:1px solid var(--acc);border-radius:12px;padding:10px 12px;margin:0 0 10px}
-.inbox.hide{display:none}.inbox button{margin:0;flex:none;min-height:44px;padding:0 14px;border-radius:12px;border:0;background:var(--acc);color:#fff;font-size:15px;font-weight:700}
+.inbox.hide{display:none}
+.inbox a.dl{flex:none;display:inline-flex;align-items:center;min-height:44px;padding:0 14px;border-radius:12px;background:var(--acc);color:#fff;font-size:15px;font-weight:700;text-decoration:none}
+.inbox .spin{margin-right:6px}.inbox button{margin:0;flex:none;min-height:44px;padding:0 14px;border-radius:12px;border:0;background:var(--acc);color:#fff;font-size:15px;font-weight:700}
 .drv .cap .who{display:none}
 .sc{display:inline-flex;align-items:center;justify-content:center;min-width:34px;height:26px;padding:0 6px;border-radius:8px;font-weight:700;font-size:13px;color:#fff;flex:none;line-height:1}
 .legend2 .sc{min-width:20px;height:18px;font-size:11px;border-radius:5px;padding:0 4px}
@@ -256,6 +270,7 @@ details.older>summary{cursor:pointer;margin:6px 0}
 </nav>
 
 <section id="v-home">
+  <div id="pk-h" class="inbox hide"></div>
   <div id="inbox-h" class="inbox hide"></div>
   <div class="card hide" id="resume-card">
     <div class="lab">Paused</div>
@@ -370,10 +385,14 @@ details.older>summary{cursor:pointer;margin:6px 0}
 
 <section id="v-sync" class="hide">
   <div class="card">
-    <h2>1. Send my recordings to Claude (best feedback)</h2>
-    <div class="mut">Makes one zip file with your recorded answers and their prompts. Download it and attach it in the Claude chat. Claude transcribes the audio accurately and reviews content, length, pace and pauses.</div>
-    <button class="alt" id="pack-new">Pack new answers</button>
-    <button class="alt" id="pack-s">Pack this session</button>
+    <h2>1. Send my answers to Claude</h2>
+    <div id="pk-s" class="inbox hide"></div>
+    <div class="mut">The app packs your answers by itself after each part you finish, with any follow-up answers you wrote. When the notice appears, tap Download and attach the file in the Claude chat. The notice goes away once you download it, or when Claude's reply for those answers is loaded.</div>
+    <button class="alt" id="pack-new">Make the pack now</button>
+    <details style="margin-top:8px"><summary class="mut sm2" style="cursor:pointer">Re-pack one whole day</summary>
+      <div class="mut sm2">Only if Claude asks for a day again. This pack is not tracked.</div>
+      <select id="pack-day" aria-label="Day to pack"></select> <button class="alt" id="pack-s">Pack this day</button>
+    </details>
     <div id="pack-m" class="mut"></div>
   </div>
   <div class="card">
@@ -455,6 +474,13 @@ details.older>summary{cursor:pointer;margin:6px 0}
       <div id="cfg-url-wrap"><div class="lab">Apps Script web app URL (ends in /exec)</div><input id="cfg-url" type="text" placeholder="https://script.google.com/macros/s/.../exec"></div>
       <div class="lab">API token (from the Apps Script log)</div><input id="cfg-tok" type="password" placeholder="token">
       <button class="alt" id="cfg-save">Save and check</button>
+    </div>
+    <div class="card">
+      <h2>Use the app on another device</h2>
+      <div class="mut">For example your computer, to write follow-up answers on a keyboard. Make a link here, send it to yourself, and open it on the other device: it connects in one tap. Keep the link private: it carries your token.</div>
+      <button class="alt" id="cfg-link">Make the link</button>
+      <input id="cfg-link-t" type="text" readonly class="hide" aria-label="Link for another device" style="margin-top:8px">
+      <div id="cfg-link-m" class="mut sm2"></div>
     </div>
     <div class="card">
       <h2>New sessions</h2>
@@ -549,8 +575,9 @@ details.older>summary{cursor:pointer;margin:6px 0}
 </main>
 
 <script>
-var APP_VERSION = '2.1.1';
+var APP_VERSION = '2.2.0';
 var LOCAL_CHANGES = [
+  { v: '2.2.0', date: '2026-11-14', notes: ['Answer packs are made for you after each part you finish. A notice on Drive and Sync says when one is waiting; it goes away once you tap Download, or when Claude\'s reply for those answers is loaded', 'One button on Sync instead of two; packing a whole day again is under Re-pack one day', 'Follow-ups: write your answer under each one, on the phone or on a computer. Your answers go to Claude in the next pack', 'Follow-ups you added yourself can be removed', 'Versions fold: tap one to see its changes', 'Setup, Connect: a link that connects another device (for example your computer) in one tap'] },
   { v: '2.1.1', date: '2026-11-13', notes: ['Fixed: the next drive is now the day after the last one you played (it showed Day 1, because Day 1 was never finished)', 'The pack button now says which day it packs, and Pack new answers says when nothing new was recorded'] },
   { v: '2.1.0', date: '2026-11-12', notes: ['New layout, Drive first: the home screen shows the next drive with one large Start button; all other sessions are one tap below', 'Needs work: your three lowest answers on the home screen, each with a Practice button', 'After the drive: open follow-ups, the newest review and the answer pack in one place', 'Driving screen: dark, three large buttons (back 15 s, Pause, forward or Done) and a larger countdown; the other controls are under More controls', 'Tabs moved to the bottom of the screen'] },
   { v: '2.0.0', date: '2026-11-11', notes: ['Review, Sessions: one book-like page per session with the script, your answers in every version, sample answers, Claude\'s notes and follow-ups', 'Follow-ups: tick off or skip the actions each session asked for; add your own', 'Today: every session and part shows its title and a short introduction', 'Answer countdown: large digits you can read at a glance, counted in real seconds, with a beep 5 seconds before the end and a visible "moving on" notice', 'Load now shows progress file by file', 'Sync: Clean up duplicates', 'Guide is now Setup, in five short pages that match the current workflow'] },
@@ -579,6 +606,11 @@ var cfg = { url: '', token: '', stt: true };
 try { var saved = JSON.parse(localStorage.getItem('cc.cfg') || '{}'); for (var k in saved) cfg[k] = saved[k]; } catch (e) {}
 function saveCfg() { try { localStorage.setItem('cc.cfg', JSON.stringify(cfg)); } catch (e) {} }
 var backendVersion = '';
+(function () { // a link from Setup, Connect: '#connect=' + the address and token
+  var m = /^#connect=(.+)$/.exec(location.hash || ''); if (!m) return;
+  try { var c = JSON.parse(decodeURIComponent(escape(atob(decodeURIComponent(m[1]))))); if (c.url && c.token) { cfg.url = c.url; cfg.token = c.token; saveCfg(); window.__connected = true; } } catch (e) {}
+  try { history.replaceState(null, '', location.pathname + location.search); } catch (e) { location.hash = ''; }
+})();
 
 /* ---- API (hosted page uses fetch; Apps Script fallback uses google.script.run) ---- */
 async function call(action, p) {
@@ -588,7 +620,7 @@ async function call(action, p) {
     return unwrap(r);
   }
   if (!cfg.url) throw new Error('no_url');
-  var big = { audio: 1, response: 1, log: 1, usage: 1, 'import': 1, saveSettings: 1, revoice: 1, voiceSample: 1, marketNow: 1, feedback: 1 }[action];
+  var big = { audio: 1, response: 1, log: 1, usage: 1, 'import': 1, saveSettings: 1, revoice: 1, voiceSample: 1, marketNow: 1, feedback: 1, followSet: 1 }[action];
   var res = big
     ? await fetch(cfg.url, { method: 'POST', headers: { 'Content-Type': 'text/plain;charset=utf-8' }, body: JSON.stringify({ action: action, p: p, token: cfg.token }) })
     : await fetch(cfg.url + '?action=' + action + '&token=' + encodeURIComponent(cfg.token) + '&p=' + encodeURIComponent(JSON.stringify(p)));
@@ -608,7 +640,7 @@ var running = false, paused = false;
 function locked() { return running && !paused; }
 $('t-home').onclick = function () { if (!locked()) { show('home'); renderList(); homeData(false); } };
 $('t-review').onclick = function () { if (!locked()) { show('review'); if (!$('rv-ses').classList.contains('hide')) loadSes(); else if (!$('rv-use').classList.contains('hide')) loadReview(); peekInbox(); } };
-$('t-sync').onclick = function () { if (!locked()) { show('sync'); peekInbox(); loadAuto(); } };
+$('t-sync').onclick = function () { if (!locked()) { show('sync'); peekInbox(); peekPack(); loadAuto(); } };
 $('t-guide').onclick = function () { if (!locked()) { show('guide'); var w = 'start'; try { w = localStorage.getItem('cc.setup') || (cfg.token ? 'start' : 'conn'); } catch (e) {} setupTab(w); loadGuide(); } };
 $('vtag').textContent = 'v' + APP_VERSION;
 
@@ -713,8 +745,10 @@ async function homeData(force) {
     call('history', { limit: 800 }).catch(function () { return hist; }),
     call('reports').catch(function () { return reports; }),
     call('followups', {}).catch(function () { return null; }),
-    call('inbox').catch(function () { return null; })
+    call('inbox').catch(function () { return null; }),
+    call('packs').catch(function () { return null; })
   ]);
+  packInfo = got[4]; renderPack();
   var arr = function (x, d) { return Array.isArray(x) ? x : d; };
   hist = arr(got[0], []); reports = arr(got[1], []); homeOld = got[2] === null; fuAll = arr(got[2], fuAll); inboxInfo = got[3];
   itemScore = {}; reports.slice().reverse().forEach(function (r) { (r.items || []).forEach(function (it) { if (it.key && it.score != null) itemScore[it.key] = Number(it.score); }); });
@@ -905,7 +939,7 @@ function micAdvice() {
 function micLive() { try { return !!stream && stream.getAudioTracks().some(function (t) { return t.readyState === 'live' && t.enabled; }); } catch (e) { return false; } }
 async function freshMic() { if (micLive()) return true; try { if (stream) stream.getTracks().forEach(function (t) { t.stop(); }); } catch (e) {} stream = null; return await openMic(); }
 document.addEventListener('visibilitychange', function () { if (document.visibilityState === 'visible' && stream && !micLive()) freshMic(); });
-var lostCount = 0;
+var lostCount = 0, newAnswers = 0;
 function b64(blob) { return new Promise(function (r) { var f = new FileReader(); f.onload = function () { r(String(f.result).split(',')[1]); }; f.readAsDataURL(blob); }); }
 function beginRec() {
   var R = { chunks: [], mime: '', transcript: '', rec: null, an: null, buf: null, t0: Date.now(), mr: null };
@@ -956,7 +990,7 @@ async function finishRec(R, item, prompt) {
     $('p-hint').textContent = 'Nothing was recorded for that answer: the phone cut the microphone off. The app reopened it for the next answer. Use Practice again on this question later' + (lostCount > 1 ? ' (' + lostCount + ' lost this session).' : '.');
     stream = null; freshMic();
   }
-  R.transcript = text;
+  R.transcript = text; newAnswers++;
   pending.push((async function () {
     var a = { id: '', url: '' };
     try { if (blob.size > 0 && blob.size < 6000000) a = await call('audio', { session: item.session, block: item.block, seq: item.seq, b64: await b64(blob), mime: R.mime || 'audio/webm' }); } catch (e) {}
@@ -1080,6 +1114,7 @@ async function runChain(s, blocks, fromStart) {
   if (stream) { stream.getTracks().forEach(function (t) { t.stop(); }); stream = null; }
   $('p-state').textContent = 'Saving...';
   await Promise.all(pending); pending = [];
+  if (newAnswers) { newAnswers = 0; autoPack(false); }
   if (outcome === 'completed' && last) showDone(s, finished);
   else if (!leaveFlag) { show('home'); renderList(); }
 }
@@ -1577,7 +1612,7 @@ function showRetry() {
   $('rt-rec').disabled = false; $('rt-play').disabled = false; $('rt-stop').disabled = true;
 }
 $('rt-show').onclick = function () { var h = $('rt-hint').classList.toggle('hide'); this.textContent = h ? 'Show the hint' : 'Hide the hint'; };
-$('rt-close').onclick = function () { rq.stop = true; if (rq.audio) rq.audio.pause(); $('retry').classList.add('hide'); if (rq.saved) { rq.saved = false; loadHist(); } };
+$('rt-close').onclick = async function () { rq.stop = true; if (rq.audio) rq.audio.pause(); $('retry').classList.add('hide'); if (rq.saved) { rq.saved = false; loadHist(); await Promise.all(pending); pending = []; newAnswers = 0; autoPack(false); } };
 $('rt-next').onclick = function () { rq.stop = true; if (rq.audio) rq.audio.pause(); rq.i++; showRetry(); };
 $('rt-play').onclick = async function () {
   var q = qFor(rq.keys[rq.i]); this.disabled = true; $('rt-m').textContent = 'Loading the question...';
@@ -1733,13 +1768,46 @@ function renderSes() {
       (fo.total ? ' <span class="pill ' + (fo.open ? 'open' : 'ok') + '">' + (fo.open ? fo.open + ' follow-up' + (fo.open > 1 ? 's' : '') + ' open' : 'follow-ups done') + '</span>' : '') + '</div></button>';
   }).join('');
 }
+var fuEdit = null, fuRemoveArm = null;
 function fuRow(f, withDay) {
-  var done = f.status === 'done', skip = f.status === 'skip';
-  return '<div class="furow ' + (done ? 'done' : skip ? 'skip' : '') + '"><label><input type="checkbox" data-fu="' + esc(f.id) + '"' + (done ? ' checked' : '') + '><span>' +
+  var done = f.status === 'done', skip = f.status === 'skip', ans = String(f.answer || ''), h;
+  h = '<div class="furow ' + (done ? 'done' : skip ? 'skip' : '') + '" data-fu-row="' + esc(f.id) + '"><div class="fu-line"><label><input type="checkbox" data-fu="' + esc(f.id) + '"' + (done ? ' checked' : '') + '><span>' +
     (withDay ? '<b>' + dayName(f.session) + '</b> ' : '') + (f.block && NAMES[f.block] ? '<span class="chip sm c-' + f.block + '">' + NAMES[f.block] + '</span> ' : '') + esc(pretty(f.text)) +
-    (done && f.updated ? ' <span class="mut sm2">done ' + shortDate2(f.updated) + '</span>' : '') + '</span></label>' +
-    '<button class="link" data-fu-skip="' + esc(f.id) + '">' + (skip ? 'Reopen' : done ? '' : 'Skip') + '</button></div>';
+    (done && f.updated ? ' <span class="mut sm2">done ' + shortDate2(f.updated) + '</span>' : '') + '</span></label><span class="fu-acts">' +
+    (f.mine ? '<button class="link" data-fu-remove="' + esc(f.id) + '">' + (fuRemoveArm === f.id ? 'Tap again to remove' : 'Remove') + '</button>' : '') +
+    (done ? '' : '<button class="link" data-fu-skip="' + esc(f.id) + '">' + (skip ? 'Reopen' : 'Skip') + '</button>') + '</span></div>';
+  if (fuEdit === f.id) {
+    h += '<div class="fu-ans"><div class="lab">My answer</div><textarea data-fu-text="' + esc(f.id) + '" maxlength="4000" placeholder="Write your answer. It goes to Claude with your next answer pack.">' + esc(ans) + '</textarea>' +
+         '<div class="row"><button class="pri sm" data-fu-save="' + esc(f.id) + '">Save</button><button class="alt sm" data-fu-cancel>Cancel</button></div></div>';
+  } else if (ans) {
+    h += '<div class="fu-ans"><div class="lab"><span>My answer' + (f.answered ? ' - ' + shortDate2(f.answered) : '') + '</span><button class="link" data-fu-edit="' + esc(f.id) + '">Edit</button></div>' + esc(ans) + '</div>';
+  } else if (!skip) {
+    h += '<div class="fu-write"><button class="link" data-fu-edit="' + esc(f.id) + '">Write my answer</button></div>';
+  }
+  return h + '</div>';
 }
+function fuFind(id) { return fuAll.concat(page ? page.followups : []).filter(function (x) { return x.id === id; })[0]; }
+function fuRerender() { renderFuOpen(); renderAfter(); if (page && !$('ses-page').classList.contains('hide')) renderFuPage(); }
+function fuPatch(id, ch) { [fuAll, page ? page.followups : []].forEach(function (list) { list.forEach(function (x) { if (x.id === id) for (var k in ch) x[k] = ch[k]; }); }); }
+document.addEventListener('click', async function (e) {
+  var b = e.target.closest('button'); if (!b) return;
+  if (b.dataset.fuEdit) { fuEdit = b.dataset.fuEdit; fuRemoveArm = null; fuRerender(); var t = document.querySelector('[data-fu-text="' + fuEdit + '"]'); if (t) { t.focus(); t.setSelectionRange(t.value.length, t.value.length); } }
+  else if (b.hasAttribute('data-fu-cancel')) { fuEdit = null; fuRerender(); }
+  else if (b.dataset.fuSave) {
+    var id = b.dataset.fuSave, t = document.querySelector('[data-fu-text="' + id + '"]'), v = t ? t.value.trim() : '';
+    b.disabled = true; b.textContent = 'Saving...';
+    try { await call('followSet', { id: id, answer: v }); fuPatch(id, { answer: v, answered: new Date().toISOString() }); fuEdit = null; fuRerender(); toast(v ? 'Saved. It goes to Claude with your next answer pack.' : 'Answer cleared.'); if (v) { if (packInfo) packInfo.unpackedFollowups = (packInfo.unpackedFollowups || 0) + 1; renderPack(); packSoon(); } }
+    catch (x) { b.disabled = false; b.textContent = 'Save'; toast('Could not save: ' + (/unknown action|not found/.test(x.message) ? 'the backend is older than v2.2. Paste the new Code.gs and deploy a new version.' : x.message)); }
+  }
+  else if (b.dataset.fuRemove) {
+    var rid = b.dataset.fuRemove;
+    if (fuRemoveArm !== rid) { fuRemoveArm = rid; fuRerender(); return; }
+    fuRemoveArm = null; var f = fuFind(rid);
+    fuAll = fuAll.filter(function (x) { return x.id !== rid; }); if (page) page.followups = page.followups.filter(function (x) { return x.id !== rid; });
+    fuRerender();
+    try { await call('followSet', { id: rid, status: 'removed' }); toast('Removed.'); } catch (x) { if (f) { fuAll.push(f); fuRerender(); } toast('Could not remove: ' + x.message); }
+  }
+});
 function renderFuOpen(old) {
   var open = fuOpenNow(), later = fuAll.filter(function (f) { return f.status !== 'done' && f.status !== 'skip'; }).length - open.length;
   if (old) { $('fu-open').innerHTML = '<div class="card mut sm2">Follow-ups and session pages need backend v2.0: paste the new Code.gs and deploy a new version.</div>'; return; }
@@ -1755,6 +1823,13 @@ async function setFu(id, status) {
   sessions.forEach(function (s) { if (s.session === f.session && s.follow) s.follow.open = fuAll.filter(function (x) { return x.session === s.session && x.status !== 'done' && x.status !== 'skip'; }).length; });
   renderFuOpen(); renderAfter(); if (page && !$('ses-page').classList.contains('hide')) renderFuPage();
   try { await call('followSet', { id: id, status: status }); } catch (e) { toast('Could not save the follow-up: ' + e.message); }
+}
+setTimeout(function () { if (window.__connected) toast('Connected on this device.'); }, 800);
+function mergeVers(a, b) { // the page's and the backend's changes, one entry per version, newest first
+  var by = {};
+  a.concat(b).forEach(function (c) { var k = c.v; if (!by[k]) by[k] = { v: k, date: c.date, notes: [] }; c.notes.forEach(function (n) { if (by[k].notes.indexOf(n) < 0) by[k].notes.push(n); }); });
+  var num = function (v) { return v.split('.').reduce(function (t, x) { return t * 1000 + Number(x); }, 0); };
+  return Object.keys(by).map(function (k) { return by[k]; }).sort(function (x, y) { return num(y.v) - num(x.v); });
 }
 function toast(m) { var t = $('toast'); t.textContent = m; t.classList.add('on'); clearTimeout(toast.t); toast.t = setTimeout(function () { t.classList.remove('on'); }, 4000); }
 
@@ -1907,15 +1982,22 @@ async function loadGuide() {
       try { var u = await call('usageList'); h += chk('ok', 'Usage log reachable: ' + u.length + ' practice record(s)'); } catch (e2) { h += chk('warn', 'No usage log yet: update Code.gs to v1.4 and deploy a new version.'); }
       if (chosen) { var m = await call('audioMeta', { n: chosen }); var n = Object.keys(m).length;
         h += chk(n ? 'ok' : 'warn', n ? 'Studio audio registered for ' + n + ' part(s) of session ' + chosen : 'No studio audio registered for session ' + chosen + ' (phone voice will be used)'); }
-      var about = await call('about'); vs = about.changelog;
+      var about = await call('about'); vs = mergeVers(LOCAL_CHANGES, about.changelog || []);
       var same = String(about.version).split('.').slice(0, 2).join('.') === APP_VERSION.split('.').slice(0, 2).join('.');
       h += chk(same ? 'ok' : 'warn', same ? 'Page v' + APP_VERSION + ' matches backend v' + esc(about.version) + (about.edition ? ' (' + esc(about.edition) + ' edition)' : '') : 'Version mismatch: page v' + APP_VERSION + ', backend v' + esc(about.version) + '. Redeploy the Apps Script (New version) or refresh this page.');
     } catch (e) { h += chk('bad', e.message === 'bad_token' ? 'Token rejected: copy it again from the Apps Script log (run showToken).' : 'Cannot reach the sheet: ' + esc(e.message)); }
   }
   $('checks').innerHTML = h;
   $('vinfo').textContent = 'Page v' + APP_VERSION + (backendVersion ? ' - backend v' + backendVersion : '');
-  $('vlist').innerHTML = vs.map(function (c) { return '<div class="ver"><b>v' + esc(c.v) + '</b> <span class="mut">' + esc(c.date) + '</span><ul>' + c.notes.map(function (x) { return '<li>' + esc(x) + '</li>'; }).join('') + '</ul></div>'; }).join('');
+  $('vlist').innerHTML = vs.map(function (c, i) { return '<details class="ver"' + (i === 0 ? ' open' : '') + '><summary><b>v' + esc(c.v) + '</b> <span class="mut">' + esc(c.date) + '</span><span class="mut sm2 n">' + c.notes.length + ' change' + (c.notes.length === 1 ? '' : 's') + '</span></summary><ul>' + c.notes.map(function (x) { return '<li>' + esc(x) + '</li>'; }).join('') + '</ul></details>'; }).join('');
 }
+$('cfg-link').onclick = async function () {
+  if (!cfg.url || !cfg.token) { $('cfg-link-m').textContent = 'Connect this device first.'; return; }
+  var link = location.origin + location.pathname + '#connect=' + encodeURIComponent(btoa(unescape(encodeURIComponent(JSON.stringify({ url: cfg.url, token: cfg.token })))));
+  var t = $('cfg-link-t'); t.value = link; t.classList.remove('hide'); t.select();
+  try { await navigator.clipboard.writeText(link); $('cfg-link-m').textContent = 'Copied. Send it to yourself, then open it on the other device.'; }
+  catch (e) { $('cfg-link-m').textContent = 'Copy the link above, send it to yourself, then open it on the other device.'; }
+};
 $('cfg-save').onclick = async function () {
   cfg.url = $('cfg-url').value.trim(); cfg.token = $('cfg-tok').value.trim(); cfg.stt = $('cfg-stt').checked; saveCfg();
   await loadGuide(); loadSessions();
@@ -1972,14 +2054,56 @@ async function makePack(btn, p) {
   btn.disabled = true; $('pack-m').textContent = 'Packing your recordings...';
   try {
     var r = await call('answerPack', p);
-    if (!r.count && !p.session) r.message = 'Nothing new since your last pack. If you practised since then, the answers were not saved: check Review, Answers for that day.';
     $('pack-m').innerHTML = r.count ? esc(r.message) + '<br><a href="' + esc(r.downloadUrl) + '" target="_blank">Download ' + esc(r.name) + '</a> (or <a href="' + esc(r.url) + '" target="_blank">open in Drive</a>). Then attach it in the Claude chat.' : esc(r.message);
   } catch (e) { $('pack-m').textContent = 'Error: ' + (/unknown action/.test(e.message) ? 'the backend is older than v1.6. Paste the new Code.gs and deploy a new version.' : e.message); }
   btn.disabled = false;
 }
-$('pack-new').onclick = function () { makePack(this, {}); };
-$('pack-s').onclick = function () { if (!chosen) { $('pack-m').textContent = 'Pick a day on the Drive tab first.'; return; } makePack(this, { session: chosen }); };
-function packLabel() { $('pack-s').textContent = chosen ? 'Pack all of ' + (chosen > 999 ? 'this market brief' : 'Day ' + chosen) : 'Pack this session'; }
+$('pack-new').onclick = function () { autoPack(true); };
+$('pack-s').onclick = function () { var d = Number($('pack-day').value); if (!d) { $('pack-m').textContent = 'Pick a day first.'; return; } makePack(this, { session: d }); };
+function packLabel() {
+  var sel = $('pack-day'), cur = sel.value || String(chosen || '');
+  sel.innerHTML = sessions.map(function (s) { return '<option value="' + s.session + '">' + (s.session > 999 ? 'Market brief ' + s.session : 'Day ' + s.session) + '</option>'; }).join('');
+  if (cur) sel.value = cur;
+}
+/* ---- answer packs: made after each part, one waiting at a time ---- */
+var packInfo = null, packBusy = false, packTimer = null;
+function packDays(list) { list = String(list || '').split(',').filter(Boolean).map(Number); return list.length ? (list.length > 1 ? 'Days ' + list.join(', ') : (list[0] > 999 ? 'Market brief' : 'Day ' + list[0])) : ''; }
+function renderPack() {
+  var p = packInfo, h = '';
+  if (packBusy) h = '<div><span class="spin"></span><b>Making your answer pack...</b><div class="mut sm2">It takes a few seconds per answer.</div></div>';
+  else if (p && p.pending) {
+    var k = p.pending;
+    h = '<div><b>Answers ready for Claude</b><div class="mut sm2">' + esc(packDays(k.sessions)) + ' - ' + k.count + ' answer' + (k.count === 1 ? '' : 's') + (k.followups ? ', ' + k.followups + ' follow-up answer' + (k.followups === 1 ? '' : 's') : '') +
+        (p.unpacked || p.unpackedFollowups ? '. Newer answers are added when you finish the next part.' : '') + '</div><button class="link" data-pack-sent>Already sent it</button></div>' +
+        '<a class="dl" href="' + esc(k.downloadUrl) + '" target="_blank" rel="noopener" data-pack-dl="' + esc(k.id) + '">Download</a>';
+  } else if (p && (p.unpacked || p.unpackedFollowups)) {
+    h = '<div><b>' + (p.unpacked ? p.unpacked + ' answer' + (p.unpacked === 1 ? '' : 's') : '') + (p.unpacked && p.unpackedFollowups ? ' and ' : '') + (p.unpackedFollowups ? p.unpackedFollowups + ' follow-up answer' + (p.unpackedFollowups === 1 ? '' : 's') : '') + ' not sent to Claude yet</b>' +
+        '<div class="mut sm2">' + esc(packDays((p.unpackedDays || []).join(','))) + '</div></div><button class="pri" data-pack-make>Make pack</button>';
+  }
+  ['pk-h', 'pk-s'].forEach(function (id) { var b = $(id); if (!b) return; b.innerHTML = h; b.classList.toggle('hide', !h); });
+}
+async function peekPack() { try { packInfo = await call('packs'); } catch (e) { packInfo = null; } renderPack(); }
+async function autoPack(manual) {
+  if (packBusy) return; packBusy = true; renderPack(); if (manual) $('pack-m').textContent = '';
+  try {
+    var r = await call('answerPack', {});
+    packInfo = r.status || packInfo;
+    if (manual) $('pack-m').textContent = r.message;
+  } catch (e) {
+    if (/unknown action|packs/.test(e.message)) packInfo = null;
+    (manual ? function (m) { $('pack-m').textContent = m; } : toast)('Could not make the answer pack: ' + (/unknown action/.test(e.message) ? 'the backend is older than v2.2. Paste the new Code.gs and deploy a new version.' : e.message));
+  }
+  packBusy = false; renderPack();
+}
+function packSoon() { clearTimeout(packTimer); packTimer = setTimeout(function () { autoPack(false); }, 20000); }
+document.addEventListener('click', function (e) {
+  var a = e.target.closest('[data-pack-dl]');
+  if (a) { var id = a.dataset.packDl; packInfo = { pending: null, unpacked: 0, unpackedFollowups: 0 }; renderPack(); toast('Downloading. Attach the file in the Claude chat.');
+    call('packSent', { id: id }).then(function (st) { packInfo = st; renderPack(); }).catch(function () {}); return; }
+  var b = e.target.closest('button'); if (!b) return;
+  if (b.hasAttribute('data-pack-make')) autoPack(false);
+  else if (b.hasAttribute('data-pack-sent') && packInfo && packInfo.pending) { var pid = packInfo.pending.id; packInfo.pending = null; renderPack(); call('packSent', { id: pid }).then(function (st) { packInfo = st; renderPack(); }).catch(function () {}); }
+});
 $('imp-f').onchange = function () { var f = this.files && this.files[0]; if (!f) return; var r = new FileReader(); r.onload = function () { $('imp-t').value = String(r.result); $('imp-m').textContent = 'Loaded ' + f.name + '. Tap Import.'; }; r.readAsText(f); };
 $('book-go').onclick = async function () {
   var btn = this; btn.disabled = true; $('book-m').textContent = 'Building your book in Google Docs (about 20 to 60 seconds)...';
