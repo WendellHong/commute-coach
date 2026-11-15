@@ -188,6 +188,27 @@ b.num{color:var(--acc)}
 .fu-ans textarea{width:100%;box-sizing:border-box;min-height:96px;font:inherit;font-size:15px;padding:8px;border:1px solid var(--line);border-radius:8px;background:var(--card);color:var(--ink);resize:vertical}
 .fu-ans .row{display:flex;gap:8px;margin-top:6px}.fu-ans .row button{margin:0}
 .fu-write{margin:4px 0 0 30px}
+.subnav{flex-wrap:wrap}
+.sr{position:absolute;width:1px;height:1px;overflow:hidden;clip:rect(0 0 0 0)}
+.fu-seg{display:flex;gap:6px;flex-wrap:wrap;margin:0 0 10px}
+.fu-seg button{margin:0;min-height:44px;padding:0 14px;border-radius:22px;border:1px solid var(--line);background:var(--card);color:var(--ink);font-size:14px;font-weight:600}
+.fu-seg button.on{background:var(--ink);color:var(--bg);border-color:var(--ink)}
+.fu-day{font-size:13px;font-weight:700;letter-spacing:.06em;text-transform:uppercase;color:var(--mut);margin:16px 2px 6px}
+.fuc{background:var(--card);border:1px solid var(--line);border-radius:14px;padding:12px 14px;margin:0 0 10px}
+.fuc.focus{border-color:var(--acc);box-shadow:0 0 0 2px var(--acc)}
+.fuc-h{display:flex;gap:8px;align-items:center;flex-wrap:wrap;font-size:13px}
+.fuc-t{font-size:16px;font-weight:600;line-height:1.35;margin:6px 0 8px}
+.fuc.done .fuc-t{color:var(--mut)}
+.fuc textarea{width:100%;box-sizing:border-box;min-height:120px;font:inherit;font-size:16px;line-height:1.45;padding:10px;border:1px solid var(--line);border-radius:10px;background:var(--bg);color:var(--ink);resize:vertical}
+.fuc textarea:focus{outline:2px solid var(--acc);outline-offset:0}
+.fuc-bar{display:flex;gap:8px;align-items:center;flex-wrap:wrap;margin-top:8px}
+.fuc-bar .st{flex:1;min-width:140px;font-size:13px;color:var(--mut)}
+.fuc-bar .st.warn{color:var(--warn);font-weight:600}.fuc-bar .st.ok{color:var(--ok);font-weight:600}.fuc-bar .st.err{color:var(--rec);font-weight:600}
+.fuc-bar button{margin:0;min-height:44px}
+.fuc .saved{white-space:pre-wrap;font-size:15px;line-height:1.45;padding:10px 12px;border-radius:10px;background:var(--bg)}
+.fuc-acts{display:flex;gap:16px;align-items:center;flex-wrap:wrap;margin-top:10px;padding-top:8px;border-top:1px solid var(--line);font-size:14px}
+.fuc-acts label{display:flex;gap:8px;align-items:center;cursor:pointer;min-height:36px}.fuc-acts input{width:20px;height:20px;margin:0}
+.fu-prev{margin:4px 0 0 30px;font-size:14px}.fu-prev .q{white-space:pre-wrap;color:var(--ink)}
 .furow.done .fu-ans,.furow.done .fu-ans *{text-decoration:none;color:var(--ink)}
 .furow.done .chip{text-decoration:none;opacity:.6}
 .furow label{display:flex;gap:10px;align-items:flex-start;flex:1;cursor:pointer}.furow input{width:20px;height:20px;margin-top:1px;flex:none}
@@ -349,7 +370,8 @@ details.older>summary{cursor:pointer;margin:6px 0}
 
 <section id="v-review" class="hide">
   <div id="inbox-b" class="inbox hide"></div>
-  <div class="subnav"><button id="r-ses" class="on">Sessions</button><button id="r-ans">Answers</button><button id="r-rep">Reports</button><button id="r-use">Practice</button></div>
+  <div class="subnav"><button id="r-ses" class="on">Sessions</button><button id="r-fu">Follow-ups</button><button id="r-ans">Answers</button><button id="r-rep">Reports</button><button id="r-use">Practice</button></div>
+  <div id="rv-fu" class="hide"><div id="fu-view"></div></div>
   <div id="rv-ses"><div id="fu-open"></div><div id="ses-list"></div><div id="ses-page" class="hide"></div></div>
   <div id="rv-use" class="hide">
     <div class="tiles" id="tiles"></div>
@@ -575,8 +597,9 @@ details.older>summary{cursor:pointer;margin:6px 0}
 </main>
 
 <script>
-var APP_VERSION = '2.2.0';
+var APP_VERSION = '2.3.0';
 var LOCAL_CHANGES = [
+  { v: '2.3.0', date: '2026-11-15', notes: ['Fixed: Save on a follow-up could save an empty answer, because the same follow-up was drawn in several places and Save read the wrong box', 'New: Review, Follow-ups, the one place to write and read your answers, with To answer, Answered and All', 'What you type is kept on this device as a draft until you save it, even if you leave the page', 'Saved answers show the date; Claude\'s notes on your answers appear under them', 'Elsewhere, follow-ups show your answer and a link to edit it in Follow-ups'] },
   { v: '2.2.0', date: '2026-11-14', notes: ['Answer packs are made for you after each part you finish. A notice on Drive and Sync says when one is waiting; it goes away once you tap Download, or when Claude\'s reply for those answers is loaded', 'One button on Sync instead of two; packing a whole day again is under Re-pack one day', 'Follow-ups: write your answer under each one, on the phone or on a computer. Your answers go to Claude in the next pack', 'Follow-ups you added yourself can be removed', 'Versions fold: tap one to see its changes', 'Setup, Connect: a link that connects another device (for example your computer) in one tap'] },
   { v: '2.1.1', date: '2026-11-13', notes: ['Fixed: the next drive is now the day after the last one you played (it showed Day 1, because Day 1 was never finished)', 'The pack button now says which day it packs, and Pack new answers says when nothing new was recorded'] },
   { v: '2.1.0', date: '2026-11-12', notes: ['New layout, Drive first: the home screen shows the next drive with one large Start button; all other sessions are one tap below', 'Needs work: your three lowest answers on the home screen, each with a Practice button', 'After the drive: open follow-ups, the newest review and the answer pack in one place', 'Driving screen: dark, three large buttons (back 15 s, Pause, forward or Done) and a larger countdown; the other controls are under More controls', 'Tabs moved to the bottom of the screen'] },
@@ -1414,7 +1437,7 @@ function keyOf(r) { return r.session + '|' + r.block + '|' + r.seq; }
 
 $('r-rep').onclick = function () { subTab('rep'); loadReports(); };
 function subTab(w) {
-  ['ses', 'use', 'ans', 'rep'].forEach(function (x) { $('r-' + x).classList.toggle('on', x === w); $('rv-' + x).classList.toggle('hide', x !== w); });
+  ['ses', 'fu', 'use', 'ans', 'rep'].forEach(function (x) { $('r-' + x).classList.toggle('on', x === w); $('rv-' + x).classList.toggle('hide', x !== w); });
 }
 $('r-use').onclick = function () { subTab('use'); loadReview(); };
 $('r-ans').onclick = function () { subTab('ans'); loadHist(); };
@@ -1768,37 +1791,125 @@ function renderSes() {
       (fo.total ? ' <span class="pill ' + (fo.open ? 'open' : 'ok') + '">' + (fo.open ? fo.open + ' follow-up' + (fo.open > 1 ? 's' : '') + ' open' : 'follow-ups done') + '</span>' : '') + '</div></button>';
   }).join('');
 }
-var fuEdit = null, fuRemoveArm = null;
-function fuRow(f, withDay) {
+var fuRemoveArm = null, fuFilter = 'todo', fuEditing = {}, fuFlash = {}, fuStay = {}, fuLoaded = false;
+function fuDraft(id, v) { // what you typed and have not saved yet, kept on this device
+  try { if (v === undefined) return localStorage.getItem('cc.fud.' + id); if (v === null) localStorage.removeItem('cc.fud.' + id); else localStorage.setItem('cc.fud.' + id, v); } catch (e) { return null; }
+}
+function fuHasDraft(f) { var d = fuDraft(f.id); return d != null && d.trim() !== String(f.answer || '').trim(); }
+function fuRow(f, withDay) { // compact row for the Drive tab, Sessions and a day's page; you write answers in Review, Follow-ups
   var done = f.status === 'done', skip = f.status === 'skip', ans = String(f.answer || ''), h;
   h = '<div class="furow ' + (done ? 'done' : skip ? 'skip' : '') + '" data-fu-row="' + esc(f.id) + '"><div class="fu-line"><label><input type="checkbox" data-fu="' + esc(f.id) + '"' + (done ? ' checked' : '') + '><span>' +
     (withDay ? '<b>' + dayName(f.session) + '</b> ' : '') + (f.block && NAMES[f.block] ? '<span class="chip sm c-' + f.block + '">' + NAMES[f.block] + '</span> ' : '') + esc(pretty(f.text)) +
     (done && f.updated ? ' <span class="mut sm2">done ' + shortDate2(f.updated) + '</span>' : '') + '</span></label><span class="fu-acts">' +
     (f.mine ? '<button class="link" data-fu-remove="' + esc(f.id) + '">' + (fuRemoveArm === f.id ? 'Tap again to remove' : 'Remove') + '</button>' : '') +
     (done ? '' : '<button class="link" data-fu-skip="' + esc(f.id) + '">' + (skip ? 'Reopen' : 'Skip') + '</button>') + '</span></div>';
-  if (fuEdit === f.id) {
-    h += '<div class="fu-ans"><div class="lab">My answer</div><textarea data-fu-text="' + esc(f.id) + '" maxlength="4000" placeholder="Write your answer. It goes to Claude with your next answer pack.">' + esc(ans) + '</textarea>' +
-         '<div class="row"><button class="pri sm" data-fu-save="' + esc(f.id) + '">Save</button><button class="alt sm" data-fu-cancel>Cancel</button></div></div>';
-  } else if (ans) {
-    h += '<div class="fu-ans"><div class="lab"><span>My answer' + (f.answered ? ' - ' + shortDate2(f.answered) : '') + '</span><button class="link" data-fu-edit="' + esc(f.id) + '">Edit</button></div>' + esc(ans) + '</div>';
-  } else if (!skip) {
-    h += '<div class="fu-write"><button class="link" data-fu-edit="' + esc(f.id) + '">Write my answer</button></div>';
-  }
+  if (ans) h += '<div class="fu-ans"><div class="lab"><span>My answer' + (f.answered ? ' - ' + shortDate2(f.answered) : '') + '</span><button class="link" data-fu-go="' + esc(f.id) + '">Edit</button></div>' + esc(ans) +
+    (f.claude ? '<div class="mut sm2" style="margin-top:6px;white-space:normal"><b>Claude:</b> ' + esc(f.claude) + '</div>' : '') + '</div>';
+  else if (!skip) h += '<div class="fu-write"><button class="link" data-fu-go="' + esc(f.id) + '">' + (fuHasDraft(f) ? 'Finish my answer (draft not saved)' : 'Write my answer') + '</button></div>';
   return h + '</div>';
 }
 function fuFind(id) { return fuAll.concat(page ? page.followups : []).filter(function (x) { return x.id === id; })[0]; }
-function fuRerender() { renderFuOpen(); renderAfter(); if (page && !$('ses-page').classList.contains('hide')) renderFuPage(); }
+function fuRerender() { renderFuOpen(); renderAfter(); if (page && !$('ses-page').classList.contains('hide')) renderFuPage(); if (!$('rv-fu').classList.contains('hide')) renderFuView(); }
 function fuPatch(id, ch) { [fuAll, page ? page.followups : []].forEach(function (list) { list.forEach(function (x) { if (x.id === id) for (var k in ch) x[k] = ch[k]; }); }); }
+
+/* ---- Review > Follow-ups ---- */
+function fuLists() {
+  var live = fuAll.filter(function (f) { return f.status !== 'removed'; });
+  var started = live.filter(function (f) { return sesStarted(f.session) || f.answer || f.mine || fuHasDraft(f); });
+  return {
+    todo: started.filter(function (f) { return (f.status !== 'done' && f.status !== 'skip' && !String(f.answer || '').trim()) || fuHasDraft(f) || fuStay[f.id]; }), // a card you just saved stays in view until you switch lists
+    answered: live.filter(function (f) { return String(f.answer || '').trim(); }),
+    all: started
+  };
+}
+async function loadFu(focusId) {
+  if (!fuLoaded) $('fu-view').innerHTML = '<div class="loading"><span class="spin"></span> Loading follow-ups...</div>';
+  try { fuAll = await call('followups', {}); fuLoaded = true; }
+  catch (e) { $('fu-view').innerHTML = '<div class="card mut">' + (/unknown action/.test(e.message) ? 'Follow-ups need backend v2.0 or later: paste the new Code.gs and deploy a new version.' : 'Could not load: ' + esc(e.message)) + '</div>'; return; }
+  renderFuView(focusId);
+}
+function fuCard(f) {
+  var id = esc(f.id), saved = String(f.answer || ''), draft = fuDraft(f.id), done = f.status === 'done', skip = f.status === 'skip';
+  var editing = fuEditing[f.id] || fuHasDraft(f) || (!saved.trim() && !skip);
+  var h = '<div class="fuc' + (done ? ' done' : '') + '" data-fuc="' + id + '"><div class="fuc-h"><b>' + dayName(f.session) + '</b>' +
+    (f.block && NAMES[f.block] ? '<span class="chip sm c-' + f.block + '">' + NAMES[f.block] + '</span>' : '') +
+    (f.mine ? '<span class="mut sm2">added by you</span>' : '') + (done ? '<span class="pill ok">done</span>' : skip ? '<span class="pill">skipped</span>' : '') + '</div>' +
+    '<div class="fuc-t">' + esc(pretty(f.text)) + '</div>';
+  if (editing) {
+    var val = draft != null ? draft : saved, dirty = draft != null && draft.trim() !== saved.trim();
+    var st = fuFlash[f.id] ? '<span class="st ok">Saved</span>' : dirty ? '<span class="st warn">Not saved yet</span>' : saved ? '<span class="st">Saved ' + shortDate2(f.answered) + '</span>' : '<span class="st">Your answer goes to Claude with your next answer pack.</span>';
+    h += '<label class="sr" for="fu-in-' + id + '">My answer</label><textarea id="fu-in-' + id + '" data-fu-in="' + id + '" maxlength="4000" placeholder="Write your answer here.">' + esc(val) + '</textarea>' +
+      '<div class="fuc-bar">' + st.replace('class="st', 'data-fu-st="' + id + '" class="st') +
+      '<button class="pri sm" data-fu-save="' + id + '"' + (dirty || (!saved && val.trim()) ? '' : ' disabled') + '>Save</button>' +
+      (saved ? '<button class="alt sm" data-fu-cancel="' + id + '">Cancel</button>' : '') + '</div>';
+  } else if (saved) {
+    h += '<div class="saved">' + esc(saved) + '</div><div class="fuc-bar"><span class="st' + (fuFlash[f.id] ? ' ok">Saved' : '">Saved ' + shortDate2(f.answered)) + '</span><button class="alt sm" data-fu-edit="' + id + '">Edit</button>' +
+      '<button class="link" data-fu-clear="' + id + '">' + (fuRemoveArm === 'clear:' + f.id ? 'Tap again to delete the answer' : 'Delete answer') + '</button></div>';
+  }
+  if (f.claude) h += '<div class="box note"><div class="lab">Claude\'s note' + (f.claudeAt ? ' - ' + shortDate2(f.claudeAt) : '') + '</div>' + esc(f.claude) + '</div>';
+  h += '<div class="fuc-acts"><label><input type="checkbox" data-fu="' + id + '"' + (done ? ' checked' : '') + '> Done</label>' +
+    (done ? '' : '<button class="link" data-fu-skip="' + id + '">' + (skip ? 'Reopen' : 'Skip') + '</button>') +
+    (f.mine ? '<button class="link" data-fu-remove="' + id + '">' + (fuRemoveArm === f.id ? 'Tap again to remove' : 'Remove') + '</button>' : '') + '</div></div>';
+  return h;
+}
+function renderFuView(focusId) {
+  var L = fuLists(), list = L[fuFilter] || L.all, by = {}, days = [];
+  if (focusId && !list.some(function (f) { return f.id === focusId; })) { fuFilter = 'all'; list = L.all.some(function (f) { return f.id === focusId; }) ? L.all : L.answered; }
+  list.forEach(function (f) { if (!by[f.session]) { by[f.session] = []; days.push(f.session); } by[f.session].push(f); });
+  days.sort(function (a, b) { return b - a; });
+  var h = '<div class="fu-seg" role="group" aria-label="Show">' + [['todo', 'To answer', L.todo.length], ['answered', 'Answered', L.answered.length], ['all', 'All', L.all.length]].map(function (x) {
+    return '<button data-fu-filter="' + x[0] + '" class="' + (fuFilter === x[0] ? 'on' : '') + '" aria-pressed="' + (fuFilter === x[0]) + '">' + x[1] + ' (' + x[2] + ')</button>'; }).join('') + '</div>';
+  if (!list.length) h += '<div class="card mut">' + (fuFilter === 'todo' ? 'Nothing waiting for an answer. Follow-ups of later days appear once you play that day.' : fuFilter === 'answered' ? 'No answers yet.' : 'No follow-ups yet.') + '</div>';
+  days.forEach(function (d) { h += '<div class="fu-day">' + dayName(d) + '</div>' + by[d].map(fuCard).join(''); });
+  $('fu-view').innerHTML = h;
+  if (focusId) {
+    var c = document.querySelector('[data-fuc="' + focusId + '"]');
+    if (c) { c.classList.add('focus'); c.scrollIntoView({ block: 'center' }); var t = c.querySelector('textarea'); if (t) { t.focus(); t.setSelectionRange(t.value.length, t.value.length); } setTimeout(function () { c.classList.remove('focus'); }, 2500); }
+  }
+}
+function goFollow(id) { var f = fuFind(id); if (f && !String(f.answer || '').trim()) fuEditing[id] = true; show('review'); subTab('fu'); if (fuLoaded) renderFuView(id); loadFu(id); }
+$('r-fu').onclick = function () { subTab('fu'); loadFu(); };
+$('rv-fu').addEventListener('input', function (e) {
+  var t = e.target; if (!t.dataset || !t.dataset.fuIn) return;
+  var id = t.dataset.fuIn, f = fuFind(id), saved = f ? String(f.answer || '') : '';
+  fuDraft(id, t.value); delete fuFlash[id];
+  var dirty = t.value.trim() !== saved.trim(), st = document.querySelector('[data-fu-st="' + id + '"]'), sv = document.querySelector('[data-fu-save="' + id + '"]');
+  if (st) { st.className = 'st' + (dirty ? ' warn' : ''); st.textContent = dirty ? 'Not saved yet' : (saved ? 'Saved ' + shortDate2(f.answered) : 'Your answer goes to Claude with your next answer pack.'); }
+  if (sv) sv.disabled = !dirty || !t.value.trim();
+});
+$('rv-fu').addEventListener('change', function (e) { var c = e.target; if (c && c.dataset && c.dataset.fu) setFu(c.dataset.fu, c.checked ? 'done' : 'open'); });
+async function fuSave(id, v, clear) {
+  var st = document.querySelector('[data-fu-st="' + id + '"]'), sv = document.querySelector('[data-fu-save="' + id + '"]');
+  if (sv) { sv.disabled = true; sv.textContent = 'Saving...'; }
+  try {
+    await call('followSet', clear ? { id: id, answer: '', clear: true } : { id: id, answer: v });
+    fuPatch(id, { answer: v, answered: new Date().toISOString() }); fuDraft(id, null); fuEditing[id] = false; fuStay[id] = 1;
+    fuFlash[id] = 1; setTimeout(function () { delete fuFlash[id]; }, 8000);
+    fuRerender(); toast(clear ? 'Answer deleted.' : 'Saved. It goes to Claude with your next answer pack.');
+    if (!clear) { if (packInfo) packInfo.unpackedFollowups = (packInfo.unpackedFollowups || 0) + 1; renderPack(); packSoon(); }
+  } catch (x) {
+    if (sv) { sv.disabled = false; sv.textContent = 'Save'; }
+    var m = /unknown action|not found/.test(x.message) ? 'the backend is older than v2.2. Paste the new Code.gs and deploy a new version.' : x.message;
+    if (st) { st.className = 'st err'; st.textContent = 'Not saved: ' + m + ' Your text is kept on this device.'; } else toast('Not saved: ' + m);
+  }
+}
 document.addEventListener('click', async function (e) {
   var b = e.target.closest('button'); if (!b) return;
-  if (b.dataset.fuEdit) { fuEdit = b.dataset.fuEdit; fuRemoveArm = null; fuRerender(); var t = document.querySelector('[data-fu-text="' + fuEdit + '"]'); if (t) { t.focus(); t.setSelectionRange(t.value.length, t.value.length); } }
-  else if (b.hasAttribute('data-fu-cancel')) { fuEdit = null; fuRerender(); }
+  if (b.dataset.fuGo) goFollow(b.dataset.fuGo);
+  else if (b.dataset.fuFilter) { fuFilter = b.dataset.fuFilter; fuRemoveArm = null; fuStay = {}; renderFuView(); }
+  else if (b.dataset.fuEdit) { fuEditing[b.dataset.fuEdit] = true; fuRemoveArm = null; renderFuView(b.dataset.fuEdit); }
+  else if (b.dataset.fuCancel) { var cid = b.dataset.fuCancel; fuDraft(cid, null); fuEditing[cid] = false; renderFuView(); }
   else if (b.dataset.fuSave) {
-    var id = b.dataset.fuSave, t = document.querySelector('[data-fu-text="' + id + '"]'), v = t ? t.value.trim() : '';
-    b.disabled = true; b.textContent = 'Saving...';
-    try { await call('followSet', { id: id, answer: v }); fuPatch(id, { answer: v, answered: new Date().toISOString() }); fuEdit = null; fuRerender(); toast(v ? 'Saved. It goes to Claude with your next answer pack.' : 'Answer cleared.'); if (v) { if (packInfo) packInfo.unpackedFollowups = (packInfo.unpackedFollowups || 0) + 1; renderPack(); packSoon(); } }
-    catch (x) { b.disabled = false; b.textContent = 'Save'; toast('Could not save: ' + (/unknown action|not found/.test(x.message) ? 'the backend is older than v2.2. Paste the new Code.gs and deploy a new version.' : x.message)); }
+    var id = b.dataset.fuSave, card = b.closest('[data-fuc]'), t = card ? card.querySelector('textarea') : null, v = t ? t.value.trim() : '';
+    if (!v) { toast('Write your answer first.'); return; }
+    fuSave(id, v, false);
   }
+  else if (b.dataset.fuClear) {
+    var did = b.dataset.fuClear;
+    if (fuRemoveArm !== 'clear:' + did) { fuRemoveArm = 'clear:' + did; renderFuView(); return; }
+    fuRemoveArm = null; fuSave(did, '', true);
+  }
+  else if (b.dataset.fuSkip && b.closest('#rv-fu')) { var sf = fuFind(b.dataset.fuSkip); if (sf) setFu(sf.id, sf.status === 'skip' ? 'open' : 'skip'); }
   else if (b.dataset.fuRemove) {
     var rid = b.dataset.fuRemove;
     if (fuRemoveArm !== rid) { fuRemoveArm = rid; fuRerender(); return; }
@@ -1812,7 +1923,7 @@ function renderFuOpen(old) {
   var open = fuOpenNow(), later = fuAll.filter(function (f) { return f.status !== 'done' && f.status !== 'skip'; }).length - open.length;
   if (old) { $('fu-open').innerHTML = '<div class="card mut sm2">Follow-ups and session pages need backend v2.0: paste the new Code.gs and deploy a new version.</div>'; return; }
   if (!fuAll.length) { $('fu-open').innerHTML = ''; return; }
-  $('fu-open').innerHTML = '<details class="card fu"' + (open.length && open.length <= 6 ? ' open' : '') + '><summary><b>Open follow-ups</b> <span class="pill ' + (open.length ? 'open' : 'ok') + '">' + open.length + ' open</span> <span class="mut sm2">' + (later ? later + ' more come with later days' : 'of ' + fuAll.length) + '</span></summary>' +
+  $('fu-open').innerHTML = '<details class="card fu"' + (open.length && open.length <= 6 ? ' open' : '') + '><summary><b>Open follow-ups</b> <button class="link" data-fu-tab>Write and review answers</button> <span class="pill ' + (open.length ? 'open' : 'ok') + '">' + open.length + ' open</span> <span class="mut sm2">' + (later ? later + ' more come with later days' : 'of ' + fuAll.length) + '</span></summary>' +
     (open.length ? open.map(function (f) { return fuRow(f, true); }).join('') : '<div class="mut sm2">Everything is done or skipped.</div>') + '</details>';
 }
 async function setFu(id, status) {
@@ -1821,7 +1932,7 @@ async function setFu(id, status) {
   if (page) page.followups.forEach(function (x) { if (x.id === id) { x.status = status; x.updated = f.updated; } });
   fuAll.forEach(function (x) { if (x.id === id) { x.status = status; x.updated = f.updated; } });
   sessions.forEach(function (s) { if (s.session === f.session && s.follow) s.follow.open = fuAll.filter(function (x) { return x.session === s.session && x.status !== 'done' && x.status !== 'skip'; }).length; });
-  renderFuOpen(); renderAfter(); if (page && !$('ses-page').classList.contains('hide')) renderFuPage();
+  fuRerender();
   try { await call('followSet', { id: id, status: status }); } catch (e) { toast('Could not save the follow-up: ' + e.message); }
 }
 setTimeout(function () { if (window.__connected) toast('Connected on this device.'); }, 800);
@@ -1913,6 +2024,7 @@ $('rv-ses').addEventListener('click', async function (e) {
 });
 $('rv-ses').addEventListener('change', function (e) { var c = e.target; if (c && c.dataset && c.dataset.fu) setFu(c.dataset.fu, c.checked ? 'done' : 'open'); });
 $('r-ses').onclick = function () { subTab('ses'); loadSes(); };
+document.addEventListener('click', function (e) { var b = e.target.closest('[data-fu-tab]'); if (b) { e.preventDefault(); subTab('fu'); loadFu(); } });
 
 /* ---- loading Claude's replies, one file at a time, with visible progress ---- */
 function progHtml(i, n, text) { return '<div class="prog"><div class="prog-t"><span class="spin"></span> ' + esc(text) + '</div><div class="prog-b"><i style="width:' + (n ? Math.round(100 * i / n) : 5) + '%"></i></div></div>'; }
