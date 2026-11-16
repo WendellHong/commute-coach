@@ -121,9 +121,10 @@ button.pri{border-color:var(--acc);color:var(--acc);font-weight:600}
 @media (min-width:560px){.tiles{grid-template-columns:repeat(4,1fr)}}
 .tile{background:var(--card);border:1px solid var(--line);border-radius:12px;padding:10px 12px}
 .tile .tv{font-size:20px;font-weight:700;margin-top:2px}
-.viz-root{--s1:#2a78d6;--s2:#eb6834;--s3:#1baf7a}
-@media (prefers-color-scheme:dark){.viz-root,.tblwrap,.tip{--s1:#3987e5;--s2:#d95926;--s3:#199e70}}
-.tblwrap,.tip{--s1:#2a78d6;--s2:#eb6834;--s3:#1baf7a}
+.viz-root{--s1:#2a78d6;--s2:#eb6834;--s3:#1baf7a;--s4:#8b5fd6}
+@media (prefers-color-scheme:dark){.viz-root,.tblwrap,.tip{--s1:#3987e5;--s2:#d95926;--s3:#199e70;--s4:#9a72e3}}
+.tblwrap,.tip{--s1:#2a78d6;--s2:#eb6834;--s3:#1baf7a;--s4:#8b5fd6}
+.rvw .note2{font-size:12.5px;color:var(--warn);margin:-2px 0 8px 90px}.bk-rv{margin:6px 0 10px}
 .chartwrap svg{width:100%;height:auto;display:block}
 .chartwrap .grid{stroke:var(--line);stroke-width:1}
 .chartwrap .ax{fill:var(--mut);font-size:11px}
@@ -147,7 +148,7 @@ details.day>summary{list-style:none;cursor:pointer;padding:8px 0;display:flex;ju
 details.day>summary::-webkit-details-marker{display:none}
 .blk{margin:12px 0 4px}
 .chip{display:inline-block;font-size:12px;font-weight:700;letter-spacing:.04em;text-transform:uppercase;padding:3px 9px;border-radius:999px;color:#fff}
-.chip.c-mindset{background:#2a78d6}.chip.c-interview{background:#c4521f}.chip.c-market{background:#14845c}
+.chip.c-mindset{background:#2a78d6}.chip.c-interview{background:#c4521f}.chip.c-market{background:#14845c}.chip.c-review{background:#7a4cc2}
 .q{border-top:1px solid var(--line);padding:10px 0}
 .q-p{color:var(--mut);font-size:14px;margin-bottom:6px}
 .att{margin:6px 0;padding-left:10px;border-left:3px solid var(--line)}
@@ -298,6 +299,10 @@ details.older>summary{cursor:pointer;margin:6px 0}
     <div id="resume-txt" style="font-weight:600;margin:2px 0 4px"></div>
     <button class="alt" id="resume-go">Resume</button>
     <button class="alt" id="resume-end">End and save</button>
+  </div>
+  <div id="rvw-w" class="hide">
+    <div class="lab2">Review from Claude <span>for the commute</span></div>
+    <div class="card hero rvw" id="rvw"></div>
   </div>
   <div class="lab2">Next drive <span id="hero-n"></span></div>
   <div class="card hero" id="hero"><div class="mut">Loading...</div></div>
@@ -471,9 +476,10 @@ details.older>summary{cursor:pointer;margin:6px 0}
       <div class="flow">
         <div class="step"><b class="n">1</b><div><div class="who">Drive</div>The Drive tab shows the next drive with its three parts. Tap "Start drive", or one part by its name; other days are under "All sessions". The screen turns dark with three large buttons: back 15 seconds, Pause, and forward (it becomes Done while you answer). At each chime, answer out loud: a large countdown shows the seconds left, and a beep sounds 5 seconds before the end.</div></div>
         <div class="step"><b class="n">2</b><div><div class="who">After the drive - Sync</div>Tap "Pack new answers", download the zip, and attach it in the Claude chat.</div></div>
-        <div class="step"><b class="n">3</b><div><div class="who">Claude</div>Sends back one Claude-reply file per day: an accurate transcript of every answer, a scored note with a better wording, and the day's report.</div></div>
-        <div class="step"><b class="n">4</b><div><div class="who">You - Drive, then Review</div>Save the reply files into Drive, folder "Commute Coach audio &gt; Claude replies". Open Review and tap "Load now". A progress bar shows each file; loaded files move to "Imported".</div></div>
-        <div class="step"><b class="n">5</b><div><div class="who">Review - Sessions</div>Open the day's page: the script, your answers in every version, sample answers, Claude's notes, and the follow-ups to tick off. Tap "Practice again" on any answer you want to improve; the new version goes into your next pack.</div></div>
+        <div class="step"><b class="n">3</b><div><div class="who">Claude</div>Sends back one Claude-reply file per day: an accurate transcript of every answer, a scored note with a better wording, and the day's report. Usually also a review: a second reply file (..._review.json) and its audio (DayNN_4_Review.mp3), with spoken feedback, a redo of your weakest answers and new drills.</div></div>
+        <div class="step"><b class="n">4</b><div><div class="who">You - Drive, then Review</div>Save the reply files, and the review MP3, into Drive, folder "Commute Coach audio &gt; Claude replies". Open Review and tap "Load now". A progress bar shows each file; loaded files move to "Imported", and the MP3 moves to the audio folder by itself.</div></div>
+        <div class="step"><b class="n">5</b><div><div class="who">Next commute - Drive</div>"Review from Claude" sits above the next drive until you have heard it. Play it first: it is about ten to fifteen minutes. Your redo answers go into your next pack, and the next review checks what improved.</div></div>
+        <div class="step"><b class="n">6</b><div><div class="who">Review - Sessions</div>Open the day's page: the script, your answers in every version, sample answers, Claude's notes, and the follow-ups to tick off. Tap "Practice again" on any answer you want to improve; the new version goes into your next pack.</div></div>
       </div>
     </div>
     <div class="card">
@@ -597,8 +603,9 @@ details.older>summary{cursor:pointer;margin:6px 0}
 </main>
 
 <script>
-var APP_VERSION = '2.3.0';
+var APP_VERSION = '2.4.0';
 var LOCAL_CHANGES = [
+  { v: '2.4.0', date: '2026-11-16', notes: ['New: Review from Claude. After each answer pack, Claude can send a spoken review for the commute: what to fix, better wording, a redo of your weakest answers, and new drills that go one step further', 'Drive shows reviews you have not heard yet, above the next drive. A day\'s page shows the review as its last part, with your redo answers and Claude\'s notes', 'Your redo answers go into the next pack, so the next review can check what improved', 'A recording that stops early (the phone cut the microphone off) is now flagged as lost, even when part of it was saved'] },
   { v: '2.3.0', date: '2026-11-15', notes: ['Fixed: Save on a follow-up could save an empty answer, because the same follow-up was drawn in several places and Save read the wrong box', 'New: Review, Follow-ups, the one place to write and read your answers, with To answer, Answered and All', 'What you type is kept on this device as a draft until you save it, even if you leave the page', 'Saved answers show the date; Claude\'s notes on your answers appear under them', 'Elsewhere, follow-ups show your answer and a link to edit it in Follow-ups'] },
   { v: '2.2.0', date: '2026-11-14', notes: ['Answer packs are made for you after each part you finish. A notice on Drive and Sync says when one is waiting; it goes away once you tap Download, or when Claude\'s reply for those answers is loaded', 'One button on Sync instead of two; packing a whole day again is under Re-pack one day', 'Follow-ups: write your answer under each one, on the phone or on a computer. Your answers go to Claude in the next pack', 'Follow-ups you added yourself can be removed', 'Versions fold: tap one to see its changes', 'Setup, Connect: a link that connects another device (for example your computer) in one tap'] },
   { v: '2.1.1', date: '2026-11-13', notes: ['Fixed: the next drive is now the day after the last one you played (it showed Day 1, because Day 1 was never finished)', 'The pack button now says which day it packs, and Pack new answers says when nothing new was recorded'] },
@@ -668,7 +675,7 @@ $('t-guide').onclick = function () { if (!locked()) { show('guide'); var w = 'st
 $('vtag').textContent = 'v' + APP_VERSION;
 
 /* ---- names, device, local state ---- */
-var ORDER = ['mindset', 'interview', 'market'], NAMES = { mindset: 'Mindset', interview: 'Interview', market: 'Market' };
+var ORDER = ['mindset', 'interview', 'market', 'review'], MAIN = ['mindset', 'interview', 'market'], NAMES = { mindset: 'Mindset', interview: 'Interview', market: 'Market', review: 'Review' };
 var UA = navigator.userAgent;
 var DEVICE = /iPhone|iPad/.test(UA) ? 'iPhone' : /Android/.test(UA) ? 'Android' : /Windows/.test(UA) ? 'PC' : /Mac/.test(UA) ? 'Mac' : 'Other';
 function lsGet(k, d) { try { var v = JSON.parse(localStorage.getItem(k)); return v == null ? d : v; } catch (e) { return d; } }
@@ -756,8 +763,25 @@ function renderList() {
   Array.prototype.forEach.call(document.querySelectorAll('#hero [data-hero-page]'), function (el) {
     el.onclick = function () { goPage(Number(el.dataset.heroPage)); };
   });
-  renderResume(); renderWeak(); renderAfter(); packLabel();
+  renderResume(); renderWeak(); renderAfter(); packLabel(); renderReviews();
 }
+function rvInfo(s) { return s.review || { ready: true, min: partMin(s.session, 'review'), file: '' }; }
+function renderReviews() { // reviews not heard yet, newest first; a paused one stays until it is finished
+  var list = sessions.filter(function (s) { return hasReview(s) && !progress(s.session, 'review').done; }).sort(function (a, b) { return b.session - a.session; }).slice(0, 2);
+  $('rvw-w').classList.toggle('hide', !list.length);
+  if (!list.length) { $('rvw').innerHTML = ''; return; }
+  $('rvw').innerHTML = list.map(function (s) {
+    var st = partStatus(s.session, 'review'), inf = (s.info || {}).review || {}, ri = rvInfo(s), resume = st.p.pos || st.p.idx;
+    return '<button class="hp" data-rv-play="' + s.session + '" aria-label="Play the review of ' + dayName(s.session) + '"><span class="chip sm c-review">' + dayName(s.session) + '</span><span class="ht">' + esc(pretty(inf.title || 'Review and extra practice')) +
+      '<small>' + esc(resume ? st.text + ' - tap to resume' : st.text) + '</small></span><span class="hm">' + (ri.min ? ri.min + ' min' : '') + '</span></button>' +
+      (ri.ready === false ? '<div class="note2">The audio file' + (ri.file ? ' ' + esc(ri.file) : '') + ' is not in Drive yet. Save it in Claude replies and tap Load now. Until then it plays with the phone voice.</div>' : '') +
+      (resume ? '<button class="link" data-rv-restart="' + s.session + '" style="margin:0 0 6px 90px">Restart the review</button>' : '') +
+      '<button class="link" data-rv-page="' + s.session + '" style="margin:0 0 6px 90px">Read it on ' + dayName(s.session) + '\'s page</button>';
+  }).join('') + (function (s) { var p = partStatus(s.session, 'review').p, mn = rvInfo(s).min;
+    return '<button class="go" data-rv-play="' + s.session + '"><svg width="26" height="26" viewBox="0 0 24 24" aria-hidden="true"><path d="M7 4.5v15l12-7.5z" fill="#fff"/></svg>' + (p.pos || p.idx ? 'Continue the review' : 'Play the review') + (mn ? ', ' + mn + ' min' : '') + '</button>'; })(list[0]);
+  if (list[0] && rvInfo(list[0]).ready !== false && !rvPre[list[0].session]) { rvPre[list[0].session] = 1; (async function (n) { try { if (!metaBy[n]) metaBy[n] = await call('audioMeta', { n: n }); if (metaBy[n].review) await blockUrl(n, 'review'); } catch (e) { delete rvPre[n]; } })(list[0].session); }
+}
+var rvPre = {};
 /* ---- home: needs work, after the drive ---- */
 var homeAt = 0, homeOld = false;
 async function homeData(force) {
@@ -809,7 +833,7 @@ function renderAfter() {
   h += open.slice(0, 3).map(function (f) { return fuRow(f, true); }).join('');
   if (open.length > 3) h += '<button class="arow" data-after="fu">All ' + open.length + ' open follow-ups<span aria-hidden="true">&rsaquo;</span></button>';
   var rp = reports.slice().sort(function (x, y) { return String(y.date).localeCompare(String(x.date)) || (Number([].concat(y.sessions || [])[0]) - Number([].concat(x.sessions || [])[0])); })[0], rs = rp && [].concat(rp.sessions || [])[0];
-  if (rp && rs != null) h += '<button class="arow" data-after="page" data-n="' + esc(rs) + '">' + esc((Number(rs) > 999 ? 'Market brief' : 'Day ' + rs) + ' review is ready' + (rp.scores && rp.scores.overall != null ? ': ' + rp.scores.overall + ' out of 5' : '')) + '<span aria-hidden="true">&rsaquo;</span></button>';
+  if (rp && rs != null) h += '<button class="arow" data-after="page" data-n="' + esc(rs) + '">' + esc((Number(rs) > 999 ? 'Market brief' : 'Day ' + rs) + ' review is ready' + (rp.scores && rp.scores.overall != null ? ': ' + rp.scores.overall + ' out of 5' : '') + (hasReview(Number(rs)) ? ', with audio' : '')) + '<span aria-hidden="true">&rsaquo;</span></button>';
   h += '<button class="arow" data-after="sync">Pack new answers for Claude<span aria-hidden="true">&rsaquo;</span></button>';
   if (homeOld) h += '<div class="mut sm2">Follow-ups need backend v2.0 or later.</div>';
   $('after').innerHTML = h; $('after-w').classList.remove('hide');
@@ -817,7 +841,10 @@ function renderAfter() {
 function goPage(n) { show('review'); subTab('ses'); loadSes(); openPage(n); }
 $('v-home').addEventListener('click', function (e) {
   var b = e.target.closest('button'); if (!b) return;
-  if (b.dataset.weak) { startRetry([b.dataset.weak]); }
+  if (b.dataset.rvPlay) { startParts(Number(b.dataset.rvPlay), ['review'], false); }
+  else if (b.dataset.rvRestart) { startParts(Number(b.dataset.rvRestart), ['review'], true); }
+  else if (b.dataset.rvPage) { goPage(Number(b.dataset.rvPage)); }
+  else if (b.dataset.weak) { startRetry([b.dataset.weak]); }
   else if (b.hasAttribute('data-weak-all')) { show('review'); subTab('ans'); aSort = 'weak'; $('a-sort').value = 'weak'; loadHist(); }
   else if (b.dataset.after === 'fu') { show('review'); subTab('ses'); loadSes(); }
   else if (b.dataset.after === 'page') { goPage(Number(b.dataset.n)); }
@@ -983,6 +1010,7 @@ function beginRec() {
   }
   try { actx = actx || new (window.AudioContext || window.webkitAudioContext)();
     var src = actx.createMediaStreamSource(stream); R.an = actx.createAnalyser(); R.an.fftSize = 512; src.connect(R.an); R.buf = new Uint8Array(R.an.fftSize); } catch (e) {}
+  try { stream.getAudioTracks().forEach(function (t) { var cut = function () { R.cut = true; }; t.addEventListener('mute', cut); t.addEventListener('ended', cut); }); } catch (e) {}
   R.mr.start();
   return R;
 }
@@ -996,6 +1024,7 @@ function level(R, meterId) {
 }
 async function finishRec(R, item, prompt) {
   $('p-meter').style.width = '0';
+  var micDead = !!R.cut || !micLive(), silent = !!(R.an && actx && actx.state === 'running' && (R.peak || 0) < 0.0005);
   await new Promise(function (r) { R.mr.onstop = r; try { R.mr.stop(); } catch (e) { r(); } });
   if (R.rec) { // wait for the last words: the final result arrives after stop()
     R.stopping = true;
@@ -1007,10 +1036,10 @@ async function finishRec(R, item, prompt) {
     sttWarn(R.sttErr);
   }
   var dur = Math.round((Date.now() - R.t0) / 1000), blob = new Blob(R.chunks, { type: R.mime || 'audio/webm' });
-  R.lost = blob.size < 2000 && dur >= 2; // the phone cut the microphone off: nothing was captured
+  R.lost = (blob.size < 2000 && dur >= 2) || (dur >= 8 && (micDead || silent)); // the phone cut the microphone off: nothing, or only the start, was captured
   if (R.lost) {
     lostCount++; text = '(recording lost: no audio was captured' + (text && text.charAt(0) !== '(' ? '; phone heard: ' + text : '') + ')';
-    $('p-hint').textContent = 'Nothing was recorded for that answer: the phone cut the microphone off. The app reopened it for the next answer. Use Practice again on this question later' + (lostCount > 1 ? ' (' + lostCount + ' lost this session).' : '.');
+    $('p-hint').textContent = 'That answer was not recorded (the phone cut the microphone off). The app reopened it for the next answer. Use Practice again on this question later' + (lostCount > 1 ? ' (' + lostCount + ' lost this session).' : '.');
     stream = null; freshMic();
   }
   R.transcript = text; newAnswers++;
@@ -1143,6 +1172,12 @@ async function runChain(s, blocks, fromStart) {
 }
 
 function showDone(s, finished) {
+  if (finished.length === 1 && finished[0] === 'review') {
+    $('d-title').textContent = dayName(s) + ': review finished';
+    $('d-sum').textContent = 'Saved. Your new answers go into the next pack for Claude, so the next review can check what improved.';
+    $('d-parts').innerHTML = ''; $('d-next').classList.add('hide'); $('d-conf').classList.add('hide'); $('conf-m').textContent = '';
+    show('done'); return;
+  }
   var left = blocksOf(s).filter(function (b) { return !progress(s, b).done; });
   $('d-title').textContent = finished.length > 1 ? 'Day ' + s + ': ' + finished.length + ' parts finished' : 'Day ' + s + ': ' + NAMES[finished[0]] + ' finished';
   $('d-sum').textContent = 'Saved to your sheet. Your answers are in Review.';
@@ -1295,7 +1330,8 @@ $('b-prevl').onclick = function () { if (run && run.mode === 'audio') seekLine =
 $('b-nextl').onclick = function () { if (run && run.mode === 'audio') seekLine = 1; else rel(1); };
 $('p-seek').addEventListener('input', function () { dragging = true; if (run && run.mode === 'audio') $('p-time').textContent = 'Go to ' + fmt(this.value); });
 $('p-seek').addEventListener('change', function () { dragging = false; if (!run) return; if (run.mode === 'audio') seekTo = Number(this.value); });
-function blocksOf(s) { var ss = sessions.filter(function (x) { return x.session === s; })[0]; var b = ss && ss.blocks && ss.blocks.length ? ss.blocks : ORDER; return ORDER.filter(function (x) { return b.indexOf(x) >= 0; }); }
+function blocksOf(s) { var ss = sessions.filter(function (x) { return x.session === s; })[0]; var b = ss && ss.blocks && ss.blocks.length ? ss.blocks : MAIN; return MAIN.filter(function (x) { return b.indexOf(x) >= 0; }); }
+function hasReview(s) { var ss = typeof s === 'object' ? s : sessions.filter(function (x) { return x.session === s; })[0]; return !!(ss && ((ss.blocks || []).indexOf('review') >= 0 || ss.review)); }
 function jumpPart(d) { if (!run) return; var bl = blocksOf(run.s), i = bl.indexOf(run.b) + d; if (i < 0 || i >= bl.length) return; startParts(run.s, d > 0 && run.multi ? bl.slice(i) : [bl[i]], false); }
 $('b-prevp').onclick = function () { jumpPart(-1); };
 $('b-nextp').onclick = function () { jumpPart(1); };
@@ -1304,7 +1340,7 @@ $('resume-go').onclick = function () { if (!run) return; show('play'); setPaused
 $('resume-end').onclick = function () { if (!run) return; stopFlag = true; quietUnpause(); };
 
 /* ---- review: practice log, tiles, two charts; answers ---- */
-var COLORS = { mindset: 'var(--s1)', interview: 'var(--s2)', market: 'var(--s3)' };
+var COLORS = { mindset: 'var(--s1)', interview: 'var(--s2)', market: 'var(--s3)', review: 'var(--s4)' };
 function dayKey(iso) { var d = new Date(iso); return d.getFullYear() + '-' + ('0' + (d.getMonth() + 1)).slice(-2) + '-' + ('0' + d.getDate()).slice(-2); }
 function dayLabel(k) { var p = k.split('-'); return Number(p[1]) + '/' + Number(p[2]); }
 function dayRange(rows) {
@@ -1336,7 +1372,7 @@ function niceMax(v) { var steps = [10, 15, 20, 30, 45, 60, 90, 120, 180]; for (v
 
 function chartMinutes(rows, days) {
   var W = Math.max(300, Math.min(640, $('ch-min').clientWidth || 340)), H = 200, L = 28, R = 4, T = 8, B = 24, pw = W - L - R, ph = H - T - B;
-  var per = {}; days.forEach(function (d) { per[d] = { mindset: 0, interview: 0, market: 0 }; });
+  var per = {}; days.forEach(function (d) { per[d] = { mindset: 0, interview: 0, market: 0, review: 0 }; });
   rows.forEach(function (r) { var k = dayKey(r.end); if (per[k] && per[k][r.block] !== undefined) per[k][r.block] += (Number(r.listenedSec) || 0) / 60; });
   var max = niceMax(Math.max(10, Math.max.apply(null, days.map(function (d) { return ORDER.reduce(function (s, b) { return s + per[d][b]; }, 0); }))));
   var bw = pw / days.length, barW = Math.max(6, Math.min(26, bw * 0.62)), y = function (v) { return T + ph - ph * v / max; };
@@ -1788,6 +1824,7 @@ function renderSes() {
     return '<button class="sescard" data-open="' + s.session + '"><div class="sc-h"><div><b>' + dayName(s.session) + '</b> <span class="mut">' + esc(pretty(shortTitle(s.title))) + '</span></div>' + (st.avg != null ? badge(st.avg) : '') + '</div>' +
       (s.intro ? '<div class="mut sm2 clamp2">' + esc(pretty(s.intro)) + '</div>' : '') +
       '<div class="sc-f mut sm2">' + (st.answered ? st.answered + ' answered, last ' + shortDate2(st.last) : 'Not answered yet') +
+      (hasReview(s) ? ' <span class="pill ' + (progress(s.session, 'review').done ? 'ok' : 'open') + '">' + (progress(s.session, 'review').done ? 'review heard' : 'review audio') + '</span>' : '') +
       (fo.total ? ' <span class="pill ' + (fo.open ? 'open' : 'ok') + '">' + (fo.open ? fo.open + ' follow-up' + (fo.open > 1 ? 's' : '') + ' open' : 'follow-ups done') + '</span>' : '') + '</div></button>';
   }).join('');
 }
@@ -1969,14 +2006,16 @@ function renderPage() {
     '<div class="bk-meta">' + (st.avg != null ? badge(st.avg) + ' ' : '') + '<span class="mut sm2">' + (st.answered ? st.answered + ' questions answered, last ' + shortDate2(st.last) : 'Not answered yet') + '</span></div></div>';
   if (rp) h += '<div class="dayrep"><div class="lab">Claude\'s report - ' + esc(rp.date) + (rp.scores && rp.scores.overall != null ? ' - overall ' + esc(rp.scores.overall) + '/5' : '') + '</div>' + (rp.summary ? '<div>' + esc(rp.summary) + '</div>' : '') +
     ((rp.wins || []).length ? '<div class="dr-row"><b>Went well:</b> ' + esc(rp.wins[0]) + '</div>' : '') + ((rp.fixes || []).length ? '<div class="dr-row"><b>Fix first:</b> ' + esc(rp.fixes[0]) + '</div>' : '') +
-    (rp.nextFocus ? '<div class="dr-row"><b>Practice next:</b> ' + esc(rp.nextFocus) + '</div>' : '') + '</div>';
+    (rp.nextFocus ? '<div class="dr-row"><b>Practice next:</b> ' + esc(rp.nextFocus) + '</div>' : '') +
+    (blocks.indexOf('review') >= 0 ? '<button class="alt sm bk-rv" data-rv-play="' + n + '">Listen to the review' + (partMin(n, 'review') ? ', ' + partMin(n, 'review') + ' min' : '') + '</button>' : '') + '</div>';
   h += '<div class="card fu" id="bk-fu"></div>';
   h += '<div class="bk-toc">' + blocks.map(function (b, i) { var inf = (P.info || {})[b] || {}; return '<a href="#bk-' + b + '" data-jump="bk-' + b + '"><span class="chip sm c-' + b + '">' + (i + 1) + ' ' + NAMES[b] + '</span> ' + esc(pretty(inf.title || '')) + '</a>'; }).join('') + '</div>';
   h += '<div class="seg bk-mode"><button data-mode="full" class="' + (pageMode === 'full' ? 'on' : '') + '">Full script</button><button data-mode="qa" class="' + (pageMode === 'qa' ? 'on' : '') + '">Questions and answers</button></div>';
   h += '<div class="bk-body ' + (pageMode === 'qa' ? 'qa-only' : '') + '">';
   blocks.forEach(function (b, bi) {
     var rows = P.content.filter(function (r) { return r.block === b; }), inf = (P.info || {})[b] || {};
-    h += '<h2 id="bk-' + b + '"><span class="chip c-' + b + '">Part ' + (bi + 1) + ' - ' + NAMES[b] + '</span> ' + esc(pretty(inf.title || '')) + '</h2>' + (inf.intro ? '<p class="bk-pintro">' + esc(pretty(inf.intro)) + '</p>' : '');
+    h += '<h2 id="bk-' + b + '"><span class="chip c-' + b + '">' + (b === 'review' ? 'Review from Claude' : 'Part ' + (bi + 1) + ' - ' + NAMES[b]) + '</span> ' + esc(pretty(inf.title || '')) + '</h2>' + (inf.intro ? '<p class="bk-pintro">' + esc(pretty(inf.intro)) + '</p>' : '') +
+      (b === 'review' ? '<button class="alt sm bk-rv" data-rv-play="' + n + '">Play the review' + (progress(n, 'review').done ? ' again' : '') + '</button>' : '');
     var qn = 0;
     rows.forEach(function (r, i) {
       var k = b + '|' + r.seq;
@@ -2009,7 +2048,8 @@ function renderPage() {
 }
 $('rv-ses').addEventListener('click', async function (e) {
   var b = e.target.closest('button, a'); if (!b) return;
-  if (b.dataset.open) openPage(Number(b.dataset.open));
+  if (b.dataset.rvPlay) startParts(Number(b.dataset.rvPlay), ['review'], false);
+  else if (b.dataset.open) openPage(Number(b.dataset.open));
   else if (b.hasAttribute('data-back')) { page = null; $('ses-page').classList.add('hide'); $('ses-list').classList.remove('hide'); $('fu-open').classList.remove('hide'); renderSes(); renderFuOpen(); }
   else if (b.hasAttribute('data-print')) window.print();
   else if (b.dataset.mode) { pageMode = b.dataset.mode; var y = window.scrollY; renderPage(); window.scrollTo(0, y); }
@@ -2051,6 +2091,7 @@ async function loadDrive(btn) {
       out.innerHTML = sum + '<ul class="sm2">' + results.map(function (x) { return '<li>' + (x.ok ? '' : '<b>Not loaded:</b> ') + esc(x.name) + ': ' + esc(x.message) + '</li>'; }).join('') + '</ul>';
       inboxInfo = { count: results.length - good, files: results.filter(function (x) { return !x.ok; }).map(function (x) { return { name: x.name }; }) };
       ban.classList.remove('busy'); renderInbox();
+      if (good) { itemsBy = {}; metaBy = {}; blobUrls = {}; loading = {}; rvPre = {}; loadSessions(); }
       if (onReview) { if (!$('rv-ses').classList.contains('hide')) await loadSes(); else if (!$('rv-ans').classList.contains('hide')) await loadHist(); toast('Loaded ' + good + ' of ' + results.length + ' repl' + (results.length === 1 ? 'y' : 'ies') + '.'); }
     } else { ban.classList.remove('busy'); inboxInfo = { count: 0, files: [] }; renderInbox(); }
   } catch (e) { ban.classList.remove('busy'); out.textContent = /unknown action/.test(e.message) ? 'The backend is older than this page: paste the new Code.gs and deploy a new version.' : 'Error: ' + e.message; renderInbox(); }
