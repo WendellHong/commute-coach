@@ -142,6 +142,15 @@ button.pri{border-color:var(--acc);color:var(--acc);font-weight:600}
 .lp-ask{font-size:18px;line-height:1.45;margin:6px 0 8px;font-weight:600}.lp-line{font-size:20px;line-height:1.45;margin:6px 0 4px}.lp-line.dim{font-size:15px}
 .lp-row{display:flex;flex-wrap:wrap}.lp-nav{grid-template-columns:1fr 1fr}#lp-wbox textarea{width:100%}
 button.ln-save{display:block;margin:4px 0 0}
+.dsub{display:grid;grid-template-columns:repeat(4,1fr);gap:6px;margin:10px 0 4px}.dsub button{min-height:56px;border:1px solid var(--line);background:var(--card);color:var(--ink);border-radius:12px;font-size:15px;font-weight:700;line-height:1.15;padding:4px}
+.dsub button.on{background:var(--acc);border-color:var(--acc);color:#fff}.dsub i{font-style:normal;display:inline-block;min-width:18px;border-radius:9px;background:var(--warn);color:#fff;font-size:12px;padding:0 4px}.dsub i:empty{display:none}
+.fz{display:flex;align-items:center;gap:8px;background:var(--card);border:1px solid var(--line);border-radius:12px;padding:8px 10px;margin:8px 0 0}.fz.hot{border-color:var(--acc)}
+.fz-t{flex:1;display:flex;flex-direction:column;font-size:14px}.fz-t span{color:var(--mut);font-size:13px}.fz-go{min-height:44px;border:0;background:var(--acc);color:#fff;border-radius:10px;padding:0 14px;font-weight:700;font-size:15px}
+.fz .dl{min-height:44px;display:inline-flex;align-items:center}.fz-out{margin-top:8px}.fz-sum{border:1px solid var(--acc);border-radius:10px;padding:8px 10px;margin-bottom:6px}
+.td-head{display:flex;justify-content:space-between;align-items:baseline;margin:6px 0 2px}.td-intro{font-size:14px;margin-bottom:8px}.td-parts{margin:4px 0 2px}.chip.done{opacity:.55}
+.td-t{font-size:18px;font-weight:700;margin:2px 0 4px}.td-row{display:flex;gap:8px;margin-top:8px}.td-row .alt{flex:1;margin:0}
+.td-l{border-bottom:1px solid var(--line);padding:8px 0}.td-l:last-of-type{border-bottom:0}.td-lt{font-size:13px;color:var(--mut)}.td-lx{font-size:17px;line-height:1.4;margin:4px 0}.td-la{display:flex;gap:6px}.td-la .alt{margin:0}
+.td-rh{display:flex;justify-content:space-between;align-items:flex-start;gap:10px}.td-score{text-align:center;line-height:1}.td-score b{font-size:30px;display:block}.td-score span{font-size:12px;color:var(--mut)}
 .rvw .note2{font-size:12.5px;color:var(--warn);margin:-2px 0 8px 90px}.bk-rv{margin:6px 0 10px}
 .chartwrap svg{width:100%;height:auto;display:block}
 .chartwrap .grid{stroke:var(--line);stroke-width:1}
@@ -303,16 +312,29 @@ details.older>summary{cursor:pointer;margin:6px 0}
 <header><b>Commute Coach</b><span id="vtag"></span></header>
 <div id="toast" role="status"></div>
 <nav>
-  <button id="t-home" class="on">Drive</button>
+  <button id="t-today" class="on">Today</button>
+  <button id="t-home">Drive</button>
   <button id="t-lines">Lines</button>
   <button id="t-review">Review</button>
-  <button id="t-sync">Sync</button>
   <button id="t-guide">Setup</button>
 </nav>
+<section id="v-today">
+  <div class="td-head"><h1 class="ln-h1">Today</h1><div class="mut sm2" id="td-date"></div></div>
+  <div class="fz"></div><div class="fz-out card hide"></div>
+  <div class="lab2">Today's session</div>
+  <div class="card hero" id="td-ses"><div class="mut">Loading...</div></div>
+  <div id="td-rv-w" class="hide"><div class="lab2">Last review <span>from Claude</span></div><div class="card hero" id="td-rv"></div></div>
+  <div class="lab2">Today's lines <span>5 sentences</span></div>
+  <div class="card hero" id="td-ln"><div class="mut">Loading...</div></div>
+  <div id="td-rep-w" class="hide"><div class="lab2">Latest report <span id="td-rep-d"></span></div><div class="card" id="td-rep"></div></div>
+</section>
 
-<section id="v-home">
-  <div id="pk-h" class="inbox hide"></div>
-  <div id="inbox-h" class="inbox hide"></div>
+<section id="v-home" class="hide">
+  <div class="fz"></div><div class="fz-out card hide"></div>
+  <div class="dsub" role="tablist" aria-label="Drive">
+    <button data-dsub="next" class="on" role="tab">Next drive</button><button data-dsub="weak" role="tab">Needs work <i id="ds-wn"></i></button><button data-dsub="after" role="tab">After <i id="ds-an"></i></button><button data-dsub="all" role="tab">All sessions</button>
+  </div>
+  <div id="dv-next">
   <div class="card hide" id="resume-card">
     <div class="lab">Paused</div>
     <div id="resume-txt" style="font-weight:600;margin:2px 0 4px"></div>
@@ -327,19 +349,27 @@ details.older>summary{cursor:pointer;margin:6px 0}
   <div class="card hero" id="hero"><div class="mut">Loading...</div></div>
   <div class="mut" id="prep" style="margin-top:6px"></div>
   <div class="mut" id="micnote" style="margin-top:6px"></div>
+  </div>
+  <div id="dv-weak" class="hide">
+  <div class="card mut hide" id="dv-weak-e">Nothing needs work right now. Your lowest answers show here after Claude's notes arrive.</div>
   <div id="weak-w" class="hide">
     <div class="lab2">Needs work <span>your lowest answers</span></div>
     <div class="card" id="weak"></div>
   </div>
+  </div>
+  <div id="dv-after" class="hide">
+  <div class="card mut hide" id="dv-after-e">Nothing to do after the drive right now.</div>
   <div id="after-w" class="hide">
     <div class="lab2">After the drive</div>
     <div class="card" id="after"></div>
   </div>
-  <details class="card" id="all-sess" style="margin-top:16px">
-    <summary>All sessions</summary>
+  </div>
+  <div id="dv-all" class="hide">
+  <div class="card" id="all-sess">
     <div class="mut sm2">Tap a day to make it the next drive.</div>
     <div id="list"></div>
-  </details>
+  </div>
+  </div>
 </section>
 
 <section id="v-play" class="hide">
@@ -449,7 +479,39 @@ details.older>summary{cursor:pointer;margin:6px 0}
   <div id="tip" class="tip hide"></div>
 </section>
 
-<section id="v-sync" class="hide">
+
+<section id="v-guide" class="hide">
+  <div class="subnav wrap"><button id="g-start" class="on">Start here</button><button id="g-files">Files</button><button id="g-conn">Connect</button><button id="g-opt">Options</button><button id="g-help">Help</button><button id="g-ver">Versions</button></div>
+
+  <div id="gv-start">
+    <div class="card">
+      <h2>Every day</h2>
+      <div class="flow">
+        <div class="step"><b class="n">1</b><div><div class="who">Drive</div>The Drive tab shows the next drive with its three parts. Tap "Start drive", or one part by its name; other days are under "All sessions". The screen turns dark with three large buttons: back 15 seconds, Pause, and forward (it becomes Done while you answer). At each chime, answer out loud: a large countdown shows the seconds left, and a beep sounds 5 seconds before the end.</div></div>
+        <div class="step"><b class="n">2</b><div><div class="who">After the drive - Sync</div>Tap "Pack new answers", download the zip, and attach it in the Claude chat.</div></div>
+        <div class="step"><b class="n">3</b><div><div class="who">Claude</div>Sends back one Claude-reply file per day: an accurate transcript of every answer, a scored note with a better wording, and the day's report. Usually also a review: a second reply file (..._review.json) and its audio (DayNN_4_Review.mp3), with spoken feedback, a redo of your weakest answers and new drills.</div></div>
+        <div class="step"><b class="n">4</b><div><div class="who">You - Drive, then Review</div>Save the reply files, and the review MP3, into Drive, folder "Commute Coach audio &gt; Claude replies". Open Review and tap "Load now". A progress bar shows each file; loaded files move to "Imported", and the MP3 moves to the audio folder by itself.</div></div>
+        <div class="step"><b class="n">5</b><div><div class="who">Next commute - Drive</div>"Review from Claude" sits above the next drive until you have heard it. Play it first: it is about ten to fifteen minutes. Your redo answers go into your next pack, and the next review checks what improved.</div></div>
+        <div class="step"><b class="n">7</b><div><div class="who">Any time - Lines</div>Your key sentences. Listen, Repeat after the model, or tap Your way: you see only the situation and say it naturally, then compare with the line. Use Line drill in the car. Every try goes to Claude in the next pack, and the notes come back to the line.</div></div>
+        <div class="step"><b class="n">6</b><div><div class="who">Review - Sessions</div>Open the day's page: the script, your answers in every version, sample answers, Claude's notes, and the follow-ups to tick off. Tap "Practice again" on any answer you want to improve; the new version goes into your next pack.</div></div>
+      </div>
+    </div>
+    <div class="card">
+      <h2>Once a week</h2>
+      <div class="flow">
+        <div class="step"><b class="n">1</b><div><div class="who">Claude</div>Ask for next week's sessions. You get a zip with one DayNN.json and three MP3 files per day.</div></div>
+        <div class="step"><b class="n">2</b><div><div class="who">You - Drive</div>Unzip and upload all files to the Drive folder "Commute Coach audio".</div></div>
+        <div class="step"><b class="n">3</b><div><div class="who">Setup - Connect</div>Tap "Load new sessions from Drive". The new days appear on the Drive tab, under All sessions, with their titles and introductions.</div></div>
+      </div>
+    </div>
+    <div class="card">
+      <h2>When you need it</h2>
+      <div class="mut"><b>Reports</b> (Review): scores and trends by day. <b>Answers</b> (Review): every answer, sortable by "Needs work first". <b>Prep book</b> (Sync): an editable Google Doc and a PDF of your stories, answers and company notes. <b>Clean up duplicates</b> (Sync): one tap, safe to run any time.</div>
+    </div>
+  </div>
+
+  <div id="gv-files" class="hide">
+  <div class="card"><h2>Sync all</h2><div class="mut">One tap: load new sessions from Drive, load Claude's replies, and pack your new answers. It then tells you how many files to upload.</div><div class="fz"></div><div class="fz-out card hide"></div></div>
   <div class="card">
     <h2>1. Send my answers to Claude</h2>
     <div id="pk-s" class="inbox hide"></div>
@@ -504,38 +566,7 @@ details.older>summary{cursor:pointer;margin:6px 0}
     <button class="alt" id="auto">Get feedback now</button>
     <div id="auto-m" class="mut"></div>
   </div>
-</section>
-
-<section id="v-guide" class="hide">
-  <div class="subnav wrap"><button id="g-start" class="on">Start here</button><button id="g-conn">Connect</button><button id="g-opt">Options</button><button id="g-help">Help</button><button id="g-ver">Versions</button></div>
-
-  <div id="gv-start">
-    <div class="card">
-      <h2>Every day</h2>
-      <div class="flow">
-        <div class="step"><b class="n">1</b><div><div class="who">Drive</div>The Drive tab shows the next drive with its three parts. Tap "Start drive", or one part by its name; other days are under "All sessions". The screen turns dark with three large buttons: back 15 seconds, Pause, and forward (it becomes Done while you answer). At each chime, answer out loud: a large countdown shows the seconds left, and a beep sounds 5 seconds before the end.</div></div>
-        <div class="step"><b class="n">2</b><div><div class="who">After the drive - Sync</div>Tap "Pack new answers", download the zip, and attach it in the Claude chat.</div></div>
-        <div class="step"><b class="n">3</b><div><div class="who">Claude</div>Sends back one Claude-reply file per day: an accurate transcript of every answer, a scored note with a better wording, and the day's report. Usually also a review: a second reply file (..._review.json) and its audio (DayNN_4_Review.mp3), with spoken feedback, a redo of your weakest answers and new drills.</div></div>
-        <div class="step"><b class="n">4</b><div><div class="who">You - Drive, then Review</div>Save the reply files, and the review MP3, into Drive, folder "Commute Coach audio &gt; Claude replies". Open Review and tap "Load now". A progress bar shows each file; loaded files move to "Imported", and the MP3 moves to the audio folder by itself.</div></div>
-        <div class="step"><b class="n">5</b><div><div class="who">Next commute - Drive</div>"Review from Claude" sits above the next drive until you have heard it. Play it first: it is about ten to fifteen minutes. Your redo answers go into your next pack, and the next review checks what improved.</div></div>
-        <div class="step"><b class="n">7</b><div><div class="who">Any time - Lines</div>Your key sentences. Listen, Repeat after the model, or tap Your way: you see only the situation and say it naturally, then compare with the line. Use Line drill in the car. Every try goes to Claude in the next pack, and the notes come back to the line.</div></div>
-        <div class="step"><b class="n">6</b><div><div class="who">Review - Sessions</div>Open the day's page: the script, your answers in every version, sample answers, Claude's notes, and the follow-ups to tick off. Tap "Practice again" on any answer you want to improve; the new version goes into your next pack.</div></div>
-      </div>
-    </div>
-    <div class="card">
-      <h2>Once a week</h2>
-      <div class="flow">
-        <div class="step"><b class="n">1</b><div><div class="who">Claude</div>Ask for next week's sessions. You get a zip with one DayNN.json and three MP3 files per day.</div></div>
-        <div class="step"><b class="n">2</b><div><div class="who">You - Drive</div>Unzip and upload all files to the Drive folder "Commute Coach audio".</div></div>
-        <div class="step"><b class="n">3</b><div><div class="who">Setup - Connect</div>Tap "Load new sessions from Drive". The new days appear on the Drive tab, under All sessions, with their titles and introductions.</div></div>
-      </div>
-    </div>
-    <div class="card">
-      <h2>When you need it</h2>
-      <div class="mut"><b>Reports</b> (Review): scores and trends by day. <b>Answers</b> (Review): every answer, sortable by "Needs work first". <b>Prep book</b> (Sync): an editable Google Doc and a PDF of your stories, answers and company notes. <b>Clean up duplicates</b> (Sync): one tap, safe to run any time.</div>
-    </div>
   </div>
-
   <div id="gv-conn" class="hide">
     <div class="card">
       <h2>Connection</h2>
@@ -593,6 +624,8 @@ details.older>summary{cursor:pointer;margin:6px 0}
   </div>
 
   <div id="gv-help" class="hide">
+    <div class="card"><h2>Recent app errors</h2><div class="mut sm2">If the app stops or acts strangely, copy these notes into the Claude chat: they help find the cause.</div><ul id="errlog" class="sm2"></ul>
+      <button class="alt" id="err-copy">Copy</button><button class="alt" id="err-clear">Clear</button></div>
     <div class="card">
       <h2>If something goes wrong</h2>
       <h3>The microphone does not ask for permission</h3>
@@ -664,8 +697,10 @@ details.older>summary{cursor:pointer;margin:6px 0}
 </main>
 
 <script>
-var APP_VERSION = '2.5.1';
+var APP_VERSION = '2.6.0';
 var LOCAL_CHANGES = [
+  { v: '2.6.0', date: '2026-11-18', notes: ['New start page, Today: today\'s session, the last review, five lines for today, and the latest report', 'Drive has four big tabs for the car: Next drive, Needs work, After, All sessions', 'One Files button (Drive, Today and Setup): Sync all loads new sessions, loads Claude\'s replies, packs your new answers, and says how many files you need to upload', 'Sync is now Setup, Files', 'Steadier when you switch apps: if the phone pauses the audio, the app shows Paused and Resume picks up from there; the phone voice no longer hangs; requests to your sheet time out and retry instead of waiting forever; the microphone and sound are restarted when you come back', 'Setup, Help lists recent app errors, to copy into the chat if something goes wrong'] },
+  { v: '2.5.2', date: '2026-11-18', notes: ['Fixed: version 2.5.1 marked good answers as "not recorded". The check now measures how much audio was actually saved, and flags an answer only when 8 seconds or more are missing', 'Lines: each recording opens a fresh microphone, so a try is not lost to a stale one'] },
   { v: '2.5.1', date: '2026-11-17', notes: ['Lost-recording check, fixed both ways: an answer is flagged only when the microphone went silent or stopped well before the end (8 seconds or more). A full answer is no longer marked lost because the microphone closed at the very end, and an answer cut off after a few seconds is now caught even when the phone gives no signal'] },
   { v: '2.5.0', date: '2026-11-17', notes: ['New tab: Lines. Your key sentences for interviews, the market and your mindset, in one place', 'For each line: Listen, Repeat (say it after the model), and Your way (see only the situation, say it naturally, then compare). You can also write your version', 'Every try goes into the next answer pack; Claude\'s notes come back to the line, marked New note', 'Line drill: hands-free for the car. For each line, your way first, then the line, then say it once more', 'Star lines, mark them as known, add your own, or save any "Say it like this" from Review with + Add to Lines'] },
   { v: '2.4.0', date: '2026-11-16', notes: ['New: Review from Claude. After each answer pack, Claude can send a spoken review for the commute: what to fix, better wording, a redo of your weakest answers, and new drills that go one step further', 'Drive shows reviews you have not heard yet, above the next drive. A day\'s page shows the review as its last part, with your redo answers and Claude\'s notes', 'Your redo answers go into the next pack, so the next review can check what improved', 'A recording that stops early (the phone cut the microphone off) is now flagged as lost, even when part of it was saved'] },
@@ -714,18 +749,28 @@ async function call(action, p) {
   }
   if (!cfg.url) throw new Error('no_url');
   var big = { audio: 1, response: 1, log: 1, usage: 1, 'import': 1, saveSettings: 1, revoice: 1, voiceSample: 1, marketNow: 1, feedback: 1, followSet: 1, lineSet: 1 }[action];
-  var res = big
-    ? await fetch(cfg.url, { method: 'POST', headers: { 'Content-Type': 'text/plain;charset=utf-8' }, body: JSON.stringify({ action: action, p: p, token: cfg.token }) })
-    : await fetch(cfg.url + '?action=' + action + '&token=' + encodeURIComponent(cfg.token) + '&p=' + encodeURIComponent(JSON.stringify(p)));
+  var slow = { syncDrive: 1, tidy: 1, answerPack: 1, makeBook: 1, loadInbox: 1, 'import': 1, marketNow: 1, revoice: 1, voiceSample: 1, feedback: 1 }[action], ms = slow ? 330000 : big ? 150000 : 60000;
+  var getUrl = cfg.url + '?action=' + action + '&token=' + encodeURIComponent(cfg.token) + '&p=' + encodeURIComponent(JSON.stringify(p));
+  var res;
+  if (big) res = await fetchT(cfg.url, { method: 'POST', headers: { 'Content-Type': 'text/plain;charset=utf-8' }, body: JSON.stringify({ action: action, p: p, token: cfg.token }) }, ms);
+  else {
+    try { res = await fetchT(getUrl, {}, ms); }
+    catch (e) { if (slow) throw e; await sleep(1500); res = await fetchT(getUrl, {}, ms); } // one retry: a request cut off while the app was in the background
+  }
   return unwrap(await res.json());
+}
+function fetchT(u, o, ms) {
+  if (!window.AbortController) return fetch(u, o);
+  var c = new AbortController(), t = setTimeout(function () { c.abort(); }, ms); o = o || {}; o.signal = c.signal;
+  return fetch(u, o).then(function (r) { clearTimeout(t); return r; }, function (e) { clearTimeout(t); throw (e && e.name === 'AbortError') ? new Error('no answer from your sheet after ' + Math.round(ms / 1000) + ' seconds') : e; });
 }
 function unwrap(j) { if (!j || !j.ok) throw new Error(j && j.error || 'bad_response'); backendVersion = j.version || backendVersion; return j.data; }
 
 /* ---- tabs ---- */
-var views = ['home', 'play', 'done', 'lines', 'review', 'sync', 'guide'];
+var views = ['today', 'home', 'play', 'done', 'lines', 'review', 'guide'];
 function show(v) {
   views.forEach(function (x) { $('v-' + x).classList.toggle('hide', x !== v); });
-  ['home', 'lines', 'review', 'sync', 'guide'].forEach(function (x) { $('t-' + x).classList.toggle('on', x === v); });
+  ['today', 'home', 'lines', 'review', 'guide'].forEach(function (x) { $('t-' + x).classList.toggle('on', x === v); });
   document.body.classList.toggle('driving', v === 'play'); if (v !== 'play') window.scrollTo(0, 0);
 }
 /* ---- tabs (locked only while a part is actively playing) ---- */
@@ -733,7 +778,6 @@ var running = false, paused = false;
 function locked() { return running && !paused; }
 $('t-home').onclick = function () { if (!locked()) { show('home'); renderList(); homeData(false); } };
 $('t-review').onclick = function () { if (!locked()) { show('review'); if (!$('rv-ses').classList.contains('hide')) loadSes(); else if (!$('rv-use').classList.contains('hide')) loadReview(); peekInbox(); } };
-$('t-sync').onclick = function () { if (!locked()) { show('sync'); peekInbox(); peekPack(); loadAuto(); } };
 $('t-guide').onclick = function () { if (!locked()) { show('guide'); var w = 'start'; try { w = localStorage.getItem('cc.setup') || (cfg.token ? 'start' : 'conn'); } catch (e) {} setupTab(w); loadGuide(); } };
 $('vtag').textContent = 'v' + APP_VERSION;
 
@@ -812,7 +856,7 @@ function renderList() {
   });
   $('list').innerHTML = h || '<div class="mut">No sessions yet. Open Setup, Connect.</div>';
   Array.prototype.forEach.call(document.querySelectorAll('#list .sess-h'), function (el) {
-    el.onclick = function () { chosen = Number(el.parentNode.dataset.s); $('all-sess').open = false; renderList(); prefetch(chosen); window.scrollTo(0, 0); };
+    el.onclick = function () { chosen = Number(el.parentNode.dataset.s); renderList(); prefetch(chosen); window.scrollTo(0, 0); };
   });
   Array.prototype.forEach.call(document.querySelectorAll('#hero [data-play]'), function (el) {
     el.onclick = function () { startParts(chosen, [el.dataset.play], false); };
@@ -826,7 +870,7 @@ function renderList() {
   Array.prototype.forEach.call(document.querySelectorAll('#hero [data-hero-page]'), function (el) {
     el.onclick = function () { goPage(Number(el.dataset.heroPage)); };
   });
-  renderResume(); renderWeak(); renderAfter(); packLabel(); renderReviews();
+  renderResume(); renderWeak(); renderAfter(); packLabel(); renderReviews(); dsubFill(); renderToday();
 }
 function rvInfo(s) { return s.review || { ready: true, min: partMin(s.session, 'review'), file: '' }; }
 function renderReviews() { // reviews not heard yet, newest first; a paused one stays until it is finished
@@ -849,7 +893,7 @@ var rvPre = {};
 var homeAt = 0, homeOld = false;
 async function homeData(force) {
   if (!cfg.token || (!IS_AS && !cfg.url)) return;
-  if (!force && Date.now() - homeAt < 5 * 60000) { renderWeak(); renderAfter(); return; }
+  if (!force && Date.now() - homeAt < 5 * 60000) { renderWeak(); renderAfter(); dsubFill(); renderToday(); return; }
   homeAt = Date.now();
   var got = await Promise.all([
     call('history', { limit: 800 }).catch(function () { return hist; }),
@@ -862,7 +906,7 @@ async function homeData(force) {
   var arr = function (x, d) { return Array.isArray(x) ? x : d; };
   hist = splitHist(arr(got[0], [])); reports = arr(got[1], []); homeOld = got[2] === null; fuAll = arr(got[2], fuAll); inboxInfo = got[3];
   itemScore = {}; reports.slice().reverse().forEach(function (r) { (r.items || []).forEach(function (it) { if (it.key && it.score != null) itemScore[it.key] = Number(it.score); }); });
-  renderInbox(); renderWeak(); renderAfter();
+  renderInbox(); renderWeak(); renderAfter(); dsubFill(); renderToday();
 }
 function weakest(n) {
   var by = {}, out = [];
@@ -911,7 +955,7 @@ $('v-home').addEventListener('click', function (e) {
   else if (b.hasAttribute('data-weak-all')) { show('review'); subTab('ans'); aSort = 'weak'; $('a-sort').value = 'weak'; loadHist(); }
   else if (b.dataset.after === 'fu') { show('review'); subTab('ses'); loadSes(); }
   else if (b.dataset.after === 'page') { goPage(Number(b.dataset.n)); }
-  else if (b.dataset.after === 'sync') { show('sync'); peekInbox(); loadAuto(); }
+  else if (b.dataset.after === 'sync') { goFiles(); }
   else if (b.dataset.fuSkip) { setFu(b.dataset.fuSkip, 'skip'); }
 });
 $('v-home').addEventListener('change', function (e) { var c = e.target; if (c && c.dataset && c.dataset.fu) { setFu(c.dataset.fu, c.checked ? 'done' : 'open'); toast('Marked done. It stays on that day\'s page.'); } });
@@ -1008,7 +1052,15 @@ function speakOne(text, role) {
   return new Promise(function (res) {
     if (!window.speechSynthesis || FAST) return res();
     var u = new SpeechSynthesisUtterance(text), v = pick(role); if (v) u.voice = v;
-    u.lang = 'en-US'; u.rate = 0.95; u.pitch = role === 'interviewer' ? 0.85 : 1; u.onend = res; u.onerror = res;
+    u.lang = 'en-US'; u.rate = 0.95; u.pitch = role === 'interviewer' ? 0.85 : 1;
+    var t0 = Date.now(), held = 0, maxMs = 5000 + text.split(/\s+/).length * 650, fin = false, iv = null;
+    var done = function () { if (fin) return; fin = true; clearInterval(iv); res(); };
+    u.onend = done; u.onerror = done;
+    iv = setInterval(function () { // the phone can drop the end-of-speech event when you switch apps
+      if (paused) { held += 500; return; }
+      var el = Date.now() - t0 - held;
+      if ((el > 1500 && !speechSynthesis.speaking && !speechSynthesis.pending) || el > maxMs) done();
+    }, 500);
     speechSynthesis.speak(u);
   });
 }
@@ -1082,17 +1134,24 @@ function level(R, meterId) {
   if (!R || !R.an) return 0;
   R.an.getByteTimeDomainData(R.buf);
   var s = 0; for (var i = 0; i < R.buf.length; i++) { var d = (R.buf[i] - 128) / 128; s += d * d; }
+  if (actx && actx.state !== 'running' && !level.rz) { level.rz = 1; try { actx.resume().then(function () { level.rz = 0; }, function () { level.rz = 0; }); } catch (e) { level.rz = 0; } }
   var lv = Math.sqrt(s / R.buf.length); R.peak = Math.max(R.peak || 0, lv);
   if (lv === 0) { if (!R.z0) R.z0 = Date.now(); } else R.z0 = 0; // a dead microphone reads exactly zero
   $(meterId || 'p-meter').style.width = Math.min(100, lv * 400) + '%';
   return lv;
 }
+function audioSeconds(blob) { // the length of the audio actually saved, or null if the browser cannot tell
+  return new Promise(function (done) {
+    var t = setTimeout(function () { done(null); }, 4000);
+    try {
+      var fin = function (b) { clearTimeout(t); done(b && isFinite(b.duration) ? b.duration : null); }, fail = function () { clearTimeout(t); done(null); };
+      var ctx = actx || new (window.AudioContext || window.webkitAudioContext)(); actx = ctx;
+      blob.arrayBuffer().then(function (buf) { var p = ctx.decodeAudioData(buf, fin, fail); if (p && p.then) p.then(fin, fail); }, fail);
+    } catch (e) { clearTimeout(t); done(null); }
+  });
+}
 async function finishRec(R, item, prompt) {
   $('p-meter').style.width = '0';
-  var tEnd = Date.now(), recStopped = R.mr && R.mr.state === 'inactive';
-  if (recStopped && !R.cutAt) R.cutAt = tEnd - 1;
-  var cutEarly = !!R.cutAt && (tEnd - R.cutAt) / 1000 >= 8 || (recStopped && !R.chunks.length);
-  var deadTail = !!(R.z0 && R.an && actx && actx.state === 'running' && (tEnd - R.z0) / 1000 >= 8);
   await new Promise(function (r) { R.mr.onstop = r; try { R.mr.stop(); } catch (e) { r(); } });
   if (R.rec) { // wait for the last words: the final result arrives after stop()
     R.stopping = true;
@@ -1104,7 +1163,8 @@ async function finishRec(R, item, prompt) {
     sttWarn(R.sttErr);
   }
   var dur = Math.round((Date.now() - R.t0) / 1000), blob = new Blob(R.chunks, { type: R.mime || 'audio/webm' });
-  R.lost = (blob.size < 2000 && dur >= 2) || (dur >= 10 && (cutEarly || deadTail)); // the phone cut the microphone off: nothing, or only the start, was captured
+  var got = blob.size >= 2000 && dur >= 10 ? await audioSeconds(blob) : null; R.gotSec = got;
+  R.lost = (blob.size < 2000 && dur >= 2) || (got != null && got < dur - 8); // the phone cut the microphone off: nothing, or only the start, was saved
   if (R.lost) {
     lostCount++; text = '(recording lost: no audio was captured' + (text && text.charAt(0) !== '(' ? '; phone heard: ' + text : '') + ')';
     $('p-hint').textContent = 'That answer was not recorded (the phone cut the microphone off). The app reopened it for the next answer. Use Practice again on this question later' + (lostCount > 1 ? ' (' + lostCount + ' lost this session).' : '.');
@@ -1705,6 +1765,7 @@ function renderInbox() {
     b.innerHTML = '<div><b>' + n + ' Claude repl' + (n === 1 ? 'y' : 'ies') + ' waiting in Drive</b><div class="mut sm2">' + inboxInfo.files.map(function (f) { return esc(f.name); }).join(', ') + '</div></div><button class="pri" data-load-drive>Load now</button>';
     b.classList.remove('hide');
   });
+  renderFz();
 }
 document.addEventListener('click', function (e) { var b = e.target.closest('[data-load-drive]'); if (b) loadDrive(b); });
 $('drive-check').onclick = async function () {
@@ -2173,8 +2234,8 @@ $('tidy-go').onclick = async function () {
 };
 
 /* ---- Setup: sub-pages and options ---- */
-function setupTab(w) { ['start', 'conn', 'opt', 'help', 'ver'].forEach(function (x) { $('g-' + x).classList.toggle('on', x === w); $('gv-' + x).classList.toggle('hide', x !== w); }); try { localStorage.setItem('cc.setup', w); } catch (e) {} }
-['start', 'conn', 'opt', 'help', 'ver'].forEach(function (x) { $('g-' + x).onclick = function () { setupTab(x); }; });
+function setupTab(w) { if (w === 'help') setTimeout(renderErrs, 0); ['start', 'files', 'conn', 'opt', 'help', 'ver'].forEach(function (x) { $('g-' + x).classList.toggle('on', x === w); $('gv-' + x).classList.toggle('hide', x !== w); }); try { localStorage.setItem('cc.setup', w); } catch (e) {} }
+['start', 'files', 'conn', 'opt', 'help', 'ver'].forEach(function (x) { $('g-' + x).onclick = function () { setupTab(x); if (x === 'files') { peekInbox(); peekPack(); loadAuto(); } }; });
 function loadOpts() {
   $('cfg-stt').checked = cfg.stt !== false; $('cfg-auto').checked = cfg.autoNext !== false; $('cfg-tick').checked = cfg.tick !== false;
   var d = null; try { d = JSON.parse(localStorage.getItem('cc.drift') || 'null'); } catch (e) {}
@@ -2303,6 +2364,7 @@ function renderPack() {
         '<div class="mut sm2">' + esc(packDays((p.unpackedDays || []).join(','))) + '</div></div><button class="pri" data-pack-make>Make pack</button>';
   }
   ['pk-h', 'pk-s'].forEach(function (id) { var b = $(id); if (!b) return; b.innerHTML = h; b.classList.toggle('hide', !h); });
+  renderFz();
 }
 async function peekPack() { try { packInfo = await call('packs'); } catch (e) { packInfo = null; } renderPack(); }
 async function autoPack(manual) {
@@ -2358,7 +2420,7 @@ async function loadLines(quiet) {
   try {
     var got = await Promise.all([call('lines'), call('history', { limit: 600, session: 0 }).catch(function () { return null; }),
       metaBy[0] ? metaBy[0] : call('audioMeta', { n: 0 }).catch(function () { return {}; })]);
-    lines = got[0] || []; if (got[1]) lineHist = got[1].filter(isLineTry); metaBy[0] = got[2] || {}; linesOk = true;
+    lines = Array.isArray(got[0]) ? got[0] : []; if (Array.isArray(got[1])) lineHist = got[1].filter(isLineTry); metaBy[0] = got[2] || {}; linesOk = true;
     lnLocal = lnLocal.filter(function (x) { return !lineHist.some(function (h) { return Number(h.seq) === x.seq && h.block === x.block && Math.abs(tms(h.timestamp) - tms(x.timestamp)) < 120000; }); });
   } catch (e) {
     linesOk = false;
@@ -2461,7 +2523,9 @@ async function playClip(key, text, role) {
   if (player.src !== url) { player.src = url; await new Promise(function (r) { player.onloadedmetadata = r; setTimeout(r, 3000); }); }
   player.playbackRate = FAST ? 16 : 1; player.currentTime = c.t0; showCap(null, pretty(text), null, role || 'coach');
   try { await player.play(); } catch (e) { await say(text, role || 'coach'); return; }
+  var stall = 0;
   while (!stopFlag && !leaveFlag && !skipFlag && player.currentTime < c.t1) {
+    if (!paused && player.paused) { if (++stall > 75) break; } else stall = 0; // the phone stopped the clip: go on after 3 seconds
     if (paused) { player.pause(); while (paused && !stopFlag && !leaveFlag) await sleep(200); if (!stopFlag && !leaveFlag) { try { await player.play(); } catch (e) {} } }
     await sleep(40);
   }
@@ -2536,8 +2600,8 @@ $('lp-send').onclick = async function () {
 $('lp-rec').onclick = async function () {
   var l = lnById(lp.ids[lp.i]), btn = this, mode = lp.mode;
   if (player) player.pause();
-  await freshMic();
-  var own = !stream; if (!stream && !(await openMic())) { $('lp-m').textContent = micAdvice(); return; }
+  if (!running && stream) { try { stream.getTracks().forEach(function (t) { t.stop(); }); } catch (e) {} stream = null; } // a fresh microphone for every try
+  var own = true; if (!(await openMic())) { $('lp-m').textContent = micAdvice(); return; }
   btn.disabled = true; $('lp-listen').disabled = true; $('lp-mine').disabled = true;
   beep(700); var R = beginRec(); if (!R) { $('lp-m').textContent = 'Recording is not supported here.'; btn.disabled = false; $('lp-listen').disabled = false; return; }
   var sec = lpSec(l, mode); lp.stop = false; $('lp-stop').disabled = false; $('lp-state').textContent = 'Recording'; $('lp-state').className = 'state rec';
@@ -2660,7 +2724,176 @@ function saveLineBtn(text, topic, ask, cat) {
   return '<button class="link sm2 ln-save" data-ln-save="' + esc(text) + '" data-ln-topic="' + esc(topic || '') + '" data-ln-ask="' + esc(String(ask || '').slice(-300)) + '" data-ln-cat="' + esc(cat || '') + '"' + (have ? ' disabled>In your Lines' : '>+ Add to Lines') + '</button>';
 }
 
-loadSessions();
+/* ---- Drive tabs: Next drive, Needs work, After, All sessions ---- */
+function dsub(w) {
+  ['next', 'weak', 'after', 'all'].forEach(function (x) { $('dv-' + x).classList.toggle('hide', x !== w); var b = document.querySelector('[data-dsub="' + x + '"]'); b.classList.toggle('on', x === w); b.setAttribute('aria-selected', x === w); });
+  lsSet('cc.dsub', w); dsubFill();
+}
+function dsubFill() {
+  var nw = $('weak-w').classList.contains('hide') ? 0 : $('weak').querySelectorAll('[data-weak]').length, na = $('after-w').classList.contains('hide') ? 0 : $('after').querySelectorAll('button, input').length;
+  $('ds-wn').textContent = nw ? nw : ''; $('ds-an').textContent = na ? '!' : '';
+  $('dv-weak-e').classList.toggle('hide', !!nw); $('dv-after-e').classList.toggle('hide', !$('after-w').classList.contains('hide'));
+}
+Array.prototype.forEach.call(document.querySelectorAll('[data-dsub]'), function (b) { b.onclick = function () { dsub(b.dataset.dsub); }; });
+$('list').addEventListener('click', function (e) { if (e.target.closest('.sess-h')) setTimeout(function () { dsub('next'); }, 0); });
+
+/* ---- Files: one button to load new sessions, load Claude's replies, and pack new answers ---- */
+var fzBusy = false, fzStep = null, fzResult = null;
+function fzSummary() {
+  var p = packInfo || {}, n = inboxInfo && inboxInfo.count || 0, out = [];
+  if (p.pending) out.push('1 file to send to Claude');
+  else if (p.unpacked || p.unpackedFollowups) out.push((p.unpacked || 0) + (p.unpackedFollowups || 0) + ' new answer' + ((p.unpacked || 0) + (p.unpackedFollowups || 0) === 1 ? '' : 's') + ' to pack');
+  if (n) out.push(n + ' Claude repl' + (n === 1 ? 'y' : 'ies') + ' to load');
+  return out;
+}
+function renderFz() {
+  var p = packInfo || {}, sum = fzSummary(), h;
+  if (fzBusy) h = '<div class="fz-t"><span class="spin"></span><b>Syncing, step ' + fzStep[0] + ' of 3</b><span>' + esc(fzStep[1]) + '</span></div>';
+  else h = '<div class="fz-t"><b>Files</b><span>' + (sum.length ? esc(sum.join(' - ')) : 'Up to date. Nothing to send or load.') + '</span></div>' +
+    (p.pending ? '<a class="dl" href="' + esc(p.pending.downloadUrl) + '" target="_blank" rel="noopener" data-pack-dl="' + esc(p.pending.id) + '">Download</a>' : '') +
+    '<button class="fz-go" data-fz-sync>Sync all</button>';
+  Array.prototype.forEach.call(document.querySelectorAll('.fz'), function (el) { el.innerHTML = h; el.classList.toggle('hot', !!(p.pending || (inboxInfo && inboxInfo.count))); });
+  var r = '';
+  if (fzResult) {
+    var up = fzResult.upload;
+    r = '<div class="fz-sum"><b>' + (up ? 'Files to upload: 1' : 'Files to upload: none') + '</b>' + (up ? '<div>Attach <b>' + esc(up.name) + '</b> (' + up.count + ' answer' + (up.count === 1 ? '' : 's') + ') in the Claude chat.</div><a class="dl" href="' + esc(up.downloadUrl) + '" target="_blank" rel="noopener" data-pack-dl="' + esc(up.id) + '">Download the answer pack</a>' : '') + '</div>' +
+      '<ul class="sm2">' + fzResult.lines.map(function (l) { return '<li><b>' + esc(l[0]) + ':</b> ' + esc(l[1]) + '</li>'; }).join('') + '</ul>' +
+      '<div class="mut sm2">When Claude replies, save its files in Drive, folder Commute Coach audio &gt; Claude replies. Then tap Sync all again.</div><button class="link" data-fz-close>Close</button>';
+  }
+  Array.prototype.forEach.call(document.querySelectorAll('.fz-out'), function (el) { el.innerHTML = r; el.classList.toggle('hide', !r); });
+}
+async function syncAll() {
+  if (fzBusy) return; fzBusy = true; fzResult = null;
+  var lines = [], step = function (i, t) { fzStep = [i, t]; renderFz(); };
+  try {
+    step(1, 'Looking for new sessions in Drive');
+    try { var r1 = await call('syncDrive'); lines.push(['New sessions', (r1.sessions ? r1.sessions + ' day file(s) and ' + r1.audio + ' audio file(s) checked' : 'none found') + (r1.missing && r1.missing.length ? '; missing audio: ' + r1.missing.slice(0, 3).join(', ') : '')]); itemsBy = {}; metaBy = {}; blobUrls = {}; loading = {}; }
+    catch (e) { lines.push(['New sessions', 'not checked (' + e.message + ')']); }
+    step(2, 'Loading Claude\'s replies');
+    var box = await call('inbox'), files = box.files || [], res = [];
+    for (var i = 0; i < files.length; i++) { step(2, 'Loading reply ' + (i + 1) + ' of ' + files.length); var r2 = await call('loadInbox', { id: files[i].id, name: files[i].name }); res = res.concat(r2.results || []); if ((r2.results || []).length > 1) break; }
+    var good = res.filter(function (x) { return x.ok; });
+    lines.push(['From Claude', files.length ? 'loaded ' + good.length + ' of ' + res.length + ' repl' + (res.length === 1 ? 'y' : 'ies') + (good.some(function (x) { return /audio linked/.test(x.message); }) ? ', with audio' : '') + (res.length > good.length ? '. Not loaded: ' + res.filter(function (x) { return !x.ok; }).map(function (x) { return x.name + ' (' + x.message + ')'; }).join('; ') : '') : 'no new replies']);
+    if (good.length) { try { await call('tidy'); } catch (x) {} itemsBy = {}; metaBy = {}; blobUrls = {}; loading = {}; rvPre = {}; }
+    inboxInfo = { count: res.length - good.length, files: res.filter(function (x) { return !x.ok; }).map(function (x) { return { name: x.name }; }) };
+    step(3, 'Packing your new answers');
+    var st = await call('packs');
+    if (st && (st.unpacked || st.unpackedFollowups)) { var r3 = await call('answerPack', {}); st = r3.status || st; }
+    packInfo = st;
+    var pk = st && st.pending;
+    lines.push(['To Claude', pk ? '1 answer pack, ' + packDays(pk.sessions) + ' (' + pk.count + ' answers' + (pk.followups ? ', ' + pk.followups + ' follow-up answers' : '') + ')' : 'nothing new to send']);
+    fzResult = { lines: lines, upload: pk ? pk : null };
+    if (good.length || lines[0][1].indexOf('checked') > 0) { await loadSessions(); if (linesOk) loadLines(true); }
+  } catch (e) { fzResult = { lines: lines.concat([['Stopped', e.message]]), upload: packInfo && packInfo.pending }; }
+  fzBusy = false; renderFz(); renderInbox(); renderPack(); renderToday();
+}
+document.addEventListener('click', function (e) {
+  var b = e.target.closest('button'); if (!b) return;
+  if (b.hasAttribute('data-fz-sync')) syncAll();
+  else if (b.hasAttribute('data-fz-close')) { fzResult = null; renderFz(); }
+});
+function goFiles() { show('guide'); setupTab('files'); peekInbox(); peekPack(); loadAuto(); }
+
+/* ---- Today: one session, the last review, five lines, the latest report ---- */
+var tdLinesTried = false;
+function todayLines() {
+  if (!lines.length) return [];
+  var d = new Date(), key = d.getFullYear() + '-' + (d.getMonth() + 1) + '-' + d.getDate(), saved = lsGet('cc.tlines', null);
+  if (saved && saved.date === key) { var keep = saved.ids.map(lnById).filter(function (l) { return l && l.status !== 'known'; }); if (keep.length >= Math.min(5, lines.length)) return keep.slice(0, 5); }
+  var pool = lines.filter(function (l) { return l.status !== 'known'; }).map(function (l) { return { l: l, i: lineInfo(l) }; });
+  var hot = pool.filter(function (x) { return x.i.unseen || (x.i.score != null && x.i.score < 3.5); }).slice(0, 2).map(function (x) { return x.l; });
+  var rest = pool.map(function (x) { return x.l; }).filter(function (l) { return hot.indexOf(l) < 0; });
+  var day = Math.floor(Date.now() / 86400000), start = rest.length ? (day * 5) % rest.length : 0, pick = hot.slice();
+  for (var k = 0; pick.length < 5 && k < rest.length; k++) pick.push(rest[(start + k) % rest.length]);
+  lsSet('cc.tlines', { date: key, ids: pick.map(function (l) { return l.id; }) });
+  return pick;
+}
+function latestReport() { return reports.slice().sort(function (a, b) { return String(b.date).localeCompare(String(a.date)) || String(b.id).localeCompare(String(a.id)); })[0]; }
+function renderToday() {
+  if (!$('v-today')) return;
+  var d = new Date(); $('td-date').textContent = d.toLocaleDateString('en-US', { weekday: 'long', month: 'long', day: 'numeric' });
+  // today's session
+  var s = sessions.filter(function (x) { return x.session === chosen; })[0], h = '';
+  if (!s) h = '<div class="mut">' + (cfg.token ? 'Loading your sessions...' : 'Not connected yet. Open Setup, Connect.') + '</div>';
+  else {
+    var bl = blocksOf(s.session), first = bl.filter(function (b) { return !progress(s.session, b).done; })[0], all = !first;
+    var mins = bl.reduce(function (t, b) { return t + partMin(s.session, b); }, 0);
+    h = '<div class="hd">' + dayName(s.session) + ' - ' + esc(sessionStatus(s.session)) + '</div><h1>' + esc(pretty(shortTitle(s.title))) + '</h1>' + (s.intro ? '<div class="mut td-intro">' + esc(pretty(s.intro)) + '</div>' : '') +
+      '<div class="td-parts">' + bl.map(function (b) { return '<span class="chip sm c-' + b + (progress(s.session, b).done ? ' done' : '') + '">' + NAMES[b] + (progress(s.session, b).done ? ' &#10003;' : '') + '</span>'; }).join(' ') + '</div>' +
+      '<button class="go" data-td-go="' + (all ? bl[0] : first) + '"><svg width="26" height="26" viewBox="0 0 24 24" aria-hidden="true"><path d="M7 4.5v15l12-7.5z" fill="#fff"/></svg>' + (all ? 'Play again' : first === bl[0] ? 'Start the drive' : 'Continue: ' + NAMES[first]) + (mins ? ', ' + mins + ' min' : '') + '</button>' +
+      '<button class="link" data-td-drive>More in Drive</button>';
+  }
+  $('td-ses').innerHTML = h;
+  // last review
+  var rv = sessions.filter(function (x) { return hasReview(x); }).sort(function (a, b) { return b.session - a.session; })[0];
+  $('td-rv-w').classList.toggle('hide', !rv);
+  if (rv) {
+    var heard = !!progress(rv.session, 'review').done, inf = (rv.info || {}).review || {}, ri = rvInfo(rv), st = partStatus(rv.session, 'review');
+    $('td-rv').innerHTML = '<div class="hd">' + dayName(rv.session) + ' review - ' + esc(heard ? 'heard' : st.text) + '</div><div class="td-t">' + esc(pretty(inf.title || 'Review and extra practice')) + '</div>' +
+      (inf.intro ? '<div class="mut sm2 clamp2">' + esc(pretty(inf.intro)) + '</div>' : '') +
+      (heard ? '<div class="td-row"><button class="alt" data-rv-play="' + rv.session + '">Play again</button><button class="alt" data-rv-page="' + rv.session + '">Read it</button></div>'
+             : '<button class="go" data-rv-play="' + rv.session + '"><svg width="26" height="26" viewBox="0 0 24 24" aria-hidden="true"><path d="M7 4.5v15l12-7.5z" fill="#fff"/></svg>' + (st.p.pos || st.p.idx ? 'Continue the review' : 'Play the review') + (ri.min ? ', ' + ri.min + ' min' : '') + '</button><button class="link" data-rv-page="' + rv.session + '">Read it on ' + dayName(rv.session) + '\'s page</button>');
+  }
+  // five lines
+  var tl = todayLines();
+  if (!tl.length) $('td-ln').innerHTML = '<div class="mut">' + (linesOk === false ? 'Lines need backend v2.5.' : tdLinesTried ? 'No lines yet. Load the lines file from Claude.' : 'Loading your lines...') + '</div>';
+  else $('td-ln').innerHTML = tl.map(function (l) { var cat = LCAT[l.cat] ? l.cat : 'interview'; return '<div class="td-l"><div class="td-lt"><span class="chip sm c-' + cat + '">' + LCAT[cat] + '</span> <b>' + esc(l.topic || '') + '</b></div><div class="td-lx">' + hl(l.text, l.keywords || []) + '</div><div class="td-la"><button class="alt sm" data-td-listen="' + esc(l.id) + '">Listen</button><button class="alt sm" data-td-own="' + esc(l.id) + '">Your way</button></div></div>'; }).join('') +
+    '<button class="go" data-td-drill><svg width="26" height="26" viewBox="0 0 24 24" aria-hidden="true"><path d="M7 4.5v15l12-7.5z" fill="#fff"/></svg>Drill these 5, hands-free</button><button class="link" data-td-lines>All your lines</button>';
+  // latest report
+  var rp = latestReport();
+  $('td-rep-w').classList.toggle('hide', !rp);
+  if (rp) {
+    $('td-rep-d').textContent = rp.date ? shortDate2(rp.date + 'T12:00:00') : '';
+    var sc = rp.scores && rp.scores.overall != null ? rp.scores.overall : null, n = (rp.sessions || [])[0];
+    $('td-rep').innerHTML = '<div class="td-rh"><div class="td-t">' + esc(rp.title || 'Report') + '</div>' + (sc != null ? '<div class="td-score"><b>' + sc + '</b><span>of 5</span></div>' : '') + '</div>' +
+      ((rp.wins || []).length ? '<div class="lab">Went well</div><ul class="sm2">' + rp.wins.slice(0, 2).map(function (w) { return '<li>' + esc(w) + '</li>'; }).join('') + '</ul>' : '') +
+      ((rp.fixes || []).length ? '<div class="lab">To fix</div><ul class="sm2">' + rp.fixes.slice(0, 2).map(function (w) { return '<li>' + esc(w) + '</li>'; }).join('') + '</ul>' : '') +
+      (rp.nextFocus ? '<div class="dr-row"><b>Next:</b> ' + esc(rp.nextFocus) + '</div>' : '') +
+      (n ? '<button class="link" data-rv-page="' + n + '">Open ' + dayName(n) + '\'s page</button>' : '');
+  }
+}
+$('v-today').addEventListener('click', function (e) {
+  var b = e.target.closest('button'); if (!b) return; var d = b.dataset;
+  if (d.tdGo) { var bl = blocksOf(chosen); startParts(chosen, bl.slice(Math.max(0, bl.indexOf(d.tdGo))), false); }
+  else if (b.hasAttribute('data-td-drive')) { show('home'); dsub('next'); renderList(); }
+  else if (d.rvPlay) startParts(Number(d.rvPlay), ['review'], false);
+  else if (d.rvPage) goPage(Number(d.rvPage));
+  else if (d.tdListen) lnListen(lnById(d.tdListen), b);
+  else if (d.tdOwn) { var ids = todayLines().map(function (l) { return l.id; }); lp.ids = ids; lp.i = ids.indexOf(d.tdOwn); lp.mode = 'own'; $('lp').classList.remove('hide'); showLp(); }
+  else if (b.hasAttribute('data-td-drill')) startDrill(todayLines());
+  else if (b.hasAttribute('data-td-lines')) { show('lines'); loadLines(lines.length > 0); if (lines.length) renderLines(); }
+});
+$('t-today').onclick = function () { if (!locked()) { show('today'); renderToday(); homeData(false); if (!lines.length) todayLoadLines(); } };
+async function todayLoadLines() { if (linesOk === false) return; try { await loadLines(true); } catch (e) {} tdLinesTried = true; renderToday(); }
+
+/* ---- staying alive when you switch apps ---- */
+var errLog = lsGet('cc.errs', []);
+function logErr(m) { errLog.unshift({ at: new Date().toISOString(), m: String(m).slice(0, 300), v: APP_VERSION }); errLog = errLog.slice(0, 20); lsSet('cc.errs', errLog); var el = $('errlog'); if (el) renderErrs(); }
+function renderErrs() { $('errlog').innerHTML = errLog.length ? errLog.map(function (x) { return '<li>' + esc(x.at.replace('T', ' ').slice(0, 16)) + ' (v' + esc(x.v) + '): ' + esc(x.m) + '</li>'; }).join('') : '<li>None recorded.</li>'; }
+window.addEventListener('error', function (e) { logErr((e.message || 'error') + (e.lineno ? ' (line ' + e.lineno + ')' : '')); });
+window.addEventListener('unhandledrejection', function (e) { logErr('promise: ' + (e.reason && e.reason.message || e.reason)); });
+var phonePausedTicks = 0;
+function phoneCheck() { // the phone paused the studio audio (another app, a call, or the screen): show it as paused, so Resume works
+  if (!run || run.mode !== 'audio' || paused || !player || player.ended || !player.src || player.src.indexOf('data:') === 0) { phonePausedTicks = 0; return; }
+  if (player.paused) {
+    phonePausedTicks++;
+    if (phonePausedTicks === 4 && document.visibilityState === 'visible') player.play().catch(function () {});
+    if (phonePausedTicks >= 12) { phonePausedTicks = 0; setPaused(true); $('p-hint').textContent = 'The phone paused the audio (another app, a call, or the lock screen). Tap Resume to go on from here.'; logErr('audio paused by the phone at ' + fmt(player.currentTime)); }
+  } else phonePausedTicks = 0;
+}
+setInterval(phoneCheck, 250);
+document.addEventListener('visibilitychange', function () {
+  if (document.visibilityState !== 'visible') return;
+  try { if (actx && actx.state !== 'running') actx.resume(); } catch (e) {}
+  if (run && !paused) wakeLock();
+  if (stream && !micLive()) freshMic();
+  if (window.speechSynthesis && run && run.mode !== 'audio' && !paused && !speechSynthesis.speaking) speechSynthesis.cancel();
+});
+
+$('err-copy').onclick = async function () { var t = errLog.map(function (x) { return x.at + ' v' + x.v + ': ' + x.m; }).join('\n') || 'No errors recorded.'; try { await navigator.clipboard.writeText(t); toast('Copied.'); } catch (e) { toast('Could not copy.'); } };
+$('err-clear').onclick = function () { errLog = []; lsSet('cc.errs', errLog); renderErrs(); };
+dsub(lsGet('cc.dsub', 'next')); renderFz(); renderToday();
+loadSessions().then(function () { todayLoadLines(); });
 </script>
 </body>
 </html>
