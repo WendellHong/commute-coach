@@ -697,8 +697,9 @@ details.older>summary{cursor:pointer;margin:6px 0}
 </main>
 
 <script>
-var APP_VERSION = '2.6.0';
+var APP_VERSION = '2.6.1';
 var LOCAL_CHANGES = [
+  { v: '2.6.1', date: '2026-11-19', notes: ['When a recording is lost, the answer pack now says why (recorder, microphone and device), so Claude can find the cause. It is also listed in Setup, Help, Recent app errors'] },
   { v: '2.6.0', date: '2026-11-18', notes: ['New start page, Today: today\'s session, the last review, five lines for today, and the latest report', 'Drive has four big tabs for the car: Next drive, Needs work, After, All sessions', 'One Files button (Drive, Today and Setup): Sync all loads new sessions, loads Claude\'s replies, packs your new answers, and says how many files you need to upload', 'Sync is now Setup, Files', 'Steadier when you switch apps: if the phone pauses the audio, the app shows Paused and Resume picks up from there; the phone voice no longer hangs; requests to your sheet time out and retry instead of waiting forever; the microphone and sound are restarted when you come back', 'Setup, Help lists recent app errors, to copy into the chat if something goes wrong'] },
   { v: '2.5.2', date: '2026-11-18', notes: ['Fixed: version 2.5.1 marked good answers as "not recorded". The check now measures how much audio was actually saved, and flags an answer only when 8 seconds or more are missing', 'Lines: each recording opens a fresh microphone, so a try is not lost to a stale one'] },
   { v: '2.5.1', date: '2026-11-17', notes: ['Lost-recording check, fixed both ways: an answer is flagged only when the microphone went silent or stopped well before the end (8 seconds or more). A full answer is no longer marked lost because the microphone closed at the very end, and an answer cut off after a few seconds is now caught even when the phone gives no signal'] },
@@ -1106,13 +1107,15 @@ async function freshMic() { if (micLive()) return true; try { if (stream) stream
 document.addEventListener('visibilitychange', function () { if (document.visibilityState === 'visible' && stream && !micLive()) freshMic(); });
 var lostCount = 0, newAnswers = 0;
 function b64(blob) { return new Promise(function (r) { var f = new FileReader(); f.onload = function () { r(String(f.result).split(',')[1]); }; f.readAsDataURL(blob); }); }
+function micInfo() { try { return stream ? stream.getAudioTracks().map(function (t) { return t.readyState + (t.muted ? ' muted' : '') + (t.enabled ? '' : ' disabled') + (t.label ? ' "' + t.label.slice(0, 40) + '"' : ''); }).join('; ') || 'no audio track' : 'no stream'; } catch (e) { return 'unknown'; } }
+function devInfo() { var u = navigator.userAgent; return (/iPhone|iPad/.test(u) ? 'iOS' : /Android/.test(u) ? 'Android' : /Windows/.test(u) ? 'Windows' : /Mac/.test(u) ? 'Mac' : 'other') + ' ' + (/Edg\//.test(u) ? 'Edge' : /CriOS|Chrome\//.test(u) ? 'Chrome' : /Safari\//.test(u) ? 'Safari' : /Firefox/.test(u) ? 'Firefox' : 'browser'); }
 function beginRec() {
   var R = { chunks: [], mime: '', transcript: '', rec: null, an: null, buf: null, t0: Date.now(), mr: null };
   try {
     R.mime = MediaRecorder.isTypeSupported('audio/webm') ? 'audio/webm' : (MediaRecorder.isTypeSupported('audio/mp4') ? 'audio/mp4' : '');
     R.mr = new MediaRecorder(stream, R.mime ? { mimeType: R.mime } : undefined);
   } catch (e) { return null; }
-  R.mr.ondataavailable = function (e) { if (e.data && e.data.size) R.chunks.push(e.data); };
+  R.mic0 = micInfo(); R.mr.ondataavailable = function (e) { R.nData = (R.nData || 0) + 1; if (e.data && e.data.size) R.chunks.push(e.data); };
   R.mr.onerror = function () { if (!R.cutAt) R.cutAt = Date.now(); };
   if (SR && cfg.stt && !FAST) {
     try { R.rec = new SR(); R.rec.lang = 'en-US'; R.rec.continuous = true; R.rec.interimResults = false;
@@ -1166,7 +1169,9 @@ async function finishRec(R, item, prompt) {
   var got = blob.size >= 2000 && dur >= 10 ? await audioSeconds(blob) : null; R.gotSec = got;
   R.lost = (blob.size < 2000 && dur >= 2) || (got != null && got < dur - 8); // the phone cut the microphone off: nothing, or only the start, was saved
   if (R.lost) {
-    lostCount++; text = '(recording lost: no audio was captured' + (text && text.charAt(0) !== '(' ? '; phone heard: ' + text : '') + ')';
+    lostCount++; R.diag = 'recorder ' + ((R.mr && R.mr.mimeType) || R.mime || 'default') + ', ' + (R.nData || 0) + ' data events, ' + R.chunks.length + ' with sound data, ' + Math.round((R.gotSec || 0) * 10) / 10 + ' s saved of ' + dur + ' s; mic at start: ' + R.mic0 + '; mic at end: ' + micInfo() + (R.sttErr ? '; speech-to-text: ' + R.sttErr : '') + '; ' + devInfo() + ', v' + APP_VERSION;
+    try { logErr('recording lost (' + item.session + '|' + item.block + '|' + item.seq + '): ' + R.diag); } catch (e) {}
+    text = '(recording lost: no audio was captured' + (text && text.charAt(0) !== '(' ? '; phone heard: ' + text : '') + ') [why: ' + R.diag + ']';
     $('p-hint').textContent = 'That answer was not recorded (the phone cut the microphone off). The app reopened it for the next answer. Use Practice again on this question later' + (lostCount > 1 ? ' (' + lostCount + ' lost this session).' : '.');
     stream = null; freshMic();
   }
