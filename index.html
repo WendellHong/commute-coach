@@ -697,8 +697,9 @@ details.older>summary{cursor:pointer;margin:6px 0}
 </main>
 
 <script>
-var APP_VERSION = '2.6.1';
+var APP_VERSION = '2.6.2';
 var LOCAL_CHANGES = [
+  { v: '2.6.2', date: '2026-11-20', notes: ['Fixed: a damaged audio file (shorter than it should be) made a part end early and jump to the finish screen. The app now checks the length, switches to the phone voice from that point, and says which file to replace'] },
   { v: '2.6.1', date: '2026-11-19', notes: ['When a recording is lost, the answer pack now says why (recorder, microphone and device), so Claude can find the cause. It is also listed in Setup, Help, Recent app errors'] },
   { v: '2.6.0', date: '2026-11-18', notes: ['New start page, Today: today\'s session, the last review, five lines for today, and the latest report', 'Drive has four big tabs for the car: Next drive, Needs work, After, All sessions', 'One Files button (Drive, Today and Setup): Sync all loads new sessions, loads Claude\'s replies, packs your new answers, and says how many files you need to upload', 'Sync is now Setup, Files', 'Steadier when you switch apps: if the phone pauses the audio, the app shows Paused and Resume picks up from there; the phone voice no longer hangs; requests to your sheet time out and retry instead of waiting forever; the microphone and sound are restarted when you come back', 'Setup, Help lists recent app errors, to copy into the chat if something goes wrong'] },
   { v: '2.5.2', date: '2026-11-18', notes: ['Fixed: version 2.5.1 marked good answers as "not recorded". The check now measures how much audio was actually saved, and flags an answer only when 8 seconds or more are missing', 'Lines: each recording opens a fresh microphone, so a try is not lost to a stale one'] },
@@ -1287,7 +1288,19 @@ async function runChain(s, blocks, fromStart) {
     var res = 'completed';
     if (meta) {
       try { res = await playAudioPart(s, b, items, meta, startPos); }
-      catch (e) { $('micnote').textContent = 'Audio failed to load, using the phone voice for this part.'; run.mode = 'voice'; res = await playVoicePart(s, b, items, startIdx); }
+      catch (e) {
+        var short = /^short:/.test(e.message), fileName = (meta && meta.file) || (dayName(s) + ' ' + NAMES[b]);
+        $('micnote').textContent = short ? 'The audio file ' + fileName + ' is damaged (' + fmt(Number(e.message.slice(6))) + ' of ' + fmt(meta.durationSec) + '). Using the phone voice for this part. Ask Claude for a new copy.' : 'Audio failed to load, using the phone voice for this part.';
+        if (short) logErr('damaged audio: ' + fileName + ' is ' + Math.round(Number(e.message.slice(6))) + ' s of ' + meta.durationSec + ' s');
+        run.mode = 'voice'; res = await playVoicePart(s, b, items, short ? lineAt(items, meta, startPos) : startIdx);
+      }
+      if (res && res.broken) {
+        var fn = (meta && meta.file) || (dayName(s) + ' ' + NAMES[b]);
+        logErr('damaged audio: ' + fn + ' ended at ' + Math.round(res.t) + ' s of ' + meta.durationSec + ' s');
+        $('micnote').textContent = 'The audio file ' + fn + ' ended early, at ' + fmt(res.t) + '. Going on with the phone voice. Ask Claude for a new copy.';
+        $('p-hint').textContent = 'The audio file ended early; going on with the phone voice.';
+        run.mode = 'voice'; res = await playVoicePart(s, b, items, lineAt(items, meta, res.t));
+      }
     } else res = await playVoicePart(s, b, items, startIdx);
     await closeSegment(res);
     if (res !== 'completed') { outcome = res; break; }
@@ -1332,11 +1345,17 @@ $('save-done').onclick = async function () {
 };
 
 /* Studio audio: captions and answer windows follow the audio clock. Returns 'completed' | 'stopped' | 'paused'. */
+function lineAt(items, meta, t) { // the script line playing at time t, from the captions and answer windows
+  var seq = 0; (meta.captions || []).forEach(function (c) { if (c.t0 <= t + 0.05 && c.seq) seq = c.seq; }); (meta.cues || []).forEach(function (c) { if (c.start <= t + 0.05 && c.seq > seq) seq = c.seq; });
+  for (var i = 0; i < items.length; i++) if (items[i].seq >= seq) return i;
+  return 0;
+}
 async function playAudioPart(s, b, bItems, meta, startPos) {
   $('p-state').textContent = 'Loading audio...'; $('p-state').className = 'state';
   var url = await blockUrl(s, b);
   player.src = url;
   await new Promise(function (r) { player.onloadedmetadata = r; player.onerror = r; setTimeout(r, 4000); });
+  if (isFinite(player.duration) && player.duration > 0 && meta.durationSec && player.duration < meta.durationSec - 5) throw new Error('short:' + player.duration);
   var caps = meta.captions || [], cues = meta.cues || [];
   // never resume inside an answer window: go back to its chime
   cues.forEach(function (c) { if (startPos > c.start - 0.3 && startPos < c.end) startPos = Math.max(0, c.start - 0.3); });
@@ -1361,6 +1380,7 @@ async function playAudioPart(s, b, bItems, meta, startPos) {
         if (stopFlag || leaveFlag || finished) {
           clearInterval(timer);
           if (active) { if (active.R) { await finishRec(active.R, active.item, active.prompt); run.answers++; } run.pos = Math.max(0, active.c.start - 0.3); active = null; }
+          if (finished && !stopFlag && !leaveFlag && meta.durationSec && player.currentTime < meta.durationSec - 5) { clearInterval(timer); player.pause(); resolve({ broken: true, t: player.currentTime }); return; }
           player.pause(); resolve(finished && !stopFlag && !leaveFlag ? 'completed' : stopFlag ? 'stopped' : 'paused'); return;
         }
         if (seekLine) { // previous / next sentence
