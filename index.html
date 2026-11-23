@@ -697,8 +697,9 @@ details.older>summary{cursor:pointer;margin:6px 0}
 </main>
 
 <script>
-var APP_VERSION = '2.6.2';
+var APP_VERSION = '2.6.3';
 var LOCAL_CHANGES = [
+  { v: '2.6.3', date: '2026-11-23', notes: ['If the microphone is muted when an answer starts or while you speak (it happened with the car microphone, through CarPlay), the app now waits a moment, then reopens the microphone and goes on recording. It shows a short note, and logs it in Setup, Help'] },
   { v: '2.6.2', date: '2026-11-20', notes: ['Fixed: a damaged audio file (shorter than it should be) made a part end early and jump to the finish screen. The app now checks the length, switches to the phone voice from that point, and says which file to replace'] },
   { v: '2.6.1', date: '2026-11-19', notes: ['When a recording is lost, the answer pack now says why (recorder, microphone and device), so Claude can find the cause. It is also listed in Setup, Help, Recent app errors'] },
   { v: '2.6.0', date: '2026-11-18', notes: ['New start page, Today: today\'s session, the last review, five lines for today, and the latest report', 'Drive has four big tabs for the car: Next drive, Needs work, After, All sessions', 'One Files button (Drive, Today and Setup): Sync all loads new sessions, loads Claude\'s replies, packs your new answers, and says how many files you need to upload', 'Sync is now Setup, Files', 'Steadier when you switch apps: if the phone pauses the audio, the app shows Paused and Resume picks up from there; the phone voice no longer hangs; requests to your sheet time out and retry instead of waiting forever; the microphone and sound are restarted when you come back', 'Setup, Help lists recent app errors, to copy into the chat if something goes wrong'] },
@@ -1104,6 +1105,25 @@ function micAdvice() {
   return 'Microphone error: ' + micError;
 }
 function micLive() { try { return !!stream && stream.getAudioTracks().some(function (t) { return t.readyState === 'live' && t.enabled; }); } catch (e) { return false; } }
+function micMuted() { try { return !!stream && stream.getAudioTracks().some(function (t) { return t.muted; }); } catch (e) { return false; } }
+var micBusy = false;
+async function reopenMic(why) { // a muted track records silence: get a new one
+  if (micBusy) { while (micBusy) await sleep(100); return !!stream && !micMuted(); }
+  micBusy = true;
+  try {
+    var before = micInfo();
+    try { if (stream) stream.getTracks().forEach(function (t) { t.stop(); }); } catch (e) {} stream = null;
+    var ok = await openMic();
+    logErr('microphone ' + why + ' (' + before + '); reopened: ' + (ok ? micInfo() : 'failed'));
+    $('p-hint').textContent = ok && !micMuted() ? 'The microphone was muted; it has been reopened. Go on speaking.' : 'The microphone is muted. Check the phone or the car settings.';
+    return ok && !micMuted();
+  } finally { micBusy = false; }
+}
+function swapRec(old) { // keep the answer window, but record from the reopened microphone
+  try { old.mr.stop(); } catch (e) {} try { if (old.rec) old.rec.abort(); } catch (e) {}
+  var R = stream ? beginRec() : null; if (!R) return old;
+  R.t0 = old.t0; R.reopened = true; return R;
+}
 async function freshMic() { if (micLive()) return true; try { if (stream) stream.getTracks().forEach(function (t) { t.stop(); }); } catch (e) {} stream = null; return await openMic(); }
 document.addEventListener('visibilitychange', function () { if (document.visibilityState === 'visible' && stream && !micLive()) freshMic(); });
 var lostCount = 0, newAnswers = 0;
@@ -1197,12 +1217,16 @@ async function recordTts(item, prompt) {
   showCap(null, pretty(item.cap || prompt), null, 'you'); if (item.prompt) prompt = item.prompt;
   if (!stream) { beep(700); $('p-state').textContent = 'Your turn (no mic)'; $('p-state').className = 'state rec';
     var t = Date.now(); while (!stopFlag && !leaveFlag && !skipFlag && Date.now() - t < (FAST ? 100 : maxMs)) await sleep(200); beep(520); return; }
-  await freshMic(); beep(700);
+  await freshMic();
+  if (stream && micMuted()) { await sleep(800); if (micMuted()) await reopenMic('muted at the start of an answer'); }
+  beep(700);
   var R = stream ? beginRec() : null; if (!R) return;
+  var muteSince = 0;
   $('p-state').textContent = 'Your turn'; $('p-state').className = 'state rec';
   var W = newWindow(FAST ? 0.3 : item.sec);
+  var mw = setInterval(async function () { if (!micMuted()) { muteSince = 0; return; } if (!muteSince) { muteSince = Date.now(); return; } if (Date.now() - muteSince > 1500 && !micBusy) { muteSince = 0; if (await reopenMic('muted while recording')) R = swapRec(R); } }, 500);
   while (!stopFlag && !leaveFlag && !skipFlag && !paused) { await sleep(120); if (windowStep(W, level(R), 'p').done) break; }
-  setCount('p', null); beep(520); await finishRec(R, item, prompt);
+  clearInterval(mw); setCount('p', null); beep(520); await finishRec(R, item, prompt);
 }
 
 /* ---- playing parts: one run = a chain of parts; each part's time is logged as a usage segment ---- */
@@ -1413,13 +1437,17 @@ async function playAudioPart(s, b, bItems, meta, startPos) {
           if (active) active.force = true;
           else if (ci < cues.length) player.currentTime = Math.max(0, cues[ci].start - 0.3);
         }
+        if (active && active.R && !micBusy) { // the microphone went quiet on its own (muted): reopen it and keep recording
+          if (micMuted()) { if (!active.muteSince) active.muteSince = Date.now(); else if (Date.now() - active.muteSince > 1000) { var a = active; a.muteSince = 0; reopenMic(a.R.mic0 && /muted/.test(a.R.mic0) ? 'muted at the start of an answer' : 'muted while recording').then(function (ok) { if (ok && active === a) a.R = swapRec(a.R); }); } }
+          else active.muteSince = 0;
+        }
         if (!active && ci < cues.length) {
           var c = cues[ci];
           if (t >= c.start && t < c.end - 0.8) {
             var item = bItems.filter(function (x) { return x.seq === c.seq; })[0] || { session: s, block: b, seq: c.seq };
             var prompt = promptFor(bItems, c.seq);
             if (stream && !micLive()) await freshMic();
-            active = { c: c, item: item, prompt: prompt, R: stream ? beginRec() : null, force: false, W: newWindow(c.end - 0.6 - t) };
+            active = { c: c, item: item, prompt: prompt, R: stream ? beginRec() : null, force: false, W: newWindow(c.end - 0.6 - t), muteSince: 0 };
             $('p-state').textContent = active.R ? 'Your turn' : 'Your turn (no mic)'; $('p-state').className = 'state rec';
             showCap(null, pretty(prompt), null, 'you');
           } else if (t >= c.end - 0.8) ci++;
