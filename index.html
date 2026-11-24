@@ -385,7 +385,7 @@ details.older>summary{cursor:pointer;margin:6px 0}
     </div>
     <div class="meter"><i id="p-meter"></i></div>
     <div class="mut" id="p-time" style="margin-top:4px"></div>
-    <div class="mut" id="p-hint" style="margin-top:4px"></div>
+    <div class="mut" id="p-hint" style="margin-top:4px"></div><div class="mut sm2" id="awake-note" style="color:var(--warn);margin-top:4px"></div>
     <div class="drv-main">
       <button id="b-back" aria-label="Back 15 seconds">&minus;15 s</button>
       <button id="b-pause">Pause</button>
@@ -697,8 +697,9 @@ details.older>summary{cursor:pointer;margin:6px 0}
 </main>
 
 <script>
-var APP_VERSION = '2.6.3';
+var APP_VERSION = '2.6.4';
 var LOCAL_CHANGES = [
+  { v: '2.6.4', date: '2026-11-24', notes: ['Keeps the screen on during a drive more reliably: the keep-awake request is made right at your tap, renewed if the phone drops it, with a silent video as a backup', 'If the screen still turns off (or you leave the app), the drive now pauses where it is, instead of the audio running on while captions and answer windows stop. When you come back, tap Resume', 'The microphone is reopened only while the app is on screen (the phone mutes it when the screen is off)', 'The play screen says if the screen may turn off, with the fix', 'Today: Drill these 5 now drills today\'s five lines'] },
   { v: '2.6.3', date: '2026-11-23', notes: ['If the microphone is muted when an answer starts or while you speak (it happened with the car microphone, through CarPlay), the app now waits a moment, then reopens the microphone and goes on recording. It shows a short note, and logs it in Setup, Help'] },
   { v: '2.6.2', date: '2026-11-20', notes: ['Fixed: a damaged audio file (shorter than it should be) made a part end early and jump to the finish screen. The app now checks the length, switches to the phone voice from that point, and says which file to replace'] },
   { v: '2.6.1', date: '2026-11-19', notes: ['When a recording is lost, the answer pack now says why (recorder, microphone and device), so Claude can find the cause. It is also listed in Setup, Help, Recent app errors'] },
@@ -1218,13 +1219,13 @@ async function recordTts(item, prompt) {
   if (!stream) { beep(700); $('p-state').textContent = 'Your turn (no mic)'; $('p-state').className = 'state rec';
     var t = Date.now(); while (!stopFlag && !leaveFlag && !skipFlag && Date.now() - t < (FAST ? 100 : maxMs)) await sleep(200); beep(520); return; }
   await freshMic();
-  if (stream && micMuted()) { await sleep(800); if (micMuted()) await reopenMic('muted at the start of an answer'); }
+  if (stream && micMuted() && document.visibilityState === 'visible') { await sleep(800); if (micMuted()) await reopenMic('muted at the start of an answer'); }
   beep(700);
   var R = stream ? beginRec() : null; if (!R) return;
   var muteSince = 0;
   $('p-state').textContent = 'Your turn'; $('p-state').className = 'state rec';
   var W = newWindow(FAST ? 0.3 : item.sec);
-  var mw = setInterval(async function () { if (!micMuted()) { muteSince = 0; return; } if (!muteSince) { muteSince = Date.now(); return; } if (Date.now() - muteSince > 1500 && !micBusy) { muteSince = 0; if (await reopenMic('muted while recording')) R = swapRec(R); } }, 500);
+  var mw = setInterval(async function () { if (!micMuted()) { muteSince = 0; return; } if (!muteSince) { muteSince = Date.now(); return; } if (Date.now() - muteSince > 1500 && !micBusy && !R.reopened && document.visibilityState === 'visible') { muteSince = 0; if (await reopenMic('muted while recording')) R = swapRec(R); } }, 500);
   while (!stopFlag && !leaveFlag && !skipFlag && !paused) { await sleep(120); if (windowStep(W, level(R), 'p').done) break; }
   clearInterval(mw); setCount('p', null); beep(520); await finishRec(R, item, prompt);
 }
@@ -1271,7 +1272,22 @@ async function flushOpen() { // segments left behind by a closed tab or a lost c
 window.addEventListener('pagehide', function () { if (run) snapshot(); });
 document.addEventListener('visibilitychange', function () { if (document.hidden && run) snapshot(); });
 
-async function wakeLock() { try { if (navigator.wakeLock) await navigator.wakeLock.request('screen'); } catch (e) {} }
+var wakeS = null, awakeV = null, awakeOn = false, hidPause = false;
+async function wakeLock() { // keep the screen on: the Wake Lock request, renewed when the phone drops it, plus a silent looping video as a backup
+  awakeOn = true;
+  try {
+    if (!awakeV) { awakeV = document.createElement('video'); awakeV.setAttribute('playsinline', ''); awakeV.setAttribute('muted', ''); awakeV.muted = true; awakeV.loop = true; awakeV.src = 'data:video/mp4;base64,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'; awakeV.style.cssText = 'position:fixed;width:1px;height:1px;opacity:0.01;pointer-events:none;bottom:0;left:0'; document.body.appendChild(awakeV); }
+    awakeV.play().catch(function () {});
+  } catch (e) {}
+  try {
+    if (navigator.wakeLock && (!wakeS || wakeS.released) && document.visibilityState === 'visible') {
+      wakeS = await navigator.wakeLock.request('screen');
+      wakeS.addEventListener('release', function () { if (awakeOn && running && document.visibilityState === 'visible') setTimeout(wakeLock, 300); });
+    }
+  } catch (e) { logErr('keep screen on: ' + e.message); }
+  var w = $('awake-note'); if (w) w.textContent = navigator.wakeLock ? (wakeS && !wakeS.released ? '' : 'The screen may turn off and pause the drive. To be safe: Settings, Display and Brightness, Auto-Lock: Never, and Low Power Mode off.') : 'The screen may turn off and pause the drive. To be safe: Settings, Display and Brightness, Auto-Lock: Never, and Low Power Mode off.';
+}
+function wakeOff() { awakeOn = false; try { if (wakeS) wakeS.release(); } catch (e) {} wakeS = null; try { if (awakeV) awakeV.pause(); } catch (e) {} }
 function quietUnpause() { paused = false; $('b-pause').textContent = 'Pause'; $('p-hint').textContent = ''; if (window.speechSynthesis) speechSynthesis.cancel(); renderResume(); }
 function setPaused(v) {
   paused = v; $('b-pause').textContent = paused ? 'Resume' : 'Pause';
@@ -1283,6 +1299,7 @@ function setPaused(v) {
 
 /* Entry point from every Play / Resume / From start button. */
 async function startParts(s, blocks, fromStart) {
+  wakeLock();
   if (!player) player = new Audio();
   if (!player.src || player.src.indexOf('data:') === 0) { player.src = SILENT; player.play().catch(function () {}); } // unlock audio inside the tap
   if (chain) { leaveFlag = true; quietUnpause(); await chain; }
@@ -1332,7 +1349,7 @@ async function runChain(s, blocks, fromStart) {
   }
   if (window.speechSynthesis) speechSynthesis.cancel();
   if (player) player.pause();
-  var last = run; run = null; running = false; setPaused(false);
+  var last = run; run = null; running = false; setPaused(false); wakeOff();
   if (stream) { stream.getTracks().forEach(function (t) { t.stop(); }); stream = null; }
   $('p-state').textContent = 'Saving...';
   await Promise.all(pending); pending = [];
@@ -1437,8 +1454,8 @@ async function playAudioPart(s, b, bItems, meta, startPos) {
           if (active) active.force = true;
           else if (ci < cues.length) player.currentTime = Math.max(0, cues[ci].start - 0.3);
         }
-        if (active && active.R && !micBusy) { // the microphone went quiet on its own (muted): reopen it and keep recording
-          if (micMuted()) { if (!active.muteSince) active.muteSince = Date.now(); else if (Date.now() - active.muteSince > 1000) { var a = active; a.muteSince = 0; reopenMic(a.R.mic0 && /muted/.test(a.R.mic0) ? 'muted at the start of an answer' : 'muted while recording').then(function (ok) { if (ok && active === a) a.R = swapRec(a.R); }); } }
+        if (active && active.R && !micBusy && !active.reopened && document.visibilityState === 'visible') { // the microphone went quiet on its own (muted): reopen it once and keep recording
+          if (micMuted()) { if (!active.muteSince) active.muteSince = Date.now(); else if (Date.now() - active.muteSince > 1000) { var a = active; a.muteSince = 0; a.reopened = true; reopenMic(a.R.mic0 && /muted/.test(a.R.mic0) ? 'muted at the start of an answer' : 'muted while recording').then(function (ok) { if (ok && active === a) a.R = swapRec(a.R); }); } }
           else active.muteSince = 0;
         }
         if (!active && ci < cues.length) {
@@ -2699,8 +2716,9 @@ function drillItems(list) {
   it.push({ type: 'say', voice: 'coach', text: "That's the drill. Your answers go into the next pack for Claude.", clip: 'fx:end' });
   return it;
 }
-async function startDrill() {
-  var list = drillPick(); if (!list.length) return;
+async function startDrill(list) {
+  list = list && list.length ? list : drillPick(); if (!list.length) return;
+  wakeLock();
   if (!player) player = new Audio();
   if (!player.src || player.src.indexOf('data:') === 0) { player.src = SILENT; player.play().catch(function () {}); }
   if (chain) { leaveFlag = true; quietUnpause(); await chain; }
@@ -2721,7 +2739,7 @@ async function runDrill(list) {
   await closeSegment(res);
   if (window.speechSynthesis) speechSynthesis.cancel();
   if (player) player.pause();
-  run = null; running = false; setPaused(false);
+  run = null; running = false; setPaused(false); wakeOff();
   if (stream) { stream.getTracks().forEach(function (t) { t.stop(); }); stream = null; }
   $('p-state').textContent = 'Saving...';
   await Promise.all(pending); pending = [];
@@ -2936,7 +2954,11 @@ function phoneCheck() { // the phone paused the studio audio (another app, a cal
 }
 setInterval(phoneCheck, 250);
 document.addEventListener('visibilitychange', function () {
-  if (document.visibilityState !== 'visible') return;
+  if (document.visibilityState !== 'visible') {
+    if (run && running && !paused) { hidPause = true; setPaused(true); logErr('drive paused: the screen turned off or the app was left (' + (run.mode || '') + ', ' + dayName(run.s) + ' ' + (NAMES[run.b] || run.b) + ')'); }
+    return;
+  }
+  if (hidPause && run && paused) { hidPause = false; $('p-hint').textContent = 'Paused because the screen turned off or you left the app. Tap Resume to go on from here.'; }
   try { if (actx && actx.state !== 'running') actx.resume(); } catch (e) {}
   if (run && !paused) wakeLock();
   if (stream && !micLive()) freshMic();
