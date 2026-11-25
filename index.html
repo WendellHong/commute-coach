@@ -150,6 +150,19 @@ button.ln-save{display:block;margin:4px 0 0}
 .td-head{display:flex;justify-content:space-between;align-items:baseline;margin:6px 0 2px}.td-intro{font-size:14px;margin-bottom:8px}.td-parts{margin:4px 0 2px}.chip.done{opacity:.55}
 .td-t{font-size:18px;font-weight:700;margin:2px 0 4px}.td-row{display:flex;gap:8px;margin-top:8px}.td-row .alt{flex:1;margin:0}
 .td-l{border-bottom:1px solid var(--line);padding:8px 0}.td-l:last-of-type{border-bottom:0}.td-lt{font-size:13px;color:var(--mut)}.td-lx{font-size:17px;line-height:1.4;margin:4px 0}.td-la{display:flex;gap:6px}.td-la .alt{margin:0}
+.wkr .wk-meta{font-size:13px;color:var(--mut);margin-bottom:4px}
+.wk-pl{border:1px solid var(--line);border-radius:16px;padding:10px 12px;margin:10px 0}
+.wk-pl .go{display:flex;align-items:center;justify-content:center;gap:12px;width:100%;min-height:64px;margin:0;border:0;border-radius:16px;background:var(--acc);color:#fff;font-size:20px;font-weight:700}
+.wk-ctl{display:flex;align-items:center;gap:8px;margin-top:6px}.wk-ctl .alt{margin:0;min-width:58px}.wk-ctl .wk-pp{flex:1;font-weight:700}
+.wk-bar{width:100%;margin:8px 0 2px}.wk-time{font-size:12.5px;color:var(--mut);display:flex;justify-content:space-between}
+.wk-cap{font-size:17px;line-height:1.4;min-height:48px;margin-top:6px}.wk-st{font-size:13px;color:var(--mut);margin-top:4px}
+.wk-trend{display:flex;align-items:flex-end;gap:3px;height:90px;margin:6px 0 2px;border-bottom:1px solid var(--line)}
+.wk-trend div{flex:1;background:var(--acc);opacity:.75;border-radius:3px 3px 0 0;min-width:4px;position:relative}
+.wk-trend div.hi{opacity:1}.wk-tl{display:flex;gap:3px;font-size:10px;color:var(--mut)}.wk-tl span{flex:1;text-align:center;overflow:hidden;white-space:nowrap}
+.wk-one{border-left:4px solid var(--acc);padding:6px 10px;margin:6px 0;font-size:16px;font-weight:600}
+.wk-ms label{display:flex;gap:8px;align-items:flex-start;padding:6px 0;border-bottom:1px solid var(--line)}.wk-ms label:last-child{border-bottom:0}.wk-ms input{margin-top:4px}
+.wk-ms .done{text-decoration:line-through;color:var(--mut)}
+.wk-read p{margin:6px 0;line-height:1.5}.wk-read p.on{background:rgba(127,127,127,.15);border-radius:6px}
 .td-rh{display:flex;justify-content:space-between;align-items:flex-start;gap:10px}.td-score{text-align:center;line-height:1}.td-score b{font-size:30px;display:block}.td-score span{font-size:12px;color:var(--mut)}
 .rvw .note2{font-size:12.5px;color:var(--warn);margin:-2px 0 8px 90px}.bk-rv{margin:6px 0 10px}
 .chartwrap svg{width:100%;height:auto;display:block}
@@ -324,6 +337,7 @@ details.older>summary{cursor:pointer;margin:6px 0}
   <div class="lab2">Today's session</div>
   <div class="card hero" id="td-ses"><div class="mut">Loading...</div></div>
   <div id="td-rv-w" class="hide"><div class="lab2">Last review <span>from Claude</span></div><div class="card hero" id="td-rv"></div></div>
+  <div id="td-wk-w" class="hide"><div class="lab2">Weekly review <span>from Claude</span></div><div class="card hero" id="td-wk"></div></div>
   <div class="lab2">Today's lines <span>5 sentences</span></div>
   <div class="card hero" id="td-ln"><div class="mut">Loading...</div></div>
   <div id="td-rep-w" class="hide"><div class="lab2">Latest report <span id="td-rep-d"></span></div><div class="card" id="td-rep"></div></div>
@@ -444,7 +458,7 @@ details.older>summary{cursor:pointer;margin:6px 0}
 </section>
 <section id="v-review" class="hide">
   <div id="inbox-b" class="inbox hide"></div>
-  <div class="subnav"><button id="r-ses" class="on">Sessions</button><button id="r-fu">Follow-ups</button><button id="r-ans">Answers</button><button id="r-rep">Reports</button><button id="r-use">Practice</button></div>
+  <div class="subnav"><button id="r-ses" class="on">Sessions</button><button id="r-wk">Weekly</button><button id="r-fu">Follow-ups</button><button id="r-ans">Answers</button><button id="r-rep">Reports</button><button id="r-use">Practice</button></div>
   <div id="rv-fu" class="hide"><div id="fu-view"></div></div>
   <div id="rv-ses"><div id="fu-open"></div><div id="ses-list"></div><div id="ses-page" class="hide"></div></div>
   <div id="rv-use" class="hide">
@@ -476,6 +490,7 @@ details.older>summary{cursor:pointer;margin:6px 0}
     <div id="hist"></div>
   </div>
   <div id="rv-rep" class="hide"><div id="reports"></div></div>
+  <div id="rv-wk" class="hide"><div id="wk-view"></div></div>
   <div id="tip" class="tip hide"></div>
 </section>
 
@@ -697,8 +712,9 @@ details.older>summary{cursor:pointer;margin:6px 0}
 </main>
 
 <script>
-var APP_VERSION = '2.6.4';
+var APP_VERSION = '2.7.0';
 var LOCAL_CHANGES = [
+  { v: '2.7.0', date: '2026-11-25', notes: ['Weekly review from Claude: a new Weekly page in Review, with the written review (summary, score trend, what you built, habits to fix, the one thing, plan, milestones you can tick) and its audio', 'The weekly audio has its own player: play and pause, back and forward 15 seconds, a progress bar, the sentence being spoken, and the full text to read along. It keeps playing with the screen off and remembers where you stopped', 'Today shows the newest weekly review until you have heard it, and Drive > After reminds you', 'Daily reports and the trend table no longer mix in weekly reviews'] },
   { v: '2.6.4', date: '2026-11-24', notes: ['Keeps the screen on during a drive more reliably: the keep-awake request is made right at your tap, renewed if the phone drops it, with a silent video as a backup', 'If the screen still turns off (or you leave the app), the drive now pauses where it is, instead of the audio running on while captions and answer windows stop. When you come back, tap Resume', 'The microphone is reopened only while the app is on screen (the phone mutes it when the screen is off)', 'The play screen says if the screen may turn off, with the fix', 'Today: Drill these 5 now drills today\'s five lines'] },
   { v: '2.6.3', date: '2026-11-23', notes: ['If the microphone is muted when an answer starts or while you speak (it happened with the car microphone, through CarPlay), the app now waits a moment, then reopens the microphone and goes on recording. It shows a short note, and logs it in Setup, Help'] },
   { v: '2.6.2', date: '2026-11-20', notes: ['Fixed: a damaged audio file (shorter than it should be) made a part end early and jump to the finish screen. The app now checks the length, switches to the phone voice from that point, and says which file to replace'] },
@@ -781,7 +797,7 @@ function show(v) {
 var running = false, paused = false;
 function locked() { return running && !paused; }
 $('t-home').onclick = function () { if (!locked()) { show('home'); renderList(); homeData(false); } };
-$('t-review').onclick = function () { if (!locked()) { show('review'); if (!$('rv-ses').classList.contains('hide')) loadSes(); else if (!$('rv-use').classList.contains('hide')) loadReview(); peekInbox(); } };
+$('t-review').onclick = function () { if (!locked()) { show('review'); if (!$('rv-wk').classList.contains('hide')) loadWeekly(); else if (!$('rv-ses').classList.contains('hide')) loadSes(); else if (!$('rv-use').classList.contains('hide')) loadReview(); peekInbox(); } };
 $('t-guide').onclick = function () { if (!locked()) { show('guide'); var w = 'start'; try { w = localStorage.getItem('cc.setup') || (cfg.token ? 'start' : 'conn'); } catch (e) {} setupTab(w); loadGuide(); } };
 $('vtag').textContent = 'v' + APP_VERSION;
 
@@ -943,7 +959,8 @@ function renderAfter() {
   var open = fuOpenNow(), h = '';
   h += open.slice(0, 3).map(function (f) { return fuRow(f, true); }).join('');
   if (open.length > 3) h += '<button class="arow" data-after="fu">All ' + open.length + ' open follow-ups<span aria-hidden="true">&rsaquo;</span></button>';
-  var rp = reports.slice().sort(function (x, y) { return String(y.date).localeCompare(String(x.date)) || (Number([].concat(y.sessions || [])[0]) - Number([].concat(x.sessions || [])[0])); })[0], rs = rp && [].concat(rp.sessions || [])[0];
+  var wk0 = weeklies()[0]; if (wk0 && !wkHeard[wk0.id]) h += '<button class="arow" data-after="weekly">' + esc('Weekly review is ready' + (wkMin(wk0) ? ', ' + wkMin(wk0) + ' min to listen' : '')) + '<span aria-hidden="true">&rsaquo;</span></button>';
+  var rp = reports.filter(function (r) { return !isWeekly(r); }).sort(function (x, y) { return String(y.date).localeCompare(String(x.date)) || (Number([].concat(y.sessions || [])[0]) - Number([].concat(x.sessions || [])[0])); })[0], rs = rp && [].concat(rp.sessions || [])[0];
   if (rp && rs != null) h += '<button class="arow" data-after="page" data-n="' + esc(rs) + '">' + esc((Number(rs) > 999 ? 'Market brief' : 'Day ' + rs) + ' review is ready' + (rp.scores && rp.scores.overall != null ? ': ' + rp.scores.overall + ' out of 5' : '') + (hasReview(Number(rs)) ? ', with audio' : '')) + '<span aria-hidden="true">&rsaquo;</span></button>';
   h += '<button class="arow" data-after="sync">Pack new answers for Claude<span aria-hidden="true">&rsaquo;</span></button>';
   if (homeOld) h += '<div class="mut sm2">Follow-ups need backend v2.0 or later.</div>';
@@ -960,6 +977,7 @@ $('v-home').addEventListener('click', function (e) {
   else if (b.dataset.after === 'fu') { show('review'); subTab('ses'); loadSes(); }
   else if (b.dataset.after === 'page') { goPage(Number(b.dataset.n)); }
   else if (b.dataset.after === 'sync') { goFiles(); }
+  else if (b.dataset.after === 'weekly') { goWeekly(weeklies()[0].id, false); }
   else if (b.dataset.fuSkip) { setFu(b.dataset.fuSkip, 'skip'); }
 });
 $('v-home').addEventListener('change', function (e) { var c = e.target; if (c && c.dataset && c.dataset.fu) { setFu(c.dataset.fu, c.checked ? 'done' : 'open'); toast('Marked done. It stays on that day\'s page.'); } });
@@ -1671,9 +1689,10 @@ function keyOf(r) { return r.session + '|' + r.block + '|' + r.seq; }
 
 $('r-rep').onclick = function () { subTab('rep'); loadReports(); };
 function subTab(w) {
-  ['ses', 'fu', 'use', 'ans', 'rep'].forEach(function (x) { $('r-' + x).classList.toggle('on', x === w); $('rv-' + x).classList.toggle('hide', x !== w); });
+  ['ses', 'wk', 'fu', 'use', 'ans', 'rep'].forEach(function (x) { $('r-' + x).classList.toggle('on', x === w); $('rv-' + x).classList.toggle('hide', x !== w); });
 }
 $('r-use').onclick = function () { subTab('use'); loadReview(); };
+$('r-wk').onclick = function () { subTab('wk'); loadWeekly(); };
 $('r-ans').onclick = function () { subTab('ans'); loadHist(); };
 Array.prototype.forEach.call(document.querySelectorAll('#a-blocks button'), function (b) {
   b.onclick = function () { aBlock = b.dataset.b; Array.prototype.forEach.call(document.querySelectorAll('#a-blocks button'), function (x) { x.classList.toggle('on', x === b); }); renderHist(); };
@@ -1922,6 +1941,10 @@ function scoreBar(v) { v = Number(v) || 0; return '<span class="score"><i style=
 async function loadReports() {
   $('reports').innerHTML = '<div class="mut">Loading...</div>';
   try { reports = await call('reports'); } catch (e) { $('reports').textContent = /unknown action/.test(e.message) ? 'Reports need backend v1.7: paste the new Code.gs and deploy a new version.' : 'Could not load: ' + e.message; return; }
+  var reportsAll = reports; reports = reportsAll.filter(function (r) { return !isWeekly(r); });
+  try { loadReportsBody(); } finally { reports = reportsAll; }
+}
+function loadReportsBody() {
   if (!reports.length) { $('reports').innerHTML = '<div class="mut">No reports yet. Send an answer pack to Claude; the reply includes a report you import on the Sync tab.</div>'; return; }
   var trend = '<div class="card"><h2>Trend</h2><div class="tblwrap"><table><thead><tr><th>Date</th><th>Days</th><th class="n">Answers</th><th class="n">Overall</th><th class="n">Pace (wpm)</th><th class="n">Fillers/min</th></tr></thead><tbody>' +
     reports.map(function (r) { var m = r.metrics || {}, s = r.scores || {};
@@ -2879,7 +2902,7 @@ function todayLines() {
   lsSet('cc.tlines', { date: key, ids: pick.map(function (l) { return l.id; }) });
   return pick;
 }
-function latestReport() { return reports.slice().sort(function (a, b) { return String(b.date).localeCompare(String(a.date)) || String(b.id).localeCompare(String(a.id)); })[0]; }
+function latestReport() { return reports.filter(function (r) { return !isWeekly(r); }).sort(function (a, b) { return String(b.date).localeCompare(String(a.date)) || String(b.id).localeCompare(String(a.id)); })[0]; }
 function renderToday() {
   if (!$('v-today')) return;
   var d = new Date(); $('td-date').textContent = d.toLocaleDateString('en-US', { weekday: 'long', month: 'long', day: 'numeric' });
@@ -2904,6 +2927,15 @@ function renderToday() {
       (inf.intro ? '<div class="mut sm2 clamp2">' + esc(pretty(inf.intro)) + '</div>' : '') +
       (heard ? '<div class="td-row"><button class="alt" data-rv-play="' + rv.session + '">Play again</button><button class="alt" data-rv-page="' + rv.session + '">Read it</button></div>'
              : '<button class="go" data-rv-play="' + rv.session + '"><svg width="26" height="26" viewBox="0 0 24 24" aria-hidden="true"><path d="M7 4.5v15l12-7.5z" fill="#fff"/></svg>' + (st.p.pos || st.p.idx ? 'Continue the review' : 'Play the review') + (ri.min ? ', ' + ri.min + ' min' : '') + '</button><button class="link" data-rv-page="' + rv.session + '">Read it on ' + dayName(rv.session) + '\'s page</button>');
+  }
+  // weekly review: shown until heard, and for a week after it arrives
+  var wk = weeklies()[0], wkNew = wk && !wkHeard[wk.id], wkRecent = wk && (Date.now() - new Date(wk.date + 'T12:00:00').getTime()) < 8 * 86400000;
+  $('td-wk-w').classList.toggle('hide', !(wkNew || wkRecent));
+  if (wk && (wkNew || wkRecent)) {
+    $('td-wk').innerHTML = '<div class="hd">' + esc((wk.week ? wk.week + ' - ' : '') + (wkNew ? 'new' : 'heard')) + '</div><div class="td-t">' + esc(wk.title || 'Weekly review') + '</div>' +
+      (wk.summary ? '<div class="mut sm2 clamp2">' + esc(wk.summary) + '</div>' : '') +
+      (wkNew ? '<button class="go" data-wk-go="' + esc(wk.id) + '"><svg width="26" height="26" viewBox="0 0 24 24" aria-hidden="true"><path d="M7 4.5v15l12-7.5z" fill="#fff"/></svg>' + (wkPos(wk.id) ? 'Continue the weekly review' : 'Listen to the weekly review') + (wkMin(wk) ? ', ' + wkMin(wk) + ' min' : '') + '</button><button class="link" data-wk-open="' + esc(wk.id) + '">Read it</button>'
+             : '<div class="td-row"><button class="alt" data-wk-go="' + esc(wk.id) + '">Play again</button><button class="alt" data-wk-open="' + esc(wk.id) + '">Read it</button></div>');
   }
   // five lines
   var tl = todayLines();
@@ -2936,6 +2968,125 @@ $('v-today').addEventListener('click', function (e) {
 });
 $('t-today').onclick = function () { if (!locked()) { show('today'); renderToday(); homeData(false); if (!lines.length) todayLoadLines(); } };
 async function todayLoadLines() { if (linesOk === false) return; try { await loadLines(true); } catch (e) {} tdLinesTried = true; renderToday(); }
+
+/* ---- v2.7: weekly review from Claude ---- */
+function isWeekly(r) { return !!r && (r.kind === 'weekly' || /^wk:/.test(String(r.id || ''))); }
+function weeklies() { return reports.filter(isWeekly).sort(function (a, b) { return String(b.date).localeCompare(String(a.date)); }); }
+var wkHeard = lsGet('cc.wkheard', {}), wkMs = lsGet('cc.wkms', {}), wkP = null, wkCur = null, wkCaps = [], wkSeek = null, wkLast = 0;
+function wkMin(r) { var d = r && r.audio && r.audio.durationSec; return d ? Math.max(1, Math.round(d / 60)) : 0; }
+function wkPos(id) { return lsGet('cc.wkpos', {})[id] || 0; }
+function wkIdx(id) { var l = weeklies(); for (var i = 0; i < l.length; i++) if (l[i].id === id) return i; return -1; }
+function goWeekly(id, play) { if (play) wkPrime(); show('review'); subTab('wk'); loadWeekly(id, play); }
+$('td-wk').addEventListener('click', function (e) {
+  var b = e.target.closest('button'); if (!b) return;
+  if (b.dataset.wkGo) goWeekly(b.dataset.wkGo, true); else if (b.dataset.wkOpen) goWeekly(b.dataset.wkOpen, false);
+});
+async function loadWeekly(id, play) {
+  if (!weeklies().length) $('wk-view').innerHTML = '<div class="mut">Loading...</div>';
+  try { reports = await call('reports'); } catch (e) { if (!weeklies().length) { $('wk-view').textContent = 'Could not load: ' + e.message; return; } }
+  renderWeekly(id);
+  if (id && play) wkPlay(id);
+  if (id) { var el = $('wkb' + wkIdx(id)); if (el) { el.open = true; el.scrollIntoView({ block: 'start' }); } }
+}
+function wkFmt(t) { t = Math.max(0, Math.floor(t || 0)); return Math.floor(t / 60) + ':' + ('0' + (t % 60)).slice(-2); }
+function renderWeekly(openId) {
+  var list = weeklies();
+  if (!list.length) { $('wk-view').innerHTML = '<div class="card mut">No weekly review yet. Claude sends one every week, after your Friday session: save the reply file and its MP3 in Claude replies, then tap Sync all.</div>'; return; }
+  $('wk-view').innerHTML = list.map(function (r, i) {
+    var kws = r.keywords || [], tr = r.trend || [], conf = r.confidence || [], ms = r.milestones || [], open = openId ? r.id === openId : i === 0;
+    var mx = 5, mn = 2, best = tr.reduce(function (m, x) { return Math.max(m, Number(x.score) || 0); }, 0);
+    return '<details class="day rep wkr" id="wkb' + i + '"' + (open ? ' open' : '') + '><summary><div><b>' + esc(r.week || 'Weekly review') + '</b> <span class="mut">' + esc(r.title || '') + '</span></div><div class="mut sm2">' + esc(r.period || r.date || '') + (wkHeard[r.id] ? ' - heard' : ' - new') + '</div></summary>' +
+      (r.audio ? '<div class="wk-pl" data-wk-i="' + i + '"><button class="go wk-go" data-wk-play="' + esc(r.id) + '"><svg width="26" height="26" viewBox="0 0 24 24" aria-hidden="true"><path d="M7 4.5v15l12-7.5z" fill="#fff"/></svg>' + (wkPos(r.id) ? 'Continue listening' : 'Listen') + (wkMin(r) ? ', ' + wkMin(r) + ' min' : '') + '</button>' +
+        '<div class="wk-live hide"><div class="wk-ctl"><button class="alt" data-wk-skip="-15" aria-label="Back 15 seconds">-15</button><button class="alt wk-pp" data-wk-pp>Pause</button><button class="alt" data-wk-skip="15" aria-label="Forward 15 seconds">+15</button></div>' +
+        '<input type="range" class="wk-bar" min="0" max="' + Math.round((r.audio.durationSec || 0) * 10) + '" value="0" step="1" aria-label="Position"><div class="wk-time"><span class="wk-t0">0:00</span><span>' + wkFmt(r.audio.durationSec) + '</span></div><div class="wk-cap"></div></div><div class="wk-st"></div></div>' : '') +
+      (r.summary ? '<p>' + hl(r.summary, kws) + '</p>' : '') +
+      (tr.length ? '<h3>Answer score by day</h3><div class="wk-trend" role="img" aria-label="Answer scores by day">' + tr.map(function (x) { var v = Number(x.score) || 0; return '<div' + (v === best ? ' class="hi"' : '') + ' style="height:' + Math.max(4, Math.round((v - mn) / (mx - mn) * 100)) + '%" title="' + esc(x.label + ': ' + v) + '"></div>'; }).join('') + '</div><div class="wk-tl">' + tr.map(function (x) { return '<span>' + esc(String(x.label).replace(/^Day /, '')) + '</span>'; }).join('') + '</div><div class="mut sm2">Day number below each bar; height = score from 2 to 5. Latest: ' + esc(tr[tr.length - 1].score) + ' of 5.</div>' : '') +
+      (conf.length ? '<div class="dr-row"><b>Confidence:</b> ' + conf.map(function (c) { return esc(c.label + ' ' + c.value); }).join(' &rarr; ') + ' (of 10)</div>' : '') +
+      (r.built && r.built.length ? '<h3>What you built</h3><ul class="good">' + r.built.map(function (w) { return '<li>' + esc(w) + '</li>'; }).join('') + '</ul>' : '') +
+      (r.habits && r.habits.length ? '<h3>Habits to fix</h3><ul class="fix">' + r.habits.map(function (w) { return '<li>' + esc(w) + '</li>'; }).join('') + '</ul>' : '') +
+      (r.focus ? '<h3>The one thing this week</h3><div class="wk-one">' + esc(r.focus) + '</div>' : '') +
+      (r.plan && r.plan.length ? '<h3>The plan</h3><div class="tblwrap"><table><tbody>' + r.plan.map(function (p) { return '<tr><td style="white-space:nowrap"><b>' + esc(p.when || '') + '</b></td><td style="white-space:normal">' + esc(p.what || '') + '</td></tr>'; }).join('') + '</tbody></table></div>' : '') +
+      (ms.length ? '<h3>Milestones</h3><div class="wk-ms">' + ms.map(function (m, j) { var k = r.id + '|' + j, d = !!wkMs[k]; return '<label><input type="checkbox" data-wk-ms="' + esc(k) + '"' + (d ? ' checked' : '') + '><span' + (d ? ' class="done"' : '') + '><b>By ' + esc(m.by || '') + ':</b> ' + esc(m.what || '') + '</span></label>'; }).join('') + '</div>' : '') +
+      (r.audio ? '<details class="wk-read" data-wk-read="' + esc(r.id) + '"><summary>Read along: the full text of the audio</summary><div class="wk-rt mut">Open to load the text.</div></details>' : '') +
+      '</details>';
+  }).join('');
+  if (wkCur) wkUi();
+}
+$('wk-view').addEventListener('click', function (e) {
+  var b = e.target.closest('button'); if (!b) return; var d = b.dataset;
+  if (d.wkPlay) wkPlay(d.wkPlay);
+  else if (b.hasAttribute('data-wk-pp')) { if (!wkP) return; if (wkP.paused) wkP.play().catch(function (er) { logErr('weekly play: ' + er.message); }); else wkP.pause(); }
+  else if (d.wkSkip && wkP) { wkP.currentTime = Math.max(0, Math.min((wkP.duration || 1e9) - 0.5, wkP.currentTime + Number(d.wkSkip))); wkUi(); }
+});
+$('wk-view').addEventListener('change', function (e) {
+  var c = e.target;
+  if (c.dataset && c.dataset.wkMs) { if (c.checked) wkMs[c.dataset.wkMs] = new Date().toISOString().slice(0, 10); else delete wkMs[c.dataset.wkMs]; lsSet('cc.wkms', wkMs); c.nextElementSibling.classList.toggle('done', c.checked); }
+  else if (c.classList.contains('wk-bar') && wkP && wkCur) { var box = c.closest('.wk-pl'); if (box && weeklies()[Number(box.dataset.wkI)].id === wkCur) { wkP.currentTime = Number(c.value) / 10; wkUi(); } }
+});
+$('wk-view').addEventListener('toggle', async function (e) {
+  var dt = e.target; if (!dt.dataset || !dt.dataset.wkRead || !dt.open) return;
+  var r = weeklies()[wkIdx(dt.dataset.wkRead)], box = dt.querySelector('.wk-rt');
+  try {
+    if (!metaBy[0] || !metaBy[0][r.audio.block]) metaBy[0] = await call('audioMeta', { n: 0 });
+    var m = metaBy[0][r.audio.block];
+    if (!m) { box.textContent = 'The audio is not linked yet: save ' + r.audio.file + ' in Claude replies and tap Sync all.'; return; }
+    box.classList.remove('mut');
+    box.innerHTML = (m.captions || []).map(function (c, j) { return '<p data-wk-c="' + j + '">' + esc(c.text) + '</p>'; }).join('');
+  } catch (er) { box.textContent = 'Could not load the text: ' + er.message; }
+}, true);
+function wkPrime() { // unlock audio at the tap (iPhone allows play() later on the same element)
+  if (!wkP) {
+    wkP = new Audio(); wkP.preload = 'auto';
+    wkP.addEventListener('timeupdate', wkUi); wkP.addEventListener('play', wkUi); wkP.addEventListener('pause', wkUi);
+    wkP.addEventListener('loadedmetadata', function () { if (wkSeek != null) { try { wkP.currentTime = wkSeek; } catch (e) {} wkSeek = null; } });
+    wkP.addEventListener('ended', function () { wkMark(wkCur); wkSave(0); wkUi(); });
+    wkP.addEventListener('error', function () { if (wkP.src && wkP.src.indexOf('data:') !== 0) { wkStatus('The audio could not be played on this phone.'); logErr('weekly audio error'); } });
+  }
+  if (!wkCur) { try { wkP.src = SILENT; wkP.play().catch(function () {}); } catch (e) {} }
+}
+function wkStatus(t) { Array.prototype.forEach.call(document.querySelectorAll('#wk-view .wk-pl'), function (box) { var r = weeklies()[Number(box.dataset.wkI)]; if (r && r.id === (wkStatus.id || wkCur)) box.querySelector('.wk-st').textContent = t; }); }
+async function wkPlay(id) {
+  if (running) { toast('End the drive first, then play the weekly review.'); return; }
+  wkPrime();
+  var r = weeklies()[wkIdx(id)]; if (!r || !r.audio) return;
+  if (wkCur === id && wkP.src && wkP.src.indexOf('data:') !== 0) { wkP.play().catch(function (er) { wkStatus('Tap Play again: ' + er.message); }); return; }
+  wkStatus.id = id; wkStatus('Getting the audio...');
+  try {
+    if (!metaBy[0] || !metaBy[0][r.audio.block]) metaBy[0] = await call('audioMeta', { n: 0 });
+    var m = metaBy[0][r.audio.block];
+    if (!m) { wkStatus('The audio is not in Drive yet: save ' + r.audio.file + ' in Drive > Commute Coach audio > Claude replies, then tap Sync all.'); return; }
+    var url = await fetchAudio(m, function (d, n) { wkStatus('Preparing audio... ' + d + '/' + n); });
+    if (wkCur && wkCur !== id) wkSave(wkP.currentTime);
+    wkCur = id; wkCaps = m.captions || []; var pos = wkPos(id); wkSeek = pos && pos < (m.durationSec || 1e9) - 5 ? pos : null;
+    wkP.src = url;
+    try { if ('mediaSession' in navigator) navigator.mediaSession.metadata = new MediaMetadata({ title: r.title || 'Weekly review', artist: 'Claude', album: 'Commute Coach' }); } catch (e) {}
+    await wkP.play();
+    wkStatus(''); wkUi();
+  } catch (e) { wkStatus('Could not play: ' + e.message + '. Tap Listen again.'); logErr('weekly: ' + e.message); }
+  finally { wkStatus.id = null; }
+}
+function wkSave(t) { var p = lsGet('cc.wkpos', {}); if (t > 3) p[wkCur] = Math.round(t); else delete p[wkCur]; lsSet('cc.wkpos', p); }
+function wkMark(id) { if (id && !wkHeard[id]) { wkHeard[id] = new Date().toISOString().slice(0, 10); lsSet('cc.wkheard', wkHeard); try { renderToday(); } catch (e) {} var el = $('wkb' + wkIdx(id)), sm = el && el.querySelector('summary .sm2'); if (sm) sm.textContent = sm.textContent.replace(/ - new$/, ' - heard'); } }
+function wkUi() {
+  if (!wkP || !wkCur) return;
+  var t = wkP.currentTime || 0, dur = wkP.duration || 0;
+  if (Date.now() - wkLast > 4000) { wkLast = Date.now(); if (!wkP.ended) wkSave(t); }
+  if (dur && t > dur * 0.9) wkMark(wkCur);
+  var cap = '', ci = -1; for (var j = 0; j < wkCaps.length; j++) if (wkCaps[j].t0 <= t + 0.05) { ci = j; if (t <= wkCaps[j].t1 + 1.5) cap = wkCaps[j].text; }
+  Array.prototype.forEach.call(document.querySelectorAll('#wk-view .wk-pl'), function (box) {
+    var r = weeklies()[Number(box.dataset.wkI)], me = r && r.id === wkCur, live = box.querySelector('.wk-live'), go = box.querySelector('.wk-go');
+    live.classList.toggle('hide', !me); go.classList.toggle('hide', me);
+    if (!me) return;
+    box.querySelector('.wk-pp').textContent = wkP.paused ? (wkP.ended ? 'Play again' : 'Play') : 'Pause';
+    var bar = box.querySelector('.wk-bar'); if (document.activeElement !== bar) bar.value = Math.round(t * 10);
+    box.querySelector('.wk-t0').textContent = wkFmt(t); box.querySelector('.wk-cap').textContent = cap;
+  });
+  var rd = document.querySelector('#wk-view [data-wk-read="' + String(wkCur).replace(/"/g, '') + '"]');
+  if (rd && rd.open) Array.prototype.forEach.call(rd.querySelectorAll('p[data-wk-c]'), function (p) { p.classList.toggle('on', Number(p.dataset.wkC) === ci); });
+}
+var startParts0 = startParts, startDrill0 = startDrill;
+startParts = function () { if (wkP && !wkP.paused) wkP.pause(); return startParts0.apply(this, arguments); };
+startDrill = function () { if (wkP && !wkP.paused) wkP.pause(); return startDrill0.apply(this, arguments); };
 
 /* ---- staying alive when you switch apps ---- */
 var errLog = lsGet('cc.errs', []);
